@@ -1,16 +1,13 @@
 package pansong291.xposed.quickenergy;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.text.TextUtils;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import android.app.AlertDialog;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class AliMobileAutoCollectEnergyUtils
 {
@@ -47,7 +44,7 @@ public class AliMobileAutoCollectEnergyUtils
   boolean isSucc = parseFrienRankPageDataResponse(response);
   if (isSucc)
   {
-   showToast("开始获取可以收取能量的好友信息...");
+   showDialog("开始获取可以收取能量的好友信息...", "");
    new Thread(new Runnable() {
      public void run()
      {
@@ -62,21 +59,19 @@ public class AliMobileAutoCollectEnergyUtils
    //如果发现已经解析完成了，如果有好友能量收取，就开始收取
    if (friendsRankUseridList.size() > 0)
    {
-    showToast("开始获取每个好友能够偷取的能量信息...");
+    showDialog("开始获取每个好友能够偷取的能量信息...", "");
     for (String userId : friendsRankUseridList)
     {
      // 开始收取每个用户的能量
      rpcCall_CanCollectEnergy(loader, userId);
     }
-    showToast("共收取能量：" + collectedEnergy + "克");
-    Log.i(TAG, "共收取能量：" + collectedEnergy + "克");
+    showDialog("共收取能量：" + collectedEnergy + "克，共帮收能量：" + helpCollectedEnergy + "克", "");
     friendsRankUseridList.clear();
     collectedEnergy = 0;
     Log.i(TAG, "能量收取结束");
    }else
    {
-    showToast("暂时没有可偷取的能量");
-    Log.i(TAG, "暂时没有可偷取的能量");
+    showDialog("暂时没有可偷取的能量", "");
    }
    // 执行完了调用刷新页面，看看总能量效果
    // refreshWebView();
@@ -135,7 +130,7 @@ public class AliMobileAutoCollectEnergyUtils
   */
  private static void refreshWebView()
  {
-  showToast("一共收取了" + collectedEnergy + "g能量");
+  showDialog("一共收取了" + collectedEnergy + "g能量", "");
   isWebViewRefresh = true;
  }
 
@@ -168,7 +163,8 @@ public class AliMobileAutoCollectEnergyUtils
     for (int i = 0; i < optJSONArray.length(); i++)
     {
      JSONObject jsonObject = optJSONArray.getJSONObject(i);
-     boolean optBoolean = jsonObject.optBoolean("canCollectEnergy");
+     boolean optBoolean = jsonObject.optBoolean("canCollectEnergy")
+      || jsonObject.optBoolean("canHelpCollect");
      String userId = jsonObject.optString("userId");
      if (optBoolean && !friendsRankUseridList.contains(userId))
      {
@@ -270,13 +266,11 @@ public class AliMobileAutoCollectEnergyUtils
 
    Object resp = rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.collectEnergy", jsonArray.toString(),
     "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
-   Method method = resp.getClass().getMethod("getResponse");
-   String response = (String) method.invoke(resp);
+   String response = (String)resp.getClass().getMethod("getResponse").invoke(resp);
    int collect = parseCollectEnergyResponse(response, false);
    if(collect > 0)
    {
-    showToast("收取【" + userName + "】的能量【" + collect + "克】");
-    Log.i(TAG, "收取【" + userName + "】的能量【" + collect + "克】，UserID：" + userId + "，BubbleId：" + bubbleId);
+    showDialog("收取【" + userName + "】的能量【" + collect + "克】", "，UserID：" + userId + "，BubbleId：" + bubbleId);
    }else
    {
     Log.i(TAG, "收取【" + userName + "】的能量失败，UserID：" + userId + "，BubbleId：" + bubbleId);
@@ -306,20 +300,18 @@ public class AliMobileAutoCollectEnergyUtils
    json.put("bubbleIds", bubbleAry);
    json.put("targetUserId", targetUserId);
    jsonArray.put(json);
+   Log.i(TAG, "call help collect energy params:" + jsonArray);
    Object resp = rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.forFriendCollectEnergy", jsonArray.toString(),
     "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
    String response = (String)resp.getClass().getMethod("getResponse").invoke(resp);
    int helped = parseCollectEnergyResponse(response, true);
    if (helped > 0)
    {
-    showToast("帮【" + userName + "】收取【" + helped + "克】");
-    Log.i(TAG, "帮【" + userName + "】收取【" + helped + "克】，UserID：" + targetUserId + "，BubbleId" + bubbleId);
+    showDialog("帮【" + userName + "】收取【" + helped + "克】", "，UserID：" + targetUserId + "，BubbleId：" + bubbleId);
    }else
    {
     Log.i(TAG, "帮【" + userName + "】收取失败，UserID：" + targetUserId + "，BubbleId" + bubbleId);
    }
-
-   Log.i("rpc帮助收取返回数据", response);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_ForFriendCollectEnergy err: " + e.getMessage());
@@ -385,8 +377,9 @@ public class AliMobileAutoCollectEnergyUtils
   return -1;
  }
 
- private static void showToast(final String str)
+ private static void showDialog(final String str, String str2)
  {
+  Log.i(TAG, str + str2);
   if(h5Activity != null)
   {
    try
