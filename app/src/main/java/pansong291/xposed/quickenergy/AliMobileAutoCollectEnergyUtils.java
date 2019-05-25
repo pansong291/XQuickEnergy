@@ -65,7 +65,7 @@ public class AliMobileAutoCollectEnergyUtils
      // 开始收取每个用户的能量
      rpcCall_CanCollectEnergy(loader, userId);
     }
-    showDialog("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "】克\n", "");
+    showDialog("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
     friendsRankUseridList.clear();
     collectedEnergy = 0;
     helpCollectedEnergy = 0;
@@ -409,7 +409,7 @@ public class AliMobileAutoCollectEnergyUtils
      });
    }catch(Exception e)
    {
-    Log.i(TAG, "showToast err: " + e.getMessage());
+    Log.i(TAG, "showDialog err: " + e.getMessage());
    }
   }
  }
