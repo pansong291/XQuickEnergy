@@ -21,5 +21,4 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('/storage/emulated/0/AppLibrarys/xposed_api_82_dis.jar')
 }

@@ -41,8 +41,8 @@ public class AliMobileAutoCollectEnergyUtils
    return;
   }/**/
   // 开始解析好友信息，循环把所有有能量的好友信息都解析完
-  boolean isSucc = parseFrienRankPageDataResponse(response);
-  if (isSucc)
+  boolean hasMore = parseFrienRankPageDataResponse(response);
+  if (hasMore)
   {
    showDialog("开始获取可以收取能量的好友信息...", "");
    new Thread(new Runnable() {
@@ -54,7 +54,6 @@ public class AliMobileAutoCollectEnergyUtils
     }).start();
   } else
   {
-   pageCount = 0;
    Log.i(TAG, "friendsRankUseridList " + friendsRankUseridList);
    //如果发现已经解析完成了，如果有好友能量收取，就开始收取
    if (friendsRankUseridList.size() > 0)
@@ -66,10 +65,15 @@ public class AliMobileAutoCollectEnergyUtils
      rpcCall_CanCollectEnergy(loader, userId);
     }
     showDialog("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
-    friendsRankUseridList.clear();
-    collectedEnergy = 0;
-    helpCollectedEnergy = 0;
     Log.i(TAG, "能量收取结束");
+    friendsRankUseridList.clear();
+    pageCount = 0;
+    collectedEnergy = 0;
+    if(helpCollectedEnergy != 0)
+    {
+     helpCollectedEnergy = 0;
+     autoGetCanCollectUserIdList(loader, null);
+    }
    }else
    {
     showDialog("暂时没有可收取的能量\n", "");
@@ -155,11 +159,9 @@ public class AliMobileAutoCollectEnergyUtils
  {
   try
   {
-   JSONArray optJSONArray = new JSONObject(response).optJSONArray("friendRanking");
-   if (optJSONArray == null || optJSONArray.length() == 0)
-   {
-    return false;
-   } else
+   JSONObject jo = new JSONObject(response);
+   JSONArray optJSONArray = jo.optJSONArray("friendRanking");
+   if (optJSONArray != null)
    {
     for (int i = 0; i < optJSONArray.length(); i++)
     {
@@ -172,6 +174,9 @@ public class AliMobileAutoCollectEnergyUtils
       friendsRankUseridList.add(userId);
      }
     }
+    if(optJSONArray.length() == 0)
+     return false;
+    return jo.optBoolean("hasMore");
    }
   } catch (Exception e)
   {
