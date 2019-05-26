@@ -54,6 +54,7 @@ public class AliMobileAutoCollectEnergyUtils
     }).start();
   } else
   {
+   pageCount = 0;
    Log.i(TAG, "friendsRankUseridList " + friendsRankUseridList);
    //如果发现已经解析完成了，如果有好友能量收取，就开始收取
    if (friendsRankUseridList.size() > 0)
@@ -67,7 +68,6 @@ public class AliMobileAutoCollectEnergyUtils
     showDialog("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
     Log.i(TAG, "能量收取结束");
     friendsRankUseridList.clear();
-    pageCount = 0;
     collectedEnergy = 0;
     if(helpCollectedEnergy != 0)
     {
