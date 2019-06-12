@@ -15,7 +15,7 @@
         <!-- 模块描述 -->
         <meta-data
             android:name="xposeddescription"
-            android:value="蚂蚁森林快速收取能量" />
+            android:value="蚂蚁森林快速收取能量\n（适配支付宝 10.1.65.6567）" />
 
         <!-- XposedBridgeApi的最低版本号 -->
         <meta-data

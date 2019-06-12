@@ -108,7 +108,7 @@ public class XposedHook implements IXposedHookLoadPackage
      });
    }
 
-   clazz = loader.loadClass("com.alipay.mobile.nebulabiz.rpc.H5RpcUtil");
+   clazz = loader.loadClass("com.alipay.mobile.nebulaappproxy.api.rpc.H5RpcUtil");
    if(clazz != null)
    {
     first = true;

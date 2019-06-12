@@ -337,7 +337,7 @@ public class AliMobileAutoCollectEnergyUtils
    curH5PageImpl = hF.get(viewHolder);
    Class<?> h5PageClazz = loader.loadClass("com.alipay.mobile.h5container.api.H5Page");
    Class<?> jsonClazz = loader.loadClass("com.alibaba.fastjson.JSONObject");
-   Class<?> rpcClazz = loader.loadClass("com.alipay.mobile.nebulabiz.rpc.H5RpcUtil");
+   Class<?> rpcClazz = loader.loadClass("com.alipay.mobile.nebulaappproxy.api.rpc.H5RpcUtil");
    if (curH5PageImpl != null)
    {
     Method callM = rpcClazz.getMethod("rpcCall", String.class, String.class, String.class,
