@@ -1,18 +1,18 @@
 package pansong291.xposed.quickenergy;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.text.TextUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import static pansong291.xposed.quickenergy.Log.showDialog;
 
 public class AliMobileAutoCollectEnergyUtils
 {
 
- private static String TAG = "AliMobileAutoCollectEnergyUtils";
+ private static String TAG = AliMobileAutoCollectEnergyUtils.class.getCanonicalName();
  private static ArrayList<String> friendsRankUseridList = new ArrayList<String>();
  private static boolean isWebViewRefresh;
  private static Integer collectedEnergy = 0;
@@ -21,8 +21,6 @@ public class AliMobileAutoCollectEnergyUtils
  private static Object curH5PageImpl;
  public static Object curH5Fragment;
  public static Activity h5Activity;
- private static AlertDialog dlg;
- private static StringBuffer sb;
 
 
  /**
@@ -74,6 +72,7 @@ public class AliMobileAutoCollectEnergyUtils
      helpCollectedEnergy = 0;
      autoGetCanCollectUserIdList(loader, null);
     }
+    Config.saveIdMap();
    }else
    {
     showDialog("暂时没有可收取的能量\n", "");
@@ -103,19 +102,33 @@ public class AliMobileAutoCollectEnergyUtils
      for (int i = 0; i < jsonArray.length(); i++)
      {
       JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+      String userId = jsonObject1.optString("userId");
+      long bubbleId = jsonObject1.optLong("id");
+      Config.putIdMap(userId, userName);
       if ("AVAILABLE".equals(jsonObject1.optString("collectStatus")))
       {
-       rpcCall_CollectEnergy(loader, jsonObject1.optString("userId"), jsonObject1.optLong("id"), userName);
+       if(Config.dontCollect(userId))
+        Log.showDialog("不偷取【" + userName + "】", ", userId=" + userId);
+       else
+        rpcCall_CollectEnergy(loader, userId, bubbleId, userName);
       }
       if (jsonObject1.optBoolean("canHelpCollect"))
       {
-       rpcCall_ForFriendCollectEnergy(loader, jsonObject1.optString("userId"), jsonObject1.optLong("id"), userName);
+       if(Config.helpFriend())
+       {
+         if(Config.dontHelp(userId))
+          Log.showDialog("不帮收【" + userName + "】", ", userId=" + userId);
+         else
+          rpcCall_ForFriendCollectEnergy(loader, userId, bubbleId, userName);
+       }else
+        Log.showDialog("不帮收【" + userName + "】", ", userId=" + userId);
       }
      }
     }
 
    } catch (Exception e)
    {
+    Log.i(TAG, e.getMessage());
    }
   }
  }
@@ -383,50 +396,6 @@ public class AliMobileAutoCollectEnergyUtils
   return -1;
  }
 
- private static void showDialog(final String str, String str2)
- {
-  Log.i(TAG, str + str2);
-  if(h5Activity != null)
-  {
-   try
-   {
-    h5Activity.runOnUiThread(new Runnable()
-    {
-      public void run()
-      {
-       if(sb == null)
-        sb = new StringBuffer();
-       if(dlg == null)
-        dlg = createNewDialog();
-       if(!dlg.isShowing())
-        try{
-         dlg.show();
-        }catch(Exception e)
-        {
-         Log.i(TAG, "Dialog show error: "+e.getMessage());
-         dlg = createNewDialog();
-         dlg.show();
-         sb.delete(0, sb.length());
-        }
-       sb.append(str).append('\n');
-       dlg.setMessage(sb.toString());
-      }
-     });
-   }catch(Exception e)
-   {
-    Log.i(TAG, "showDialog err: " + e.getMessage());
-   }
-  }
- }
  
- private static AlertDialog createNewDialog()
- {
-  return new AlertDialog.Builder(h5Activity)
-   .setTitle("XQuickEnergy")
-   .setMessage("")
-   .setCancelable(false)
-   .setPositiveButton("OK", null)
-   .create();
- }
  
 }

@@ -15,7 +15,7 @@ public class XposedHook implements IXposedHookLoadPackage
 {
 
  private static boolean first = false;
- private static String TAG = "quickenergy.XposedHook";
+ private static String TAG = XposedHook.class.getCanonicalName();
 
  @Override
  public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
@@ -66,6 +66,7 @@ public class XposedHook implements IXposedHookLoadPackage
   }catch(Exception e2)
   {
    Log.i(TAG, "hookRpcCall err:" + e2.getMessage());
+   //Log.showDialog("hook出错：\n" + e2.getMessage(), "");
   }
  }
 
@@ -92,7 +93,13 @@ public class XposedHook implements IXposedHookLoadPackage
         AliMobileAutoCollectEnergyUtils.curH5Fragment = param.args[0];
        }
       });
+    }else
+    {
+     Log.i(TAG, "hook出错：\ncouldn't find class com.alipay.mobile.nebulacore.ui.H5Fragment");
     }
+   }else
+   {
+    Log.i(TAG, "hook出错：\ncouldn't find class com.alipay.mobile.nebulacore.ui.H5FragmentManager");
    }
 
    clazz = loader.loadClass("com.alipay.mobile.nebulacore.ui.H5Activity");
@@ -106,6 +113,9 @@ public class XposedHook implements IXposedHookLoadPackage
        AliMobileAutoCollectEnergyUtils.h5Activity = (Activity) param.thisObject;
       }
      });
+   }else
+   {
+    Log.i(TAG, "hook出错：\ncouldn't find class com.alipay.mobile.nebulacore.ui.H5Activity");
    }
 
    clazz = loader.loadClass("com.alipay.mobile.nebulaappproxy.api.rpc.H5RpcUtil");
@@ -117,42 +127,55 @@ public class XposedHook implements IXposedHookLoadPackage
     Class<?> jsonClazz = loader.loadClass("com.alibaba.fastjson.JSONObject");
     if(h5PageClazz != null && jsonClazz != null)
     {
-     XposedHelpers.findAndHookMethod(clazz, "rpcCall", String.class, String.class, String.class,
-      boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
-      int.class, String.class, boolean.class, int.class, new XC_MethodHook()
-      {
-       @Override
-       protected void beforeHookedMethod(MethodHookParam param) throws Throwable
+     try
+     {
+      XposedHelpers.findAndHookMethod(clazz, "rpcCall", String.class, String.class, String.class,
+       boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
+       int.class, String.class, boolean.class, int.class, new XC_MethodHook()
        {
-       // Log.i(TAG, "param" + param.args);
-       }
-
-       @Override
-       protected void afterHookedMethod(MethodHookParam param) throws Throwable
-       {
-        Object resp = param.getResult();
-        if(resp != null)
+        @Override
+        protected void beforeHookedMethod(MethodHookParam param) throws Throwable
         {
-         Method method = resp.getClass().getMethod("getResponse");
-         String response = (String) method.invoke(resp);
-         Log.i(TAG, "response: " + response);
+         // Log.i(TAG, "param" + param.args);
+        }
 
-         if(AliMobileAutoCollectEnergyUtils.isRankList(response))
+        @Override
+        protected void afterHookedMethod(MethodHookParam param) throws Throwable
+        {
+         Object resp = param.getResult();
+         if(resp != null)
          {
-          Log.i(TAG, "autoGetCanCollectUserIdList");
-          AliMobileAutoCollectEnergyUtils.autoGetCanCollectUserIdList(loader, response);
-         }
+          Method method = resp.getClass().getMethod("getResponse");
+          String response = (String) method.invoke(resp);
+          Log.i(TAG, "response: " + response);
 
-         // 第一次是自己的能量，比上面的获取用户信息还要早，所有这里需要记录当前自己的userid值
-         if(AliMobileAutoCollectEnergyUtils.isUserDetail(response))
-         {
-          Log.i(TAG, "autoGetCanCollectBubbleIdList");
-          AliMobileAutoCollectEnergyUtils.autoGetCanCollectBubbleIdList(loader, response);
+          if(AliMobileAutoCollectEnergyUtils.isRankList(response))
+          {
+           Log.i(TAG, "autoGetCanCollectUserIdList");
+           AliMobileAutoCollectEnergyUtils.autoGetCanCollectUserIdList(loader, response);
+          }
+
+          // 第一次是自己的能量，比上面的获取用户信息还要早，所有这里需要记录当前自己的userid值
+          if(AliMobileAutoCollectEnergyUtils.isUserDetail(response))
+          {
+           Log.i(TAG, "autoGetCanCollectBubbleIdList");
+           AliMobileAutoCollectEnergyUtils.autoGetCanCollectBubbleIdList(loader, response);
+          }
          }
         }
-       }
-      });
+       });
+     }catch(Exception e)
+     {
+      Log.i(TAG, "hook rpcCall err:" + e.getMessage());
+      Log.showDialog("hook出错：\n" + e.getMessage(), "");
+     }
+    }else
+    {
+     Log.showDialog("hook出错：\ncouldn't find class com.alipay.mobile.h5container.api.H5Page or com.alibaba.fastjson.JSONObject", "");
     }
+   }else
+   {
+    Log.showDialog("hook出错：\ncouldn't find class com.alipay.mobile.nebulaappproxy.api.rpc.H5RpcUtil", "");
    }
   }
  }
