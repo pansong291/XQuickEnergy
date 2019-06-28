@@ -13,7 +13,7 @@ public class Config
  public List<String> dontHelpList;
  
  private static Config config;
- private static Map<String, String> idMap;
+ private static Map idMap;
  private static boolean hasIdMapChanged = false;
  
  public static boolean helpFriend()

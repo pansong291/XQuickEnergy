@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.TreeSet;
 
 public class FileUtils
 {
@@ -87,24 +88,25 @@ public class FileUtils
   {
    JSONObject jo = new JSONObject(json);
    config = new Config();
+   
    config.helpFriend = jo.optBoolean(js_helpFriend);
    Log.i(TAG, js_helpFriend + ":" + config.helpFriend);
-   
-   JSONArray ja1 = jo.optJSONArray(js_dontCollectList);
+      
+   JSONArray jaDC = jo.optJSONArray(js_dontCollectList);
    config.dontCollectList = new ArrayList<>();
    Log.i(TAG, js_dontCollectList + ":[");
-   for(int i = 0; i < ja1.length(); i++)
+   for(int i = 0; i < jaDC.length(); i++)
    {
-    config.dontCollectList.add(ja1.optString(i));
+    config.dontCollectList.add(jaDC.optString(i));
     Log.i(TAG, config.dontCollectList.get(i)+",");
    }
    
-   JSONArray ja2 = jo.optJSONArray(js_dontHelpList);
+   JSONArray jaDH = jo.optJSONArray(js_dontHelpList);
    config.dontHelpList = new ArrayList<>();
    Log.i(TAG, js_dontHelpList + ":[");
-   for(int i = 0; i < ja2.length(); i++)
+   for(int i = 0; i < jaDH.length(); i++)
    {
-    config.dontHelpList.add(ja2.optString(i));
+    config.dontHelpList.add(jaDH.optString(i));
     Log.i(TAG, config.dontHelpList.get(i)+",");
    }
   }catch(Exception e)
@@ -120,24 +122,23 @@ public class FileUtils
   JSONObject jo = new JSONObject();
   try
   {
-   if(config != null)jo.put(js_helpFriend, config.helpFriend);
-   else jo.put(js_helpFriend, true);
+   if(config == null) config = Config.defInit();
    
-   JSONArray ja1 = new JSONArray();
-   if(config != null && config.dontCollectList != null)
+   jo.put(js_helpFriend, config.helpFriend);
+      
+   JSONArray jaDC = new JSONArray();
    for(String s: config.dontCollectList)
    {
-    ja1.put(s);
+    jaDC.put(s);
    }
-   jo.put(js_dontCollectList, ja1);
+   jo.put(js_dontCollectList, jaDC);
    
-   JSONArray ja2 = new JSONArray();
-   if(config != null && config.dontHelpList != null)
-    for(String s: config.dontHelpList)
-    {
-     ja2.put(s);
-    }
-   jo.put(js_dontHelpList, ja2);
+   JSONArray jaDH = new JSONArray();
+   for(String s: config.dontHelpList)
+   {
+    jaDH.put(s);
+   }
+   jo.put(js_dontHelpList, jaDH);
   }catch(Exception e)
   {
    e.printStackTrace();

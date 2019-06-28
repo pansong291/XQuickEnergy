@@ -78,7 +78,6 @@ public class AliMobileAutoCollectEnergyUtils
     showDialog("暂时没有可收取的能量\n", "");
    }
    // 执行完了调用刷新页面，看看总能量效果
-   // refreshWebView();
   }
  }
 
@@ -96,7 +95,11 @@ public class AliMobileAutoCollectEnergyUtils
    {
     JSONObject jsonObject = new JSONObject(response);
     JSONArray jsonArray = jsonObject.optJSONArray("bubbles");
-    String userName = jsonObject.getJSONObject("userEnergy").getString("displayName");
+    jsonObject = jsonObject.getJSONObject("userEnergy");
+    String userName = jsonObject.getString("displayName");
+    String loginId = userName;
+    if(jsonObject.has("loginId"))
+     loginId += "(" + jsonObject.getString("loginId") + ")";
     if (jsonArray != null && jsonArray.length() > 0)
     {
      for (int i = 0; i < jsonArray.length(); i++)
@@ -104,7 +107,7 @@ public class AliMobileAutoCollectEnergyUtils
       JSONObject jsonObject1 = jsonArray.getJSONObject(i);
       String userId = jsonObject1.optString("userId");
       long bubbleId = jsonObject1.optLong("id");
-      Config.putIdMap(userId, userName);
+      Config.putIdMap(userId, loginId);
       if ("AVAILABLE".equals(jsonObject1.optString("collectStatus")))
       {
        if(Config.dontCollect(userId))
@@ -292,7 +295,7 @@ public class AliMobileAutoCollectEnergyUtils
     showDialog("偷取【" + userName + "】的能量【" + collect + "克】", "，UserID：" + userId + "，BubbleId：" + bubbleId);
    }else
    {
-    Log.i(TAG, "偷取【" + userName + "】的能量失败，UserID：" + userId + "，BubbleId：" + bubbleId);
+    showDialog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
    }
   }catch(Exception e)
   {
@@ -329,7 +332,7 @@ public class AliMobileAutoCollectEnergyUtils
     showDialog("帮【" + userName + "】收取【" + helped + "克】", "，UserID：" + targetUserId + "，BubbleId：" + bubbleId);
    }else
    {
-    Log.i(TAG, "帮【" + userName + "】收取失败，UserID：" + targetUserId + "，BubbleId" + bubbleId);
+    showDialog("帮【" + userName + "】收取失败", "，UserID：" + targetUserId + "，BubbleId" + bubbleId);
    }
   }catch(Exception e)
   {

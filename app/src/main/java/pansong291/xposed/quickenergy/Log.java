@@ -12,17 +12,25 @@ public class Log
  
  public static void i(String s, String s2)
  {
-  XposedBridge.log(s + ", " + s2);
+  StringBuilder sb = new StringBuilder(s + ", " + s2);
+  for(int i = 0; i < sb.length(); i += 2000)
+  {
+   if(sb.length() < i + 2000)
+    XposedBridge.log(sb.substring(i, sb.length()));
+   else
+    XposedBridge.log(sb.substring(i, i + 2000));
+  }
  }
  
  public static void showDialog(final String str, String str2)
  {
   Log.i(TAG, str + str2);
-  if(AliMobileAutoCollectEnergyUtils.h5Activity != null)
+  Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
+  if(activity != null)
   {
    try
    {
-    AliMobileAutoCollectEnergyUtils.h5Activity.runOnUiThread(new Runnable()
+    activity.runOnUiThread(new Runnable()
      {
       public void run()
       {
@@ -53,10 +61,10 @@ public class Log
 
  private static AlertDialog createNewDialog()
  {
-  return new AlertDialog.Builder(AliMobileAutoCollectEnergyUtils.h5Activity)
+  Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
+  return new AlertDialog.Builder(activity)
    .setTitle("XQuickEnergy")
    .setMessage("")
-   .setCancelable(false)
    .setPositiveButton("OK", null)
    .create();
  }
