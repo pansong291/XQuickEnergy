@@ -89,7 +89,7 @@ public class XposedHook implements IXposedHookLoadPackage
        @Override
        protected void afterHookedMethod(MethodHookParam param) throws Throwable
        {
-        Log.i("fragment", "cur fragment: " + param.args[0]);
+        Log.i(TAG, "cur fragment: " + param.args[0]);
         AliMobileAutoCollectEnergyUtils.curH5Fragment = param.args[0];
        }
       });
@@ -110,6 +110,7 @@ public class XposedHook implements IXposedHookLoadPackage
       @Override
       protected void afterHookedMethod(MethodHookParam param) throws Throwable
       {
+       Log.i(TAG, "cur activity: " + param.thisObject);
        AliMobileAutoCollectEnergyUtils.h5Activity = (Activity) param.thisObject;
       }
      });
@@ -131,7 +132,7 @@ public class XposedHook implements IXposedHookLoadPackage
      {
       XposedHelpers.findAndHookMethod(clazz, "rpcCall", String.class, String.class, String.class,
        boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
-       int.class, String.class, boolean.class, int.class, new XC_MethodHook()
+       int.class, String.class, boolean.class, int.class, String.class, new XC_MethodHook()
        {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) throws Throwable

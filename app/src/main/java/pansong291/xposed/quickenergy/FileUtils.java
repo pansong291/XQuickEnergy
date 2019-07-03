@@ -224,6 +224,24 @@ public class FileUtils
   return success;
  }
  
+ public static boolean append2File(String s, File f)
+ {
+  boolean success = false;
+  FileWriter fw = null;
+  try
+  {
+   fw = new FileWriter(f, true);
+   fw.append(s);
+   fw.flush();
+   success = true;
+  }catch(Exception e)
+  {
+   e.printStackTrace();
+  }
+  close(fw);
+  return success;
+ }
+ 
  public static void close(Closeable c)
  {
   try

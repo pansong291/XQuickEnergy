@@ -9,7 +9,13 @@ public class Log
  private static String TAG = Log.class.getCanonicalName();
  private static AlertDialog dlg;
  private static StringBuffer sb;
- 
+ /*
+  Intent it = new Intent();
+  it.setAction(it.ACTION_VIEW);
+  it.addFlags(it.FLAG_INCLUDE_STOPPED_PACKAGES);
+  it.addFlags(it.FLAG_RECEIVER_FOREGROUND);
+  it.setData(Uri.parse("alipays://platformapi/startapp?appId=60000002"));
+ */
  public static void i(String s, String s2)
  {
   StringBuilder sb = new StringBuilder(s + ", " + s2);
