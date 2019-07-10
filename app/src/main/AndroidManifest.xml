@@ -22,6 +22,18 @@
             android:name="xposedminversion"
             android:value="54" />
 
+        <activity
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:name=".MainActivity"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.MAIN" />
+                <category
+                    android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
+            </intent-filter>
+        </activity>
+        
     </application>
 
 </manifest>
