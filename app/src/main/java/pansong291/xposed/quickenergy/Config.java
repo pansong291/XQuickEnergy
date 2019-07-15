@@ -6,9 +6,16 @@ import java.util.Map;
 
 public class Config
 {
+ public enum ShowMode
+ {
+  dialog, toast
+ }
+ 
  public static final String TAG = Config.class.getCanonicalName();
  public boolean defInit;
  public boolean helpFriend;
+ public ShowMode showMode;
+ public boolean recordLog;
  public List<String> dontCollectList;
  public List<String> dontHelpList;
  
@@ -19,6 +26,16 @@ public class Config
  public static boolean helpFriend()
  {
   return getConfig().helpFriend;
+ }
+ 
+ public static ShowMode showMode()
+ {
+  return getConfig().showMode;
+ }
+ 
+ public static boolean recordLog()
+ {
+  return getConfig().recordLog;
  }
  
  public static boolean dontCollect(String id)
@@ -75,6 +92,8 @@ public class Config
   Config c = new Config();
   c.defInit = true;
   c.helpFriend = true;
+  c.showMode = ShowMode.dialog;
+  c.recordLog = false;
   c.dontCollectList = new ArrayList<>();
   c.dontHelpList = new ArrayList<>();
   return c;

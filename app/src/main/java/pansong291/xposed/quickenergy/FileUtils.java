@@ -19,7 +19,9 @@ public class FileUtils
  private static File directory;
  private static File configFile;
  private static File friendIdMapFile;
+ private static File logFile;
  private static final String js_helpFriend = "helpFriend",
+ js_showMode = "showMode", js_recordLog = "recordLog",
  js_dontCollectList = "dontCollectList", js_dontHelpList = "dontHelpList";
  
  public static File getDirectoryPath()
@@ -64,6 +66,17 @@ public class FileUtils
   return friendIdMapFile;
  }
  
+ public static File getLogFile()
+ {
+  if(logFile == null)
+  {
+   logFile = new File(getDirectoryPath(), "energy.log");
+   if(logFile.exists() && logFile.isDirectory())
+    logFile.delete();
+  }
+  return logFile;
+ }
+ 
  public static Config getSavedConfig()
  {
   Config config = null;
@@ -91,7 +104,13 @@ public class FileUtils
    
    config.helpFriend = jo.optBoolean(js_helpFriend);
    Log.i(TAG, js_helpFriend + ":" + config.helpFriend);
-      
+   
+   config.showMode = Config.ShowMode.valueOf(jo.optString(js_showMode));
+   Log.i(TAG, js_showMode + ":" + config.showMode.name());
+   
+   config.recordLog = jo.optBoolean(js_recordLog);
+   Log.i(TAG, js_recordLog + ":" + config.recordLog);
+   
    JSONArray jaDC = jo.optJSONArray(js_dontCollectList);
    config.dontCollectList = new ArrayList<>();
    Log.i(TAG, js_dontCollectList + ":[");
@@ -125,7 +144,11 @@ public class FileUtils
    if(config == null) config = Config.defInit();
    
    jo.put(js_helpFriend, config.helpFriend);
-      
+   
+   jo.put(js_showMode, config.showMode.name());
+   
+   jo.put(js_recordLog, config.recordLog);
+   
    JSONArray jaDC = new JSONArray();
    for(String s: config.dontCollectList)
    {
@@ -204,6 +227,11 @@ public class FileUtils
   }
   close(fr);
   return result.toString();
+ }
+ 
+ public static boolean append2Log(String s)
+ {
+  return append2File(s + "\n", getLogFile());
  }
  
  public static boolean write2File(String s, File f)

@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import static pansong291.xposed.quickenergy.Log.showDialog;
 
 public class AliMobileAutoCollectEnergyUtils
 {
@@ -42,7 +41,7 @@ public class AliMobileAutoCollectEnergyUtils
   boolean hasMore = parseFrienRankPageDataResponse(response);
   if (hasMore)
   {
-   showDialog("开始获取可以收取能量的好友信息...", "");
+   Log.showDialog("开始获取可以收取能量的好友信息...", "");
    new Thread(new Runnable() {
      public void run()
      {
@@ -57,13 +56,13 @@ public class AliMobileAutoCollectEnergyUtils
    //如果发现已经解析完成了，如果有好友能量收取，就开始收取
    if (friendsRankUseridList.size() > 0)
    {
-    showDialog("开始获取每个好友能够收取的能量信息...", "");
+    Log.showDialogOrToast("开始获取每个好友能够收取的能量信息...", "");
     for (String userId : friendsRankUseridList)
     {
      // 开始收取每个用户的能量
      rpcCall_CanCollectEnergy(loader, userId);
     }
-    showDialog("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
+    Log.showDialogOrToast("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
     Log.i(TAG, "能量收取结束");
     friendsRankUseridList.clear();
     collectedEnergy = 0;
@@ -75,7 +74,7 @@ public class AliMobileAutoCollectEnergyUtils
     Config.saveIdMap();
    }else
    {
-    showDialog("暂时没有可收取的能量\n", "");
+    Log.showDialogOrToast("暂时没有可收取的能量\n", "");
    }
    // 执行完了调用刷新页面，看看总能量效果
   }
@@ -151,7 +150,7 @@ public class AliMobileAutoCollectEnergyUtils
   */
  private static void refreshWebView()
  {
-  showDialog("一共收取了" + collectedEnergy + "g能量", "");
+  Log.i(TAG, "一共收取了" + collectedEnergy + "g能量");
   isWebViewRefresh = true;
  }
 
@@ -292,10 +291,10 @@ public class AliMobileAutoCollectEnergyUtils
    int collect = parseCollectEnergyResponse(response, false);
    if(collect > 0)
    {
-    showDialog("偷取【" + userName + "】的能量【" + collect + "克】", "，UserID：" + userId + "，BubbleId：" + bubbleId);
+    Log.showDialogAndRecordLog("偷取【" + userName + "】的能量【" + collect + "克】", "，UserID：" + userId + "，BubbleId：" + bubbleId);
    }else
    {
-    showDialog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
+    Log.showDialogAndRecordLog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
    }
   }catch(Exception e)
   {
@@ -329,10 +328,10 @@ public class AliMobileAutoCollectEnergyUtils
    int helped = parseCollectEnergyResponse(response, true);
    if (helped > 0)
    {
-    showDialog("帮【" + userName + "】收取【" + helped + "克】", "，UserID：" + targetUserId + "，BubbleId：" + bubbleId);
+    Log.showDialogAndRecordLog("帮【" + userName + "】收取【" + helped + "克】", "，UserID：" + targetUserId + "，BubbleId：" + bubbleId);
    }else
    {
-    showDialog("帮【" + userName + "】收取失败", "，UserID：" + targetUserId + "，BubbleId" + bubbleId);
+    Log.showDialogAndRecordLog("帮【" + userName + "】收取失败", "，UserID：" + targetUserId + "，BubbleId" + bubbleId);
    }
   }catch(Exception e)
   {

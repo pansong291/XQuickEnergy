@@ -2,7 +2,10 @@ package pansong291.xposed.quickenergy;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.icu.text.SimpleDateFormat;
+import android.widget.Toast;
 import de.robv.android.xposed.XposedBridge;
+import java.util.Date;
 
 public class Log
 {
@@ -28,8 +31,54 @@ public class Log
   }
  }
  
+ public static void showDialogOrToast(String str, String str2)
+ {
+  showDialog(str, str2);
+  showToast(str, str2);
+ }
+ 
+ public static void showDialogAndRecordLog(String str, String str2)
+ {
+  showDialog(str, str2);
+  recordLog(str, str2);
+ }
+ 
+ public static void showToast(final String str, String str2)
+ {
+  if(Config.showMode() != Config.ShowMode.toast)
+   return;
+  Log.i(TAG, str + str2);
+  final Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
+  if(activity != null)
+  {
+   try
+   {
+    activity.runOnUiThread(new Runnable()
+     {
+      public void run()
+      {
+       Toast.makeText(activity, str, 1).show();
+      }
+     });
+   }catch(Exception e)
+   {
+    Log.i(TAG, "showToast err: " + e.getMessage());
+   }
+  }
+ }
+ 
+ public static boolean recordLog(String str, String str2)
+ {
+  if(!Config.recordLog())
+   return false;
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss  ");
+  return FileUtils.append2Log(sdf.format(new Date()) + str + str2);
+ }
+ 
  public static void showDialog(final String str, String str2)
  {
+  if(Config.showMode() != Config.ShowMode.dialog)
+   return;
   Log.i(TAG, str + str2);
   Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
   if(activity != null)
