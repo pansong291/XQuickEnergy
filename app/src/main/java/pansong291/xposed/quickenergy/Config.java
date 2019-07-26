@@ -3,6 +3,7 @@ package pansong291.xposed.quickenergy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Config
 {
@@ -11,7 +12,7 @@ public class Config
   dialog, toast
  }
  
- public static final String TAG = Config.class.getCanonicalName();
+ private static final String TAG = Config.class.getCanonicalName();
  public boolean defInit;
  public boolean helpFriend;
  public ShowMode showMode;
@@ -22,6 +23,7 @@ public class Config
  private static Config config;
  private static Map idMap;
  private static boolean hasIdMapChanged = false;
+ private static String selfId;
  
  public static boolean helpFriend()
  {
@@ -76,6 +78,28 @@ public class Config
   if(hasIdMapChanged)
    hasIdMapChanged = !FileUtils.saveFriendIdMapFile(getIdMap());
   return hasIdMapChanged;
+ }
+ 
+ public static String getSelfId()
+ {
+  if(selfId == null)
+  {
+   Set idSet = getIdMap().entrySet();
+   for(Map.Entry entry: idSet)
+    if(!entry.getValue().toString().contains("*"))
+    {
+     selfId = entry.getKey().toString();
+     break;
+    }
+  }
+  return selfId;
+ }
+ 
+ public static String getNameById(String id)
+ {
+  if(getIdMap().containsKey(id))
+   return getIdMap().get(id).toString();
+  return id;
  }
  
  private static Map getIdMap()

@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Log
 {
- private static String TAG = Log.class.getCanonicalName();
+ private static final String TAG = Log.class.getCanonicalName();
  private static AlertDialog dlg;
  private static StringBuffer sb;
  /*
@@ -48,7 +48,7 @@ public class Log
   if(Config.showMode() != Config.ShowMode.toast)
    return;
   Log.i(TAG, str + str2);
-  final Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
+  final Activity activity = RpcCall.h5Activity;
   if(activity != null)
   {
    try
@@ -80,7 +80,7 @@ public class Log
   if(Config.showMode() != Config.ShowMode.dialog)
    return;
   Log.i(TAG, str + str2);
-  Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
+  Activity activity = RpcCall.h5Activity;
   if(activity != null)
   {
    try
@@ -116,7 +116,7 @@ public class Log
 
  private static AlertDialog createNewDialog()
  {
-  Activity activity = AliMobileAutoCollectEnergyUtils.h5Activity;
+  Activity activity = RpcCall.h5Activity;
   return new AlertDialog.Builder(activity)
    .setTitle("XQuickEnergy")
    .setMessage("")

@@ -15,7 +15,7 @@ import java.util.TreeSet;
 
 public class FileUtils
 {
- public static final String TAG = FileUtils.class.getCanonicalName();
+ private static final String TAG = FileUtils.class.getCanonicalName();
  private static File directory;
  private static File configFile;
  private static File friendIdMapFile;

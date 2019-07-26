@@ -8,18 +8,13 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class AliMobileAutoCollectEnergyUtils
+public class AntForest
 {
-
- private static String TAG = AliMobileAutoCollectEnergyUtils.class.getCanonicalName();
+ private static final String TAG = AntForest.class.getCanonicalName();
  private static ArrayList<String> friendsRankUseridList = new ArrayList<String>();
- private static boolean isWebViewRefresh;
  private static Integer collectedEnergy = 0;
  private static Integer helpCollectedEnergy = 0;
  private static Integer pageCount = 0;
- private static Object curH5PageImpl;
- public static Object curH5Fragment;
- public static Activity h5Activity;
 
 
  /**
@@ -30,13 +25,6 @@ public class AliMobileAutoCollectEnergyUtils
   */
  public static void autoGetCanCollectUserIdList(final ClassLoader loader, String response)
  {
-  /**
-  if (isWebViewRefresh)
-  {
-   // 如果已经刷新了，这里又回来response了，就表示这里是我们刷新webview结束来到的逻辑
-   finishWork();
-   return;
-  }/**/
   // 开始解析好友信息，循环把所有有能量的好友信息都解析完
   boolean hasMore = parseFrienRankPageDataResponse(response);
   if (hasMore)
@@ -146,25 +134,6 @@ public class AliMobileAutoCollectEnergyUtils
  }
 
  /**
-  * 刷新页面
-  */
- private static void refreshWebView()
- {
-  Log.i(TAG, "一共收取了" + collectedEnergy + "g能量");
-  isWebViewRefresh = true;
- }
-
- /**
-  * 结束工作
-  */
- private static void finishWork()
- {
-  isWebViewRefresh = false;
-  // 打印收取了多少能量
-  Log.i(TAG, "一共收取了" + collectedEnergy + "g能量");
- }
-
- /**
   * 解析好友信息
   *
   * @param response
@@ -209,7 +178,6 @@ public class AliMobileAutoCollectEnergyUtils
  {
   try
   {
-   Method rpcCallMethod = getRpcCallMethod(loader);
    JSONArray jsonArray = new JSONArray();
    JSONObject json = new JSONObject();
    json.put("av", "5");
@@ -220,8 +188,7 @@ public class AliMobileAutoCollectEnergyUtils
    jsonArray.put(json);
    Log.i(TAG, "call friendranklist params:" + jsonArray);
 
-   rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.queryEnergyRanking", jsonArray.toString(),
-    "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
+   RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryEnergyRanking", jsonArray.toString());
 
   } catch (Exception e)
   {
@@ -239,7 +206,6 @@ public class AliMobileAutoCollectEnergyUtils
  {
   try
   {
-   Method rpcCallMethod = getRpcCallMethod(loader);
    JSONArray jsonArray = new JSONArray();
    JSONObject json = new JSONObject();
    json.put("av", "5");
@@ -250,11 +216,9 @@ public class AliMobileAutoCollectEnergyUtils
    jsonArray.put(json);
    Log.i(TAG, "call cancollect energy params:" + jsonArray);
 
-   rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.queryNextAction", jsonArray.toString(),
-    "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
+   RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryNextAction", jsonArray.toString());
 
-   rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.pageQueryDynamics", jsonArray.toString(),
-    "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
+   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", jsonArray.toString());
 
   } catch (Exception e)
   {
@@ -273,7 +237,6 @@ public class AliMobileAutoCollectEnergyUtils
  {
   try
   {
-   Method rpcCallMethod = getRpcCallMethod(loader);
    JSONArray jsonArray = new JSONArray();
    JSONArray bubbleAry = new JSONArray();
    bubbleAry.put(bubbleId);
@@ -285,9 +248,8 @@ public class AliMobileAutoCollectEnergyUtils
    jsonArray.put(json);
    Log.i(TAG, "call collect energy params:" + jsonArray);
 
-   Object resp = rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.collectEnergy", jsonArray.toString(),
-    "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
-   String response = (String)resp.getClass().getMethod("getResponse").invoke(resp);
+   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.collectEnergy", jsonArray.toString());
+   String response = RpcCall.getResponse(resp);
    int collect = parseCollectEnergyResponse(response, false);
    if(collect > 0)
    {
@@ -313,7 +275,6 @@ public class AliMobileAutoCollectEnergyUtils
  {
   try
   {
-   Method rpcCallMethod = getRpcCallMethod(loader);
    JSONArray jsonArray = new JSONArray();
    JSONArray bubbleAry = new JSONArray();
    bubbleAry.put(bubbleId);
@@ -322,9 +283,8 @@ public class AliMobileAutoCollectEnergyUtils
    json.put("targetUserId", targetUserId);
    jsonArray.put(json);
    Log.i(TAG, "call help collect energy params:" + jsonArray);
-   Object resp = rpcCallMethod.invoke(null, "alipay.antmember.forest.h5.forFriendCollectEnergy", jsonArray.toString(),
-    "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
-   String response = (String)resp.getClass().getMethod("getResponse").invoke(resp);
+   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.forFriendCollectEnergy", jsonArray.toString());
+   String response = RpcCall.getResponse(resp);
    int helped = parseCollectEnergyResponse(response, true);
    if (helped > 0)
    {
@@ -340,34 +300,6 @@ public class AliMobileAutoCollectEnergyUtils
 
  }
  
- private static Method getRpcCallMethod(ClassLoader loader)
- {
-  try
-  {
-   Field aF = curH5Fragment.getClass().getDeclaredField("a");
-   aF.setAccessible(true);
-   Object viewHolder = aF.get(curH5Fragment);
-   Field hF = viewHolder.getClass().getDeclaredField("h");
-   hF.setAccessible(true);
-   curH5PageImpl = hF.get(viewHolder);
-   Class<?> h5PageClazz = loader.loadClass("com.alipay.mobile.h5container.api.H5Page");
-   Class<?> jsonClazz = loader.loadClass("com.alibaba.fastjson.JSONObject");
-   Class<?> rpcClazz = loader.loadClass("com.alipay.mobile.nebulaappproxy.api.rpc.H5RpcUtil");
-   if (curH5PageImpl != null)
-   {
-    Method callM = rpcClazz.getMethod("rpcCall", String.class, String.class, String.class,
-     boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
-     int.class, String.class, boolean.class, int.class);
-    return callM;
-
-   }
-  } catch (Exception e)
-  {
-   Log.i(TAG, "getRpcCallMethod err: " + e.getMessage());
-  }
-  return null;
- }
-
  private static int parseCollectEnergyResponse(String response, boolean isForFriend)
  {
   if(!TextUtils.isEmpty(response) && response.contains("failedBubbleIds"))

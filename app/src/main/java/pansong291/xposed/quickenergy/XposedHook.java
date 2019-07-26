@@ -14,12 +14,12 @@ import java.lang.reflect.Method;
 public class XposedHook implements IXposedHookLoadPackage
 {
 
- private static String TAG = XposedHook.class.getCanonicalName();
+ private static final String TAG = XposedHook.class.getCanonicalName();
 
  @Override
  public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
  {
-  if("com.eg.android.AlipayGphone".equals(lpparam.packageName))
+  if(ClassMember.com_eg_android_AlipayGphone.equals(lpparam.packageName))
   {
    Log.i(TAG, lpparam.packageName);
    //hookSecurity(lpparam);
@@ -60,20 +60,20 @@ public class XposedHook implements IXposedHookLoadPackage
  private void hookRpcCall(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
  {
   final ClassLoader loader = lpparam.classLoader;
-  Class<?> clazz = loader.loadClass("com.alipay.mobile.nebulacore.ui.H5FragmentManager");
+  Class<?> clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5FragmentManager);
   if(clazz != null)
   {
-   Class<?> h5FragmentClazz = loader.loadClass("com.alipay.mobile.nebulacore.ui.H5Fragment");
+   Class<?> h5FragmentClazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Fragment);
    if(h5FragmentClazz != null)
    {
-    XposedHelpers.findAndHookMethod(clazz, "pushFragment", h5FragmentClazz,
+    XposedHelpers.findAndHookMethod(clazz, ClassMember.pushFragment, h5FragmentClazz,
      boolean.class, Bundle.class, boolean.class, boolean.class, new XC_MethodHook()
      {
       @Override
       protected void afterHookedMethod(MethodHookParam param) throws Throwable
       {
        Log.i(TAG, "cur fragment: " + param.args[0]);
-       AliMobileAutoCollectEnergyUtils.curH5Fragment = param.args[0];
+       RpcCall.curH5Fragment = param.args[0];
       }
      });
     Log.i(TAG, "hook pushFragment successfully");
@@ -86,16 +86,16 @@ public class XposedHook implements IXposedHookLoadPackage
    Log.i(TAG, "hook出错：\ncouldn't find class com.alipay.mobile.nebulacore.ui.H5FragmentManager");
   }
 
-  clazz = loader.loadClass("com.alipay.mobile.nebulacore.ui.H5Activity");
+  clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Activity);
   if(clazz != null)
   {
-   XposedHelpers.findAndHookMethod(clazz, "onResume", new XC_MethodHook()
+   XposedHelpers.findAndHookMethod(clazz, ClassMember.onResume, new XC_MethodHook()
     {
      @Override
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
       Log.i(TAG, "cur activity: " + param.thisObject);
-      AliMobileAutoCollectEnergyUtils.h5Activity = (Activity) param.thisObject;
+      RpcCall.h5Activity = (Activity) param.thisObject;
      }
     });
    Log.i(TAG, "hook onResume successfully");
@@ -104,16 +104,16 @@ public class XposedHook implements IXposedHookLoadPackage
    Log.i(TAG, "hook出错：\ncouldn't find class com.alipay.mobile.nebulacore.ui.H5Activity");
   }
 
-  clazz = loader.loadClass("com.alipay.mobile.nebulaappproxy.api.rpc.H5RpcUtil");
+  clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulaappproxy_api_rpc_H5RpcUtil);
   if(clazz != null)
   {
-   Class<?> h5PageClazz = loader.loadClass("com.alipay.mobile.h5container.api.H5Page");
-   Class<?> jsonClazz = loader.loadClass("com.alibaba.fastjson.JSONObject");
+   Class<?> h5PageClazz = loader.loadClass(ClassMember.com_alipay_mobile_h5container_api_H5Page);
+   Class<?> jsonClazz = loader.loadClass(ClassMember.com_alibaba_fastjson_JSONObject);
    if(h5PageClazz != null && jsonClazz != null)
    {
     try
     {
-     XposedHelpers.findAndHookMethod(clazz, "rpcCall", String.class, String.class, String.class,
+     XposedHelpers.findAndHookMethod(clazz, ClassMember.rpcCall, String.class, String.class, String.class,
       boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
       int.class, String.class, boolean.class, int.class, String.class, new XC_MethodHook()
       {
@@ -126,25 +126,33 @@ public class XposedHook implements IXposedHookLoadPackage
        @Override
        protected void afterHookedMethod(MethodHookParam param) throws Throwable
        {
+        String args0 = (String)param.args[0];
+        if(args0 == null || !args0.contains("forest") && !args0.contains("antfarm"))
+        {
+         return;
+        }
+        Log.i(TAG, args0);
         Object resp = param.getResult();
         if(resp != null)
         {
-         Method method = resp.getClass().getMethod("getResponse");
-         String response = (String) method.invoke(resp);
+         String response = RpcCall.getResponse(resp);
          Log.i(TAG, "response: " + response);
 
-         if(AliMobileAutoCollectEnergyUtils.isRankList(response))
+         if(AntForest.isRankList(response))
          {
           Log.i(TAG, "autoGetCanCollectUserIdList");
-          AliMobileAutoCollectEnergyUtils.autoGetCanCollectUserIdList(loader, response);
+          AntForest.autoGetCanCollectUserIdList(loader, response);
          }
 
          // 第一次是自己的能量，比上面的获取用户信息还要早，所有这里需要记录当前自己的userid值
-         if(AliMobileAutoCollectEnergyUtils.isUserDetail(response))
+         if(AntForest.isUserDetail(response))
          {
           Log.i(TAG, "autoGetCanCollectBubbleIdList");
-          AliMobileAutoCollectEnergyUtils.autoGetCanCollectBubbleIdList(loader, response);
+          AntForest.autoGetCanCollectBubbleIdList(loader, response);
          }
+         
+         AntFarm.start(loader, args0, (String)param.args[1], response);
+         
         }
        }
       });
