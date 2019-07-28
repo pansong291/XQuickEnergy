@@ -10,6 +10,8 @@ import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import java.lang.reflect.Method;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 public class XposedHook implements IXposedHookLoadPackage
 {
@@ -54,6 +56,7 @@ public class XposedHook implements IXposedHookLoadPackage
   }catch(Throwable e)
   {
    Log.i(TAG, "hookSecurity err:" + e.getMessage());
+   Log.printStackTrace(TAG, e);
   }
  }
 
@@ -95,7 +98,9 @@ public class XposedHook implements IXposedHookLoadPackage
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
       Log.i(TAG, "cur activity: " + param.thisObject);
-      RpcCall.h5Activity = (Activity) param.thisObject;
+      Activity act = (Activity)param.thisObject;
+      if(RpcCall.h5Activity != act) Config.shouldReload = true;
+      RpcCall.h5Activity = act;
      }
     });
    Log.i(TAG, "hook onResume successfully");
@@ -126,33 +131,44 @@ public class XposedHook implements IXposedHookLoadPackage
        @Override
        protected void afterHookedMethod(MethodHookParam param) throws Throwable
        {
-        String args0 = (String)param.args[0];
+        String args0 = (String)param.args[0],
+        args1 = (String)param.args[1];
         if(args0 == null || !args0.contains("forest") && !args0.contains("antfarm"))
-        {
          return;
-        }
-        Log.i(TAG, args0);
+        Log.i(TAG, args0 + ", " + args1);
         Object resp = param.getResult();
         if(resp != null)
         {
          String response = RpcCall.getResponse(resp);
          Log.i(TAG, "response: " + response);
 
-         if(AntForest.isRankList(response))
+         if(Config.enableForest())
          {
-          Log.i(TAG, "autoGetCanCollectUserIdList");
-          AntForest.autoGetCanCollectUserIdList(loader, response);
-         }
+          if(AntForest.isRankList(response))
+          {
+           Log.i(TAG, "autoGetCanCollectUserIdList");
+           AntForest.autoGetCanCollectUserIdList(loader, response);
+          }
 
-         // 第一次是自己的能量，比上面的获取用户信息还要早，所有这里需要记录当前自己的userid值
-         if(AntForest.isUserDetail(response))
-         {
-          Log.i(TAG, "autoGetCanCollectBubbleIdList");
-          AntForest.autoGetCanCollectBubbleIdList(loader, response);
+          // 第一次是自己的能量，比上面的获取用户信息还要早，所以这里可以记录当前自己的userid值
+          if(AntForest.isUserDetail(response))
+          {
+           Log.i(TAG, "autoGetCanCollectBubbleIdList");
+           AntForest.autoGetCanCollectBubbleIdList(loader, response);
+          }
          }
          
-         AntFarm.start(loader, args0, (String)param.args[1], response);
+         if(Config.enableFarm())
+          AntFarm.start(loader, args0, args1, response);
          
+         if(AntFarm.isEnterFriendFarm(response))
+         {
+          JSONObject jo = new JSONArray(args1).getJSONObject(0);
+          String userId = jo.getString("userId");
+          if(userId == null || userId.isEmpty())
+           userId = AntFarm.farmId2UserId(jo.getString("farmId"));
+          Log.recordLog("进入〔"+Config.getNameById(userId)+"〕的蚂蚁森林","");
+         }
         }
        }
       });
@@ -160,6 +176,7 @@ public class XposedHook implements IXposedHookLoadPackage
     }catch(Exception e)
     {
      Log.i(TAG, "hook rpcCall err:" + e.getMessage());
+     Log.printStackTrace(TAG, e);
     }
    }else
    {

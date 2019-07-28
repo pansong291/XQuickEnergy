@@ -19,9 +19,9 @@ public class Log
   it.addFlags(it.FLAG_RECEIVER_FOREGROUND);
   it.setData(Uri.parse("alipays://platformapi/startapp?appId=60000002"));
  */
- public static void i(String s, String s2)
+ public static void i(String tag, String s)
  {
-  StringBuilder sb = new StringBuilder(s + ", " + s2);
+  StringBuilder sb = new StringBuilder(tag + ", " + s);
   for(int i = 0; i < sb.length(); i += 2000)
   {
    if(sb.length() < i + 2000)
@@ -29,6 +29,11 @@ public class Log
    else
     XposedBridge.log(sb.substring(i, i + 2000));
   }
+ }
+ 
+ public static void printStackTrace(String tag, Throwable t)
+ {
+  Log.i(tag, android.util.Log.getStackTraceString(t));
  }
  
  public static void showDialogOrToast(String str, String str2)
@@ -45,7 +50,7 @@ public class Log
  
  public static void showToast(final String str, String str2)
  {
-  if(Config.showMode() != Config.ShowMode.toast)
+  if(Config.showMode() != Config.ShowMode.TOAST)
    return;
   Log.i(TAG, str + str2);
   final Activity activity = RpcCall.h5Activity;
@@ -63,6 +68,7 @@ public class Log
    }catch(Exception e)
    {
     Log.i(TAG, "showToast err: " + e.getMessage());
+    Log.printStackTrace(TAG, e);
    }
   }
  }
@@ -72,12 +78,12 @@ public class Log
   if(!Config.recordLog())
    return false;
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss  ");
-  return FileUtils.append2Log(sdf.format(new Date()) + str + str2);
+  return FileUtils.append2LogFile(sdf.format(new Date()) + str + str2);
  }
  
  public static void showDialog(final String str, String str2)
  {
-  if(Config.showMode() != Config.ShowMode.dialog)
+  if(Config.showMode() != Config.ShowMode.DIALOG)
    return;
   Log.i(TAG, str + str2);
   Activity activity = RpcCall.h5Activity;
@@ -99,6 +105,7 @@ public class Log
         }catch(Exception e)
         {
          Log.i(TAG, "Dialog show error: "+e.getMessage());
+         Log.printStackTrace(TAG, e);
          dlg = createNewDialog();
          dlg.show();
          sb.delete(0, sb.length());
@@ -110,6 +117,7 @@ public class Log
    }catch(Exception e)
    {
     Log.i(TAG, "showDialog err: " + e.getMessage());
+    Log.printStackTrace(TAG, e);
    }
   }
  }

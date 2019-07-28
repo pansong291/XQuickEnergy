@@ -34,7 +34,7 @@ public class AntForest
      public void run()
      {
       // 发送获取下一页好友信息接口
-      rpcCall_FriendRankList(loader);
+      rpcCall_friendRankList(loader);
      }
     }).start();
   } else
@@ -48,7 +48,7 @@ public class AntForest
     for (String userId : friendsRankUseridList)
     {
      // 开始收取每个用户的能量
-     rpcCall_CanCollectEnergy(loader, userId);
+     rpcCall_canCollectEnergy(loader, userId);
     }
     Log.showDialogOrToast("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
     Log.i(TAG, "能量收取结束");
@@ -81,7 +81,7 @@ public class AntForest
    try
    {
     JSONObject jsonObject = new JSONObject(response);
-    JSONArray jsonArray = jsonObject.optJSONArray("bubbles");
+    JSONArray jsonArray = jsonObject.getJSONArray("bubbles");
     jsonObject = jsonObject.getJSONObject("userEnergy");
     String userName = jsonObject.getString("displayName");
     String loginId = userName;
@@ -92,33 +92,34 @@ public class AntForest
      for (int i = 0; i < jsonArray.length(); i++)
      {
       JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-      String userId = jsonObject1.optString("userId");
-      long bubbleId = jsonObject1.optLong("id");
+      String userId = jsonObject1.getString("userId");
+      long bubbleId = jsonObject1.getLong("id");
       Config.putIdMap(userId, loginId);
-      if ("AVAILABLE".equals(jsonObject1.optString("collectStatus")))
+      if ("AVAILABLE".equals(jsonObject1.getString("collectStatus")))
       {
        if(Config.dontCollect(userId))
         Log.showDialog("不偷取【" + userName + "】", ", userId=" + userId);
        else
-        rpcCall_CollectEnergy(loader, userId, bubbleId, userName);
+        rpcCall_collectEnergy(loader, userId, bubbleId, userName);
       }
-      if (jsonObject1.optBoolean("canHelpCollect"))
+      if (jsonObject1.getBoolean("canHelpCollect"))
       {
        if(Config.helpFriend())
        {
          if(Config.dontHelp(userId))
           Log.showDialog("不帮收【" + userName + "】", ", userId=" + userId);
          else
-          rpcCall_ForFriendCollectEnergy(loader, userId, bubbleId, userName);
+          rpcCall_forFriendCollectEnergy(loader, userId, bubbleId, userName);
        }else
         Log.showDialog("不帮收【" + userName + "】", ", userId=" + userId);
       }
      }
     }
 
-   } catch (Exception e)
+   }catch(Exception e)
    {
     Log.i(TAG, e.getMessage());
+    Log.printStackTrace(TAG, e);
    }
   }
  }
@@ -144,15 +145,15 @@ public class AntForest
   try
   {
    JSONObject jo = new JSONObject(response);
-   JSONArray optJSONArray = jo.optJSONArray("friendRanking");
+   JSONArray optJSONArray = jo.getJSONArray("friendRanking");
    if (optJSONArray != null)
    {
     for (int i = 0; i < optJSONArray.length(); i++)
     {
      JSONObject jsonObject = optJSONArray.getJSONObject(i);
-     boolean optBoolean = jsonObject.optBoolean("canCollectEnergy")
-      || jsonObject.optBoolean("canHelpCollect");
-     String userId = jsonObject.optString("userId");
+     boolean optBoolean = jsonObject.getBoolean("canCollectEnergy")
+      || jsonObject.getBoolean("canHelpCollect");
+     String userId = jsonObject.getString("userId");
      if (optBoolean && !friendsRankUseridList.contains(userId))
      {
       friendsRankUseridList.add(userId);
@@ -160,11 +161,12 @@ public class AntForest
     }
     if(optJSONArray.length() == 0)
      return false;
-    return jo.optBoolean("hasMore");
+    return jo.getBoolean("hasMore");
    }
-  } catch (Exception e)
+  }catch(Exception e)
   {
    Log.i(TAG, "parseFrienRankPageDataResponse err: " + e.getMessage());
+   Log.printStackTrace(TAG, e);
   }
   return true;
  }
@@ -174,7 +176,7 @@ public class AntForest
   *
   * @param loader
   */
- private static void rpcCall_FriendRankList(final ClassLoader loader)
+ private static void rpcCall_friendRankList(final ClassLoader loader)
  {
   try
   {
@@ -190,9 +192,10 @@ public class AntForest
 
    RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryEnergyRanking", jsonArray.toString());
 
-  } catch (Exception e)
+  }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_FriendRankList err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_friendRankList err: " + e.getMessage());
+   Log.printStackTrace(TAG, e);
   }
  }
 
@@ -202,7 +205,7 @@ public class AntForest
   * @param loader
   * @param userId
   */
- private static void rpcCall_CanCollectEnergy(final ClassLoader loader, String userId)
+ private static void rpcCall_canCollectEnergy(final ClassLoader loader, String userId)
  {
   try
   {
@@ -220,9 +223,10 @@ public class AntForest
 
    RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", jsonArray.toString());
 
-  } catch (Exception e)
+  }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_CanCollectEnergy err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_canCollectEnergy err: " + e.getMessage());
+   Log.printStackTrace(TAG, e);
   }
  }
 
@@ -233,7 +237,7 @@ public class AntForest
   * @param userId
   * @param bubbleId
   */
- private static void rpcCall_CollectEnergy(final ClassLoader loader, String userId, Long bubbleId, String userName)
+ private static void rpcCall_collectEnergy(final ClassLoader loader, String userId, Long bubbleId, String userName)
  {
   try
   {
@@ -260,7 +264,8 @@ public class AntForest
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_CollectEnergy err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_collectEnergy err: " + e.getMessage());
+   Log.printStackTrace(TAG, e);
   }
  }
  
@@ -271,7 +276,7 @@ public class AntForest
   * @param userId
   * @param bubbleId
   */
- private static void rpcCall_ForFriendCollectEnergy(ClassLoader loader, String targetUserId, Long bubbleId, String userName)
+ private static void rpcCall_forFriendCollectEnergy(ClassLoader loader, String targetUserId, Long bubbleId, String userName)
  {
   try
   {
@@ -295,7 +300,8 @@ public class AntForest
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_ForFriendCollectEnergy err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_forFriendCollectEnergy err: " + e.getMessage());
+   Log.printStackTrace(TAG, e);
   }
 
  }
@@ -308,9 +314,9 @@ public class AntForest
    {
     int count = 0;
     JSONObject jsonObject = new JSONObject(response);
-    JSONArray jsonArray = jsonObject.optJSONArray("bubbles");
+    JSONArray jsonArray = jsonObject.getJSONArray("bubbles");
     for(int i = 0; i < jsonArray.length(); i++)
-     count += jsonArray.getJSONObject(i).optInt("collectedEnergy");
+     count += jsonArray.getJSONObject(i).getInt("collectedEnergy");
     if(isForFriend)
     {
      helpCollectedEnergy += count;
@@ -318,13 +324,14 @@ public class AntForest
     {
      collectedEnergy += count;
     }
-    if("SUCCESS".equals(jsonObject.optString("resultCode")))
+    if("SUCCESS".equals(jsonObject.getString("resultCode")))
     {
      return count;
     }
    }catch(Exception e)
    {
     Log.i(TAG, "parseCollectEnergyResponse err: " + e.getMessage());
+    Log.printStackTrace(TAG, e);
    }
   }
   return -1;
