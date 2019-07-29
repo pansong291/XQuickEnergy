@@ -67,7 +67,7 @@ public class Log
      });
    }catch(Exception e)
    {
-    Log.i(TAG, "showToast err: " + e.getMessage());
+    Log.i(TAG, "showToast err:");
     Log.printStackTrace(TAG, e);
    }
   }
@@ -104,7 +104,7 @@ public class Log
          dlg.show();
         }catch(Exception e)
         {
-         Log.i(TAG, "Dialog show error: "+e.getMessage());
+         Log.i(TAG, "Dialog show error:");
          Log.printStackTrace(TAG, e);
          dlg = createNewDialog();
          dlg.show();
@@ -116,7 +116,7 @@ public class Log
      });
    }catch(Exception e)
    {
-    Log.i(TAG, "showDialog err: " + e.getMessage());
+    Log.i(TAG, "showDialog err:");
     Log.printStackTrace(TAG, e);
    }
   }

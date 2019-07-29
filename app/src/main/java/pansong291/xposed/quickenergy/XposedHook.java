@@ -55,7 +55,7 @@ public class XposedHook implements IXposedHookLoadPackage
    }
   }catch(Throwable e)
   {
-   Log.i(TAG, "hookSecurity err:" + e.getMessage());
+   Log.i(TAG, "hookSecurity err:");
    Log.printStackTrace(TAG, e);
   }
  }
@@ -167,7 +167,7 @@ public class XposedHook implements IXposedHookLoadPackage
           String userId = jo.getString("userId");
           if(userId == null || userId.isEmpty())
            userId = AntFarm.farmId2UserId(jo.getString("farmId"));
-          Log.recordLog("进入〔"+Config.getNameById(userId)+"〕的蚂蚁森林","");
+          Log.recordLog("进入〔"+Config.getNameById(userId)+"〕的蚂蚁庄园","");
          }
         }
        }
@@ -175,7 +175,7 @@ public class XposedHook implements IXposedHookLoadPackage
      Log.i(TAG, "hook rpcCall successfully");
     }catch(Exception e)
     {
-     Log.i(TAG, "hook rpcCall err:" + e.getMessage());
+     Log.i(TAG, "hook rpcCall err:");
      Log.printStackTrace(TAG, e);
     }
    }else

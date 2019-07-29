@@ -118,7 +118,6 @@ public class AntForest
 
    }catch(Exception e)
    {
-    Log.i(TAG, e.getMessage());
     Log.printStackTrace(TAG, e);
    }
   }
@@ -165,7 +164,7 @@ public class AntForest
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "parseFrienRankPageDataResponse err: " + e.getMessage());
+   Log.i(TAG, "parseFrienRankPageDataResponse err:");
    Log.printStackTrace(TAG, e);
   }
   return true;
@@ -194,7 +193,7 @@ public class AntForest
 
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_friendRankList err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_friendRankList err:");
    Log.printStackTrace(TAG, e);
   }
  }
@@ -225,7 +224,7 @@ public class AntForest
 
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_canCollectEnergy err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_canCollectEnergy err:");
    Log.printStackTrace(TAG, e);
   }
  }
@@ -264,7 +263,7 @@ public class AntForest
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_collectEnergy err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_collectEnergy err:");
    Log.printStackTrace(TAG, e);
   }
  }
@@ -300,7 +299,7 @@ public class AntForest
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_forFriendCollectEnergy err: " + e.getMessage());
+   Log.i(TAG, "rpcCall_forFriendCollectEnergy err:");
    Log.printStackTrace(TAG, e);
   }
 
@@ -330,7 +329,7 @@ public class AntForest
     }
    }catch(Exception e)
    {
-    Log.i(TAG, "parseCollectEnergyResponse err: " + e.getMessage());
+    Log.i(TAG, "parseCollectEnergyResponse err:");
     Log.printStackTrace(TAG, e);
    }
   }

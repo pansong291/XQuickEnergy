@@ -67,6 +67,11 @@ public class FileUtils
   return logFile;
  }
  
+ public static File getBackupFile(File f)
+ {
+  return new File(f.getAbsolutePath() + ".bak");
+ }
+ 
  public static String readFromFile(File f)
  {
   StringBuilder result = new StringBuilder();

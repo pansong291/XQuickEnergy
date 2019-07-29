@@ -35,7 +35,7 @@ public class RpcCall
     }
    }catch(Exception e)
    {
-    Log.i(TAG, "get RpcCallMethod err: " + e.getMessage());
+    Log.i(TAG, "get RpcCallMethod err:");
     Log.printStackTrace(TAG, e);
    }
   return rpcCallMethod.invoke(null, args0, args1,
