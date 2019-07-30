@@ -133,7 +133,10 @@ public class XposedHook implements IXposedHookLoadPackage
        {
         String args0 = (String)param.args[0],
         args1 = (String)param.args[1];
-        if(args0 == null || !args0.contains("forest") && !args0.contains("antfarm"))
+        if(args0 == null ||
+          !args0.contains("forest") &&
+          !args0.contains("antfarm") &&
+          !args0.contains("antmember"))
          return;
         Log.i(TAG, args0 + ", " + args1);
         Object resp = param.getResult();

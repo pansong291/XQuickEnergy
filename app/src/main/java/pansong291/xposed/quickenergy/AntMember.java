@@ -8,16 +8,17 @@ public class AntMember
   
  public static void receivePoint(ClassLoader loader, String args0, String args1, String response)
  {
+  memberSignin(loader, args0, response);
   if(!"alipay.antmember.biz.rpc.member.h5.queryPointCert".equals(args0))
    return;
   try
   {
-   JSONObject jo = new JSONObject(response);
+   JSONObject jo = new JSONArray(args1).getJSONObject(0);
+   int page = jo.getInt("page");
+   int pageSize = jo.getInt("pageSize");
+   jo = new JSONObject(response);
    if(jo.getString("resultCode").equals("SUCCESS"))
    {
-    jo = new JSONArray(args1).getJSONObject(0);
-    int page = jo.getInt("page");
-    int pageSize = jo.getInt("pageSize");
     Log.showDialogAndRecordLog("开始领取第"+page+"页的蚂蚁会员积分…","");
     String s;
     boolean hasNextPage = jo.getBoolean("hasNextPage");
@@ -66,6 +67,37 @@ public class AntMember
   }
  }
  
+ public static void memberSignin(ClassLoader loader, String args0, String response)
+ {
+  if(!"alipay.antmember.biz.rpc.member.h5.queryMemberSigninIndex".equals(args0))
+   return;
+  try
+  {
+   JSONObject jo = new JSONObject(response);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    if(!jo.getBoolean("currentSigninStatus"))
+    {
+     String s = RpcCall.getResponse(rpcCall_memberSignin(loader));
+     jo = new JSONObject(s);
+     if(jo.getString("resultCode").equals("SUCCESS"))
+     {
+      Log.showDialogAndRecordLog("领取〔每日签到〕〔"+
+       jo.getString("signinPoint")+"积分〕，已签到〔"+
+       jo.getString("signinSumDay")+"天〕","");
+     }else
+     {
+      Log.showDialogAndRecordLog(jo.getString("resultDesc"),response);
+     }
+    }
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "memberSignin err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+ 
  private static Object rpcCall_queryPointCert(ClassLoader loader, int page, int pageSize)
  {
   try
@@ -103,6 +135,20 @@ public class AntMember
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_queryPoint err:");
+   Log.printStackTrace(TAG, e);
+  }
+  return null;
+ }
+ 
+ private static Object rpcCall_memberSignin(ClassLoader loader)
+ {
+  try
+  {
+   String args1 = "[{}]";
+   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.memberSignin", args1);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_memberSignin err:");
    Log.printStackTrace(TAG, e);
   }
   return null;
