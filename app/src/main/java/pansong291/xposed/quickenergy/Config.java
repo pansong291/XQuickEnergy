@@ -12,9 +12,7 @@ import pansong291.xposed.quickenergy.AntFarm.SendType;
 public class Config
 {
  public enum ShowMode
- {
-  DIALOG, TOAST
- }
+ { DIALOG, TOAST }
  
  public enum RecallAnimalType
  { ALWAYS, WHEN_THIEF, WHEN_HUNGRY, NEVER }
@@ -31,7 +29,9 @@ public class Config
  jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_harvestProduce = "harvestProduce",
  jn_donation = "donation", jn_answerQuestion = "answerQuestion", jn_receiveFarmTaskAward = "receiveFarmTaskAward",
  jn_feedAnimal = "feedAnimal", jn_useAccelerateTool = "useAccelerateTool", jn_notifyFriend = "notifyFriend",
- jn_feedFriendAnimalList = "feedFriendAnimalList";
+ jn_feedFriendAnimalList = "feedFriendAnimalList",
+ /* member */
+ jn_receivePoint = "receivePoint";
 
  public static boolean shouldReload;
 
@@ -62,6 +62,9 @@ public class Config
  private boolean useAccelerateTool;
  private boolean notifyFriend;
  private List<String> feedFriendAnimalList;
+ 
+ /* member */
+ private boolean receivePoint;
 
  /* other */
  private boolean defInit;
@@ -172,6 +175,12 @@ public class Config
   return getConfig().feedFriendAnimalList.contains(id);
  }
 
+ /* member */
+ public static boolean receivePoint()
+ {
+  return getConfig().receivePoint;
+ }
+ 
  /* other */
  private static Config getConfig()
  {
@@ -308,6 +317,8 @@ public class Config
   c.useAccelerateTool = true;
   c.notifyFriend = true;
   c.feedFriendAnimalList = new ArrayList<>();
+  
+  c.receivePoint = true;
   return c;
  }
 
@@ -407,6 +418,10 @@ public class Config
     config.feedFriendAnimalList.add(ja.getString(i));
     Log.i(TAG, config.feedFriendAnimalList.get(i)+",");
    }
+   
+   /* member */
+   config.receivePoint = jo.getBoolean(jn_receivePoint);
+   Log.i(TAG, jn_receivePoint + ":" + config.receivePoint);
 
    String formated = config2Json(config);
    if(!formated.equals(json))
@@ -519,6 +534,10 @@ public class Config
    jo.put("帮好友喂鸡列表", userId);
    jo.put(jn_feedFriendAnimalList, ja);
 
+   /* member */
+   jo.put("领取蚂蚁会员积分", trueAndFalse);
+   jo.put(jn_receivePoint, config.receivePoint);
+   
    jo.put("详细介绍", "请在模块管理器中启动XQuickEnergy");
   }catch(Exception e)
   {
@@ -576,7 +595,9 @@ public class Config
      break;
 
     default:
-     lastNonSpaceChar = currentChar;
+    if(lastNonSpaceChar == '[' && currentChar != ']')
+     break;
+    lastNonSpaceChar = currentChar;
    }
   }
   formated = sb.toString();

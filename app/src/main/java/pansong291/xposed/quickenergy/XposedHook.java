@@ -169,6 +169,8 @@ public class XposedHook implements IXposedHookLoadPackage
            userId = AntFarm.farmId2UserId(jo.getString("farmId"));
           Log.recordLog("进入〔"+Config.getNameById(userId)+"〕的蚂蚁庄园","");
          }
+         
+         if(Config.receivePoint())AntMember.receivePoint(loader, args0, args1, response);
         }
        }
       });
