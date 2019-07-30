@@ -764,7 +764,7 @@ public class AntFarm
          {
           if(notified) continue;
           jo = jo.getJSONObject("animalStatusVO");
-          notifyFriend(loader, jo, friendFarmId, animalId);
+          notified = notifyFriend(loader, jo, friendFarmId, animalId);
          }
         }
        }else
