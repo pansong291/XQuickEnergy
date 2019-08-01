@@ -26,10 +26,10 @@ public class Config
  jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList", jn_dontHelpCollectList = "dontHelpCollectList",
  /* farm */
  jn_rewardFriend = "rewardFriend", jn_sendBackAnimal = "sendBackAnimal", jn_sendType = "sendType",
- jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_harvestProduce = "harvestProduce",
- jn_donation = "donation", jn_answerQuestion = "answerQuestion", jn_receiveFarmTaskAward = "receiveFarmTaskAward",
- jn_feedAnimal = "feedAnimal", jn_useAccelerateTool = "useAccelerateTool", jn_notifyFriend = "notifyFriend",
- jn_feedFriendAnimalList = "feedFriendAnimalList",
+ jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_useNewEggTool = "useNewEggTool",
+ jn_harvestProduce = "harvestProduce", jn_donation = "donation", jn_answerQuestion = "answerQuestion",
+ jn_receiveFarmTaskAward = "receiveFarmTaskAward", jn_receiveFarmToolReward = "receiveFarmToolReward", jn_feedAnimal = "feedAnimal",
+ jn_useAccelerateTool = "useAccelerateTool", jn_notifyFriend = "notifyFriend", jn_feedFriendAnimalList = "feedFriendAnimalList",
  /* member */
  jn_receivePoint = "receivePoint";
 
@@ -53,11 +53,12 @@ public class Config
  private SendType sendType;
  private List<String> sendTypeExcludeList;
  private RecallAnimalType recallAnimalType;
+ private boolean useNewEggTool;
  private boolean harvestProduce;
  private boolean donation;
  private boolean answerQuestion;
  private boolean receiveFarmTaskAward;
- private boolean listToolTaskDetails;
+ private boolean receiveFarmToolReward;
  private boolean feedAnimal;
  private boolean useAccelerateTool;
  private boolean notifyFriend;
@@ -134,6 +135,11 @@ public class Config
  {
   return getConfig().recallAnimalType;
  }
+ 
+ public static boolean useNewEggTool()
+ {
+  return getConfig().useNewEggTool;
+ }
 
  public static boolean harvestProduce()
  {
@@ -153,6 +159,11 @@ public class Config
  public static boolean receiveFarmTaskAward()
  {
   return getConfig().receiveFarmTaskAward;
+ }
+ 
+ public static boolean receiveFarmToolReward()
+ {
+  return getConfig().receiveFarmToolReward;
  }
  
  public static boolean feedAnimal()
@@ -309,10 +320,12 @@ public class Config
   c.sendType = SendType.HIT;
   c.sendTypeExcludeList = new ArrayList<>();
   c.recallAnimalType = RecallAnimalType.ALWAYS;
+  c.useNewEggTool = true;
   c.harvestProduce = true;
   c.donation = true;
   c.answerQuestion = true;
   c.receiveFarmTaskAward = true;
+  c.receiveFarmToolReward = true;
   c.feedAnimal = true;
   c.useAccelerateTool = true;
   c.notifyFriend = true;
@@ -388,6 +401,9 @@ public class Config
 
    config.recallAnimalType = RecallAnimalType.valueOf(jo.getString(jn_recallAnimalType));
    Log.i(TAG, jn_recallAnimalType + ":" + config.recallAnimalType.name());
+
+   config.useNewEggTool = jo.getBoolean(jn_useNewEggTool);
+   Log.i(TAG, jn_useNewEggTool + ":" + config.useNewEggTool);
    
    config.harvestProduce = jo.getBoolean(jn_harvestProduce);
    Log.i(TAG, jn_harvestProduce + ":" + config.harvestProduce);
@@ -400,6 +416,9 @@ public class Config
    
    config.receiveFarmTaskAward = jo.getBoolean(jn_receiveFarmTaskAward);
    Log.i(TAG, jn_receiveFarmTaskAward + ":" + config.receiveFarmTaskAward);
+
+   config.receiveFarmToolReward = jo.getBoolean(jn_receiveFarmToolReward);
+   Log.i(TAG, jn_receiveFarmToolReward + ":" + config.receiveFarmToolReward);
    
    config.feedAnimal = jo.getBoolean(jn_feedAnimal);
    Log.i(TAG, jn_feedAnimal + ":" + config.feedAnimal);
@@ -505,6 +524,9 @@ public class Config
     +RecallAnimalType.NEVER.name()+"为不召回");
    jo.put(jn_recallAnimalType, config.recallAnimalType);
 
+   jo.put("使用新蛋卡", trueAndFalse);
+   jo.put(jn_useNewEggTool, config.useNewEggTool);
+   
    jo.put("收取爱心鸡蛋", trueAndFalse);
    jo.put(jn_harvestProduce, config.harvestProduce);
    
@@ -516,6 +538,9 @@ public class Config
    
    jo.put("领取饲料", trueAndFalse);
    jo.put(jn_receiveFarmTaskAward, config.receiveFarmTaskAward);
+
+   jo.put("领取道具卡", trueAndFalse);
+   jo.put(jn_receiveFarmToolReward, config.receiveFarmToolReward);
    
    jo.put("喂鸡", trueAndFalse);
    jo.put(jn_feedAnimal, config.feedAnimal);

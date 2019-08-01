@@ -46,7 +46,7 @@ public class AntFarm
     case NEWEGGTOOL:
      return "新蛋卡";
     default:
-    return name();
+     return name();
    }
   }
  }
@@ -62,6 +62,13 @@ public class AntFarm
   public String consistencyKey, friendId, time;
  }
 
+ /**private static class FarmTool
+ {
+  public ToolType toolType;
+  public String toolId;
+  public int toolCount, toolHoldLimit;
+ }/**/
+ 
  private static String cityAdCode;
  private static String districtAdCode;
  private static String version;
@@ -77,6 +84,7 @@ public class AntFarm
  private static double benevolenceScore;
  private static double harvestBenevolenceScore;
  private static int unreceiveTaskAward = 0;
+ //private static FarmTool[] farmTools;
 
  public static void start(ClassLoader loader, String args0, String args1, String response)
  {
@@ -159,8 +167,16 @@ public class AntFarm
         if(recall)
         {
          recallAnimal(loader,ownerAnimal.animalId,ownerAnimal.currentFarmId,ownerFarmId);
-         syncAnimalStatus(loader,ownerFarmId);
+         syncAnimalStatus(loader, ownerFarmId);
         }
+       }
+       
+       if(Config.receiveFarmToolReward())receiveToolTaskReward(loader);
+       
+       if(Config.useNewEggTool())
+       {
+        useFarmTool(loader, ownerFarmId, ToolType.NEWEGGTOOL);
+        syncAnimalStatus(loader, ownerFarmId);
        }
 
        if(Config.harvestProduce() && benevolenceScore >= 1)
@@ -183,7 +199,7 @@ public class AntFarm
        {
         if(Config.feedAnimal() && AnimalFeedStatus.HUNGRY.name().equals(ownerAnimal.animalFeedStatus))
         {
-         Log.showDialogAndRecordLog("小鸡在挨饿","");
+         Log.showDialogAndRecordLog("你的小鸡在挨饿","");
          // 喂鸡
          feedAnimal(loader, ownerFarmId);
          //syncAnimalStatus(loader,ownerFarmId);
@@ -191,11 +207,11 @@ public class AntFarm
 
         if(AnimalBuff.ACCELERATING.name().equals(ownerAnimal.animalBuff))
         {
-         Log.showDialogAndRecordLog("小鸡已经双手并用着加速吃饲料了","");
+         Log.showDialogAndRecordLog("小鸡正双手并用着加速吃饲料","");
         }else if(Config.useAccelerateTool())
         {
          // 加速卡
-         useFarmTool(loader, ToolType.ACCELERATETOOL);
+         useFarmTool(loader, ownerFarmId, ToolType.ACCELERATETOOL);
         }
 
         if(unreceiveTaskAward > 0)
@@ -207,7 +223,7 @@ public class AntFarm
        }
 
        // 通知好友赶鸡并帮好友喂鸡
-       notifyFriendAndFeed(loader);
+       notifyFriendAndFeedAnimal(loader);
 
       }catch(Exception e)
       {
@@ -222,8 +238,8 @@ public class AntFarm
 
  private static boolean isEnterFarmAndHasNull(String args0)
  {
-  return args0.equals("com.alipay.antfarm.enterFarm") &&
-   cityAdCode == null || districtAdCode == null || version == null;
+  return cityAdCode == null || districtAdCode == null || version == null
+   && args0.equals("com.alipay.antfarm.enterFarm");
  }
 
  private static boolean isEnterOwnerFarm(String resp)
@@ -294,7 +310,7 @@ public class AntFarm
    if(memo.equals("SUCCESS"))
    {
     double foodHaveStolen = jo.getDouble("foodHaveStolen");
-    Log.showDialogAndRecordLog("已召回小鸡，偷吃了〔"+Config.getNameById(farmId2UserId(currentFarmId))+"〕的［"+foodHaveStolen+"克］饲料","");
+    Log.showDialogAndRecordLog("已召回小鸡，偷吃了〔"+Config.getNameById(farmId2UserId(currentFarmId))+"〕的〔"+foodHaveStolen+"克〕饲料","");
     // 这里不需要加
     // add2FoodStock((int)foodHaveStolen);
    }else
@@ -336,7 +352,7 @@ public class AntFarm
        s = "你对〔"+user+"〕的小鸡发起攻击\n";
        if(jo.has("hitLossFood"))
        {
-        s += "胖揍了〔"+user+"〕的小鸡，掉落了［"+jo.getInt("hitLossFood")+"克］饲料";
+        s += "胖揍了〔"+user+"〕的小鸡，掉落了〔"+jo.getInt("hitLossFood")+"克〕饲料";
         foodStock = jo.getInt("finalFoodStorage");
         s += "\n剩余〔"+foodStock+"克〕饲料";
        }else
@@ -582,58 +598,60 @@ public class AntFarm
   }
  }
 
- private static void receiveToolTaskAward(ClassLoader loader)
+ private static void receiveToolTaskReward(ClassLoader loader)
  {
   try
   {
-   Log.showDialogAndRecordLog("开始领取道具…","");
-   Object o = rpcCall_listFarmTask(loader);
+   Log.showDialogAndRecordLog("开始领取道具卡…","");
+   Object o = rpcCall_listToolTaskDetails(loader);
    String s = RpcCall.getResponse(o);
    JSONObject jo = new JSONObject(s);
    String memo = jo.getString("memo");
    if(memo.equals("SUCCESS"))
    {
-    JSONArray jaFarmTaskList = jo.getJSONArray("farmTaskList");
-    boolean hasAwardFood = false;
-    for(int i = 0; i < jaFarmTaskList.length(); i++)
+    JSONArray jaList = jo.getJSONArray("list");
+    boolean hasRewardTool = false;
+    for(int i = 0; i < jaList.length(); i++)
     {
-     jo = jaFarmTaskList.getJSONObject(i);
-     if(TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
+     jo = jaList.getJSONObject(i);
+     if(jo.has("taskStatus")
+      && TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
      {
-      hasAwardFood = true;
+      hasRewardTool = true;
       int awardCount = jo.getInt("awardCount");
-      if(awardCount + foodStock > foodStockLimit)
+      String awardType = jo.getString("awardType");
+      ToolType toolType = ToolType.valueOf(awardType);
+      String taskType = jo.getString("taskType");
+      /**if(awardCount + foodStock > foodStockLimit)
       {
-       unreceiveTaskAward++;
        Log.showDialogAndRecordLog("领取"+awardCount+"克饲料后将超过〔"+foodStockLimit+"克〕上限，已终止领取","");
        break;
-      }
-      String title = jo.getString("title");
-      o = rpcCall_receiveFarmTaskAward(loader, jo.getString("taskId"));
+      }/**/
+      jo = new JSONObject(jo.getString("bizInfo"));
+      String taskTitle = jo.getString("taskTitle");
+      o = rpcCall_receiveToolTaskReward(loader, awardType, awardCount, taskType);
       s = RpcCall.getResponse(o);
       jo = new JSONObject(s);
       memo = jo.getString("memo");
       if(memo.equals("SUCCESS"))
       {
-       foodStock = jo.getInt("foodStock");
-       Log.showDialogAndRecordLog("已领取〔"+jo.getInt("haveAddFoodStock")+"克〕饲料，来源："+title,"");
-       if(unreceiveTaskAward > 0)unreceiveTaskAward--;
+       //int toolStockNum = jo.getInt("toolStockNum");
+       Log.showDialogAndRecordLog("已领取〔"+awardCount+"张〕〔"+toolType.nickName()+"〕，来源："+taskTitle,"");
       }else
       {
        Log.showDialogAndRecordLog("失败，"+memo,s);
       }
      }
     }
-    if(!hasAwardFood)
-     Log.showDialogAndRecordLog("暂时没有可领取的饲料","");
-    Log.showDialogAndRecordLog("剩余〔"+foodStock+"克〕饲料","");
+    if(!hasRewardTool)
+     Log.showDialogAndRecordLog("暂时没有可领取的道具卡","");
    }else
    {
     Log.showDialogAndRecordLog("失败，"+memo,s);
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "receiveToolTaskAward err:");
+   Log.i(TAG, "receiveToolTaskReward err:");
    Log.printStackTrace(TAG, e);
   }
  }
@@ -669,11 +687,10 @@ public class AntFarm
   }
  }
 
- private static void useFarmTool(ClassLoader loader, ToolType toolType)
+ private static void useFarmTool(ClassLoader loader, String targetFarmId, ToolType toolType)
  {
   try
   {
-   Log.showDialogAndRecordLog("开始使用"+toolType.nickName()+"…","");
    Object o = rpcCall_listFarmTool(loader);
    String s = RpcCall.getResponse(o);
    JSONObject jo = new JSONObject(s);
@@ -686,10 +703,11 @@ public class AntFarm
      jo = jaToolList.getJSONObject(i);
      if(toolType.name().equals(jo.getString("toolType")))
      {
+      Log.showDialogAndRecordLog("开始使用"+toolType.nickName()+"…","");
       int toolCount = jo.getInt("toolCount");
       if(toolCount > 0)
       {
-       o = rpcCall_useFarmTool(loader, ownerFarmId, jo.getString("toolId"), toolType.name());
+       o = rpcCall_useFarmTool(loader, targetFarmId, jo.getString("toolId"), toolType.name());
        s = RpcCall.getResponse(o);
        jo = new JSONObject(s);
        memo = jo.getString("memo");
@@ -706,12 +724,12 @@ public class AntFarm
    }
   }catch(Exception e)
   {
-   Log.i(TAG, "useAccelerateTool err:");
+   Log.i(TAG, "useFarmTool err:");
    Log.printStackTrace(TAG, e);
   }
  }
 
- private static void notifyFriendAndFeed(ClassLoader loader)
+ private static void notifyFriendAndFeedAnimal(ClassLoader loader)
  {
   try
   {
@@ -735,10 +753,10 @@ public class AntFarm
       jo = jaRankingList.getJSONObject(i);
       String userId = jo.getString("userId");
       String user = Config.getNameById(userId);
-      boolean feedFriendAnimal = jo.has("actionType") && 
-       jo.getString("actionType").equals("starve_action") && 
-       Config.feedFriendAnimal(userId);
-      if(jo.getBoolean("stealingAnimal") || feedFriendAnimal)
+      boolean starve = jo.has("actionType") && 
+       jo.getString("actionType").equals("starve_action");
+      boolean feedFriendAnimal = starve && Config.feedFriendAnimal(userId);
+      if(jo.getBoolean("stealingAnimal") && !starve || feedFriendAnimal)
       {
        o = rpcCall_enterFarm(loader, "", userId);
        s = RpcCall.getResponse(o);
@@ -1113,16 +1131,19 @@ public class AntFarm
   return null;
  }
 
- private static Object rpcCall_receiveToolTaskAward(ClassLoader loader, String taskId)
+ private static Object rpcCall_receiveToolTaskReward(ClassLoader loader, String awardType, int rewardCount, String taskType)
  {
   try
   {
-   String args1 = "[{\"requestType\":\"NORMAL\",\"sceneCode\":\"ANTFARM\",\"source\":\"H5\",\"taskId\":\""
-    +taskId+"\",\"version\":\""+version+"\"}]";
-   return RpcCall.invoke(loader, "com.alipay.antfarm.receiveToolTaskAward", args1);
+   String args1 = "[{\"awardType\":\""+awardType+
+   "\",\"ignoreLimit\":false,\"requestType\":\"NORMAL\",\"rewardCount\":"
+   +rewardCount+",\"rewardType\":\""+awardType+
+   "\",\"sceneCode\":\"ANTFARM\",\"source\":\"H5\",\"taskType\":\""
+   +taskType+"\",\"version\":\""+version+"\"}]";
+   return RpcCall.invoke(loader, "com.alipay.antfarm.receiveToolTaskReward", args1);
   }catch(Exception e)
   {
-   Log.i(TAG, "rpcCall_receiveToolTaskAward err:");
+   Log.i(TAG, "rpcCall_receiveToolTaskReward err:");
    Log.printStackTrace(TAG, e);
   }
   return null;

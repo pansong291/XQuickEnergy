@@ -14,7 +14,7 @@ public class AntForest
  private static ArrayList<String> friendsRankUseridList = new ArrayList<String>();
  private static Integer collectedEnergy = 0;
  private static Integer helpCollectedEnergy = 0;
- private static Integer pageCount = 0;
+ private static Integer startPoint = 1;
 
 
  /**
@@ -39,7 +39,7 @@ public class AntForest
     }).start();
   } else
   {
-   pageCount = 0;
+   startPoint = 1;
    Log.i(TAG, "friendsRankUseridList " + friendsRankUseridList);
    //如果发现已经解析完成了，如果有好友能量收取，就开始收取
    if (friendsRankUseridList.size() > 0)
@@ -183,9 +183,9 @@ public class AntForest
    JSONObject json = new JSONObject();
    json.put("av", "5");
    json.put("ct", "android");
-   json.put("pageSize", 20); // pageCount * 20);
-   json.put("startPoint", String.valueOf(pageCount * 20 + 1));
-   pageCount++;
+   json.put("pageSize", 20);
+   json.put("startPoint", String.valueOf(startPoint));
+   startPoint+=20;
    jsonArray.put(json);
    Log.i(TAG, "call friendranklist params:" + jsonArray);
 
