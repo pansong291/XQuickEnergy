@@ -99,7 +99,10 @@ public class XposedHook implements IXposedHookLoadPackage
      {
       Log.i(TAG, "cur activity: " + param.thisObject);
       Activity act = (Activity)param.thisObject;
-      if(RpcCall.h5Activity != act) Config.shouldReload = true;
+      if(RpcCall.h5Activity != act)
+      {
+       Config.shouldReloadConfig = true;
+      }
       RpcCall.h5Activity = act;
      }
     });

@@ -40,7 +40,6 @@ public class AntForest
   if(!args0.equals("alipay.antmember.forest.h5.queryNextAction")
    || args1.contains("\"userId\"")) return;
 
-
   new Thread(new Runnable()
    {
     ClassLoader loader;
@@ -451,8 +450,8 @@ public class AntForest
   try
   {
    String args1 = "[{\"bubbleIds\":["+bubbleId+"],\"userId\":\""+userId+"\"}]";
-   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.collectEnergy", args1);
-   return RpcCall.getResponse(resp);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.collectEnergy", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_collectEnergy err:");
@@ -467,8 +466,8 @@ public class AntForest
   {
    String args1 = "[{\"bizNo\":\""+bizNo+ordinal+"\",\"targetUser\":\""
     +targetUser+"\",\"transferType\":\"WATERING\",\"version\":\"\"}]";//20181217
-   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.transferEnergy", args1);
-   return RpcCall.getResponse(resp);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.transferEnergy", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_transferEnergy err:");
@@ -482,8 +481,8 @@ public class AntForest
   try
   {
    String args1 = "[{\"bubbleIds\":["+bubbleId+"],\"targetUserId\":\""+targetUserId+"\"}]";
-   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.forFriendCollectEnergy", args1);
-   return RpcCall.getResponse(resp);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.forFriendCollectEnergy", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_forFriendCollectEnergy err:");
@@ -497,8 +496,8 @@ public class AntForest
   try
   {
    String args1 = "[{\"version\":\"\"}]"; //20190321
-   Object resp = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryTaskList", args1);
-   return RpcCall.getResponse(resp);
+   Object o = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryTaskList", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_queryTaskList err:");
@@ -514,8 +513,8 @@ public class AntForest
    String args1 =
     "[{\"ignoreLimit\":false,\"requestType\":\"H5\",\"sceneCode\":\"ANTFOREST_TASK\",\"source\":\"ANTFOREST\",\"taskType\":\""
     +taskType+"\"}]";
-   Object resp = RpcCall.invoke(loader, "com.alipay.antiep.receiveTaskAward", args1);
-   return RpcCall.getResponse(resp);
+   Object o = RpcCall.invoke(loader, "com.alipay.antiep.receiveTaskAward", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_receiveTaskAward err:");
@@ -529,8 +528,8 @@ public class AntForest
   try
   {
    String args1 = "[{\"version\":\"\"}]"; //20181217
-   Object resp = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryPropList", args1);
-   return RpcCall.getResponse(resp);
+   Object o = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryPropList", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_queryPropList err:");

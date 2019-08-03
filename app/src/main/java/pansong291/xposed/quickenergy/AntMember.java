@@ -12,6 +12,7 @@ public class AntMember
   memberSignin(loader, args0, response);
   if(!"alipay.antmember.biz.rpc.member.h5.queryPointCert".equals(args0))
    return;
+  
   try
   {
    JSONObject jo = new JSONArray(args1).getJSONObject(0);
@@ -32,7 +33,7 @@ public class AntMember
      String bizTitle = jo.getString("bizTitle");
      String id = jo.getString("id");
      int pointAmount = jo.getInt("pointAmount");
-     s = RpcCall.getResponse(rpcCall_receivePointByUser(loader,id));
+     s = rpcCall_receivePointByUser(loader,id);
      jo = new JSONObject(s);
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
@@ -47,7 +48,7 @@ public class AntMember
      rpcCall_queryPointCert(loader, page + 1, pageSize);
     }else
     {
-     s = RpcCall.getResponse(rpcCall_queryPoint(loader));
+     s = rpcCall_queryPoint(loader);
      jo = new JSONObject(s);
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
@@ -79,7 +80,7 @@ public class AntMember
    {
     if(!jo.getBoolean("currentSigninStatus"))
     {
-     String s = RpcCall.getResponse(rpcCall_memberSignin(loader));
+     String s = rpcCall_memberSignin(loader);
      jo = new JSONObject(s);
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
@@ -99,12 +100,13 @@ public class AntMember
   }
  }
  
- private static Object rpcCall_queryPointCert(ClassLoader loader, int page, int pageSize)
+ private static String rpcCall_queryPointCert(ClassLoader loader, int page, int pageSize)
  {
   try
   {
    String args1 = "[{\"page\":"+page+",\"pageSize\":"+pageSize+"}]";
-   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.queryPointCert", args1);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.queryPointCert", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_queryPointCert err:");
@@ -113,12 +115,13 @@ public class AntMember
   return null;
  }
  
- private static Object rpcCall_receivePointByUser(ClassLoader loader, String certId)
+ private static String rpcCall_receivePointByUser(ClassLoader loader, String certId)
  {
   try
   {
    String args1 = "[{\"certId\":"+certId+"}]";
-   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.receivePointByUser", args1);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.receivePointByUser", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_receivePointByUser err:");
@@ -127,12 +130,13 @@ public class AntMember
   return null;
  }
  
- private static Object rpcCall_queryPoint(ClassLoader loader)
+ private static String rpcCall_queryPoint(ClassLoader loader)
  {
   try
   {
    String args1 = "[{}]";
-   return RpcCall.invoke(loader, "alipay.antmember.h5.queryPoint", args1);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.h5.queryPoint", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_queryPoint err:");
@@ -141,12 +145,13 @@ public class AntMember
   return null;
  }
  
- private static Object rpcCall_memberSignin(ClassLoader loader)
+ private static String rpcCall_memberSignin(ClassLoader loader)
  {
   try
   {
    String args1 = "[{}]";
-   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.memberSignin", args1);
+   Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.memberSignin", args1);
+   return RpcCall.getResponse(o);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_memberSignin err:");

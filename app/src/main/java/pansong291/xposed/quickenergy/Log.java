@@ -42,6 +42,13 @@ public class Log
   showToast(str, str2);
  }
  
+ public static void showDialogOrToastAndRecordLog(String str, String str2)
+ {
+  showDialog(str, str2);
+  showToast(str, str2);
+  recordLog(str, str2);
+ }
+ 
  public static void showDialogAndRecordLog(String str, String str2)
  {
   showDialog(str, str2);
