@@ -23,7 +23,8 @@ public class Config
  jn_immediateEffect = "immediateEffect", jn_showMode = "showMode", jn_recordLog = "recordLog",
  jn_enableForest = "enableForest", jn_enableFarm = "enableFarm",
  /* forest */
- jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList", jn_dontHelpCollectList = "dontHelpCollectList",
+ jn_collectEnergy = "collectEnergy", jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList",
+ jn_dontHelpCollectList = "dontHelpCollectList", jn_receiveForestTaskAward = "receiveForestTaskAward", jn_waterFriendList = "waterFriendList",
  /* farm */
  jn_rewardFriend = "rewardFriend", jn_sendBackAnimal = "sendBackAnimal", jn_sendType = "sendType",
  jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_useNewEggTool = "useNewEggTool",
@@ -43,9 +44,12 @@ public class Config
  private boolean enableFarm;
 
  /* forest */
+ private Boolean collectEnergy;
  private boolean helpFriendCollect;
  private List<String> dontCollectList;
  private List<String> dontHelpCollectList;
+ private boolean receiveForestTaskAward;
+ private List<String> waterFriendList;
 
  /* farm */
  private boolean rewardFriend;
@@ -96,6 +100,11 @@ public class Config
  }
 
  /* forest */
+ public static boolean collectEnergy()
+ {
+  return getConfig().collectEnergy;
+ }
+ 
  public static boolean helpFriend()
  {
   return getConfig().helpFriendCollect;
@@ -109,6 +118,16 @@ public class Config
  public static boolean dontHelp(String id)
  {
   return getConfig().dontHelpCollectList.contains(id);
+ }
+ 
+ public static boolean receiveForestTaskAward()
+ {
+  return getConfig().receiveForestTaskAward;
+ }
+ 
+ public static List<String> waterFriendList()
+ {
+  return getConfig().waterFriendList;
  }
 
  /* farm */
@@ -311,9 +330,12 @@ public class Config
   c.enableForest = true;
   c.enableFarm = true;
 
+  c.collectEnergy = true;
   c.helpFriendCollect = true;
   c.dontCollectList = new ArrayList<>();
   c.dontHelpCollectList = new ArrayList<>();
+  c.receiveForestTaskAward = true;
+  c.waterFriendList = new ArrayList<>();
 
   c.rewardFriend = true;
   c.sendBackAnimal = true;
@@ -359,6 +381,9 @@ public class Config
    Log.i(TAG, jn_enableFarm + ":" + config.enableFarm);
 
    /* forest */
+   config.collectEnergy = jo.getBoolean(jn_collectEnergy);
+   Log.i(TAG, jn_collectEnergy + ":" + config.collectEnergy);
+   
    config.helpFriendCollect = jo.getBoolean(jn_helpFriendCollect);
    Log.i(TAG, jn_helpFriendCollect + ":" + config.helpFriendCollect);
 
@@ -380,6 +405,18 @@ public class Config
     Log.i(TAG, config.dontHelpCollectList.get(i)+",");
    }
 
+   config.receiveForestTaskAward = jo.getBoolean(jn_receiveForestTaskAward);
+   Log.i(TAG, jn_receiveForestTaskAward + ":" + config.receiveForestTaskAward);
+   
+   ja = jo.getJSONArray(jn_waterFriendList);
+   config.waterFriendList = new ArrayList<>();
+   Log.i(TAG, jn_waterFriendList + ":[");
+   for(int i = 0; i < ja.length(); i++)
+   {
+    config.waterFriendList.add(ja.getString(i));
+    Log.i(TAG, config.waterFriendList.get(i)+",");
+   }
+   
    /* farm */
    config.rewardFriend = jo.getBoolean(jn_rewardFriend);
    Log.i(TAG, jn_rewardFriend + ":" + config.rewardFriend);
@@ -481,6 +518,9 @@ public class Config
    jo.put(jn_enableFarm, config.enableFarm);
 
    /* forest */
+   jo.put("收取能量", trueAndFalse);
+   jo.put(jn_collectEnergy, config.collectEnergy);
+   
    jo.put("帮好友收取能量", trueAndFalse);
    jo.put(jn_helpFriendCollect, config.helpFriendCollect);
 
@@ -500,6 +540,17 @@ public class Config
    jo.put("不帮收能量的好友列表", userId);
    jo.put(jn_dontHelpCollectList, ja);
 
+   jo.put("领取森林任务奖励", trueAndFalse);
+   jo.put(jn_receiveForestTaskAward, config.receiveForestTaskAward);
+   
+   ja = new JSONArray();
+   for(String s: config.waterFriendList)
+   {
+    ja.put(s);
+   }
+   jo.put("帮浇水的好友列表", userId);
+   jo.put(jn_waterFriendList, ja);
+   
    /* farm */
    jo.put("打赏好友", trueAndFalse);
    jo.put(jn_rewardFriend, config.rewardFriend);
@@ -536,10 +587,10 @@ public class Config
    jo.put("答题", trueAndFalse);
    jo.put(jn_answerQuestion, config.answerQuestion);
    
-   jo.put("领取饲料", trueAndFalse);
+   jo.put("领取庄园任务奖励", trueAndFalse);
    jo.put(jn_receiveFarmTaskAward, config.receiveFarmTaskAward);
 
-   jo.put("领取道具卡", trueAndFalse);
+   jo.put("领取道具卡奖励", trueAndFalse);
    jo.put(jn_receiveFarmToolReward, config.receiveFarmToolReward);
    
    jo.put("喂鸡", trueAndFalse);
@@ -583,7 +634,7 @@ public class Config
   }
   StringBuilder sb = new StringBuilder(formated);
   char currentChar, lastNonSpaceChar = 0;
-  sbi:for(int i = 0; i < sb.length(); i++)
+  for(int i = 0; i < sb.length(); i++)
   {
    currentChar = sb.charAt(i);
    switch(currentChar)
@@ -599,7 +650,7 @@ public class Config
        sb.replace(i, i + 1, "// ");
        sb.deleteCharAt(sb.indexOf("\"", i));
        sb.deleteCharAt(sb.lastIndexOf(",", nextNL));
-       continue sbi;
+       break;
       }
      }
      break;
@@ -612,7 +663,7 @@ public class Config
        sb.deleteCharAt(i);
        i = sb.indexOf("\"", i);
        sb.deleteCharAt(i);
-       lastNonSpaceChar = sb.charAt(--i);
+       if(lastNonSpaceChar != '[') lastNonSpaceChar = sb.charAt(--i);
      }
      break;
 

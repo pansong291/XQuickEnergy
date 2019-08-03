@@ -238,8 +238,9 @@ public class AntFarm
 
  private static boolean isEnterFarmAndHasNull(String args0)
  {
-  return cityAdCode == null || districtAdCode == null || version == null
-   && args0.equals("com.alipay.antfarm.enterFarm");
+  if(args0.equals("com.alipay.antfarm.enterFarm"))
+   return cityAdCode == null || districtAdCode == null || version == null;
+  return false;
  }
 
  private static boolean isEnterOwnerFarm(String resp)

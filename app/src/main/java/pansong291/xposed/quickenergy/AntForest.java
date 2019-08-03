@@ -1,341 +1,603 @@
 package pansong291.xposed.quickenergy;
 
-import android.app.Activity;
-import android.text.TextUtils;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import android.os.Handler;
+import android.os.Message;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
+import android.os.Looper;
+import java.util.List;
 
 public class AntForest
 {
  private static final String TAG = AntForest.class.getCanonicalName();
- private static ArrayList<String> friendsRankUseridList = new ArrayList<String>();
- private static Integer collectedEnergy = 0;
- private static Integer helpCollectedEnergy = 0;
- private static Integer startPoint = 1;
-
-
- /**
-  * 自动获取有能量的好友信息
-  *
-  * @param loader
-  * @param response
-  */
- public static void autoGetCanCollectUserIdList(final ClassLoader loader, String response)
+ private static String selfId;
+ private static int collectedEnergy = 0;
+ private static int helpCollectedEnergy = 0;
+ private static int onceHelpCollected = 0;
+ public enum TaskAwardType
  {
-  // 开始解析好友信息，循环把所有有能量的好友信息都解析完
-  boolean hasMore = parseFrienRankPageDataResponse(response);
-  if (hasMore)
+  BUBBLE_BOOST;
+  public String nickName()
   {
-   Log.showDialog("开始获取可以收取能量的好友信息...", "");
-   new Thread(new Runnable() {
-     public void run()
-     {
-      // 发送获取下一页好友信息接口
-      rpcCall_friendRankList(loader);
-     }
-    }).start();
-  } else
-  {
-   startPoint = 1;
-   Log.i(TAG, "friendsRankUseridList " + friendsRankUseridList);
-   //如果发现已经解析完成了，如果有好友能量收取，就开始收取
-   if (friendsRankUseridList.size() > 0)
+   switch(this)
    {
-    Log.showDialogOrToast("开始获取每个好友能够收取的能量信息...", "");
-    for (String userId : friendsRankUseridList)
-    {
-     // 开始收取每个用户的能量
-     rpcCall_canCollectEnergy(loader, userId);
-    }
-    Log.showDialogOrToast("共偷取能量【" + collectedEnergy + "克】，共帮收能量【" + helpCollectedEnergy + "克】\n", "");
-    Log.i(TAG, "能量收取结束");
-    friendsRankUseridList.clear();
-    collectedEnergy = 0;
-    if(helpCollectedEnergy != 0)
-    {
-     helpCollectedEnergy = 0;
-     autoGetCanCollectUserIdList(loader, null);
-    }
-    Config.saveIdMap();
-   }else
-   {
-    Log.showDialogOrToast("暂时没有可收取的能量\n", "");
+    case BUBBLE_BOOST:
+     return "时光加速器";
+    default:
+    return name();
    }
-   // 执行完了调用刷新页面，看看总能量效果
   }
  }
+ 
+ public enum ThreadStatus
+ { START, END }
+ private static int threadCount = 0;
+ private static boolean hasMore = true;
 
- /**
-  * 自动获取能收取的能量ID
-  *
-  * @param loader
-  * @param response
-  */
- public static void autoGetCanCollectBubbleIdList(final ClassLoader loader, String response)
+ public static void start(ClassLoader loader, String args0, String args1, String resp)
  {
-  if (!TextUtils.isEmpty(response) && response.contains("collectStatus"))
-  {
-   try
+  if(!args0.equals("alipay.antmember.forest.h5.queryNextAction")
+   || args1.contains("\"userId\"")) return;
+
+
+  new Thread(new Runnable()
    {
-    JSONObject jsonObject = new JSONObject(response);
-    JSONArray jsonArray = jsonObject.getJSONArray("bubbles");
-    jsonObject = jsonObject.getJSONObject("userEnergy");
-    String userName = jsonObject.getString("displayName");
-    String loginId = userName;
-    if(jsonObject.has("loginId"))
-     loginId += "(" + jsonObject.getString("loginId") + ")";
-    if (jsonArray != null && jsonArray.length() > 0)
+    ClassLoader loader;
+    String resp;
+
+    public Runnable setData(ClassLoader cl, String s)
     {
-     for (int i = 0; i < jsonArray.length(); i++)
+     loader = cl;resp = s;
+     return this;
+    }
+
+    @Override
+    public void run()
+    {
+     try
      {
-      JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-      String userId = jsonObject1.getString("userId");
-      long bubbleId = jsonObject1.getLong("id");
-      Config.putIdMap(userId, loginId);
-      if ("AVAILABLE".equals(jsonObject1.getString("collectStatus")))
+      if(Config.collectEnergy())
       {
-       if(Config.dontCollect(userId))
-        Log.showDialog("不偷取【" + userName + "】", ", userId=" + userId);
-       else
-        rpcCall_collectEnergy(loader, userId, bubbleId, userName);
-      }
-      if (jsonObject1.getBoolean("canHelpCollect"))
-      {
-       if(Config.helpFriend())
+       Log.showDialogOrToast("开始收取能量…","");
+       queryEnergyRanking(loader, 1);
+       JSONObject jo = new JSONObject(resp);
+       if(jo.getString("resultCode").equals("SUCCESS"))
        {
-         if(Config.dontHelp(userId))
-          Log.showDialog("不帮收【" + userName + "】", ", userId=" + userId);
-         else
-          rpcCall_forFriendCollectEnergy(loader, userId, bubbleId, userName);
+        jo = jo.getJSONObject("userEnergy");
+        selfId = jo.getString("userId");
+        canCollectSelfEnergy(loader, resp);
        }else
-        Log.showDialog("不帮收【" + userName + "】", ", userId=" + userId);
+       {
+        Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+       }
       }
-     }
-    }
 
-   }catch(Exception e)
-   {
-    Log.printStackTrace(TAG, e);
-   }
-  }
- }
-
- public static boolean isRankList(String response)
- {
-  return !TextUtils.isEmpty(response) && response.contains("friendRanking");
- }
-
- public static boolean isUserDetail(String response)
- {
-  return !TextUtils.isEmpty(response) && response.contains("userEnergy");
- }
-
- /**
-  * 解析好友信息
-  *
-  * @param response
-  * @return
-  */
- private static boolean parseFrienRankPageDataResponse(String response)
- {
-  try
-  {
-   JSONObject jo = new JSONObject(response);
-   JSONArray optJSONArray = jo.getJSONArray("friendRanking");
-   if (optJSONArray != null)
-   {
-    for (int i = 0; i < optJSONArray.length(); i++)
-    {
-     JSONObject jsonObject = optJSONArray.getJSONObject(i);
-     boolean optBoolean = jsonObject.getBoolean("canCollectEnergy")
-      || jsonObject.getBoolean("canHelpCollect");
-     String userId = jsonObject.getString("userId");
-     if (optBoolean && !friendsRankUseridList.contains(userId))
+      for(String userId: Config.waterFriendList())
+      {
+       waterFriendEnergy(loader,userId);
+      }
+      
+      if(Config.receiveForestTaskAward())receiveTaskAward(loader);
+     }catch(Exception e)
      {
-      friendsRankUseridList.add(userId);
+      Log.i(TAG, "start err:");
+      Log.printStackTrace(TAG, e);
      }
     }
-    if(optJSONArray.length() == 0)
-     return false;
-    return jo.getBoolean("hasMore");
-   }
-  }catch(Exception e)
-  {
-   Log.i(TAG, "parseFrienRankPageDataResponse err:");
-   Log.printStackTrace(TAG, e);
-  }
-  return true;
+   }.setData(loader, resp)).start();
+
+
  }
 
- /**
-  * 获取分页好友信息命令
-  *
-  * @param loader
-  */
- private static void rpcCall_friendRankList(final ClassLoader loader)
+ private static void queryEnergyRanking(ClassLoader loader, int startPoint)
  {
-  try
-  {
-   JSONArray jsonArray = new JSONArray();
-   JSONObject json = new JSONObject();
-   json.put("av", "5");
-   json.put("ct", "android");
-   json.put("pageSize", 20);
-   json.put("startPoint", String.valueOf(startPoint));
-   startPoint+=20;
-   jsonArray.put(json);
-   Log.i(TAG, "call friendranklist params:" + jsonArray);
-
-   RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryEnergyRanking", jsonArray.toString());
-
-  }catch(Exception e)
-  {
-   Log.i(TAG, "rpcCall_friendRankList err:");
-   Log.printStackTrace(TAG, e);
-  }
- }
-
- /**
-  * 获取指定用户可以收取的能量信息
-  *
-  * @param loader
-  * @param userId
-  */
- private static void rpcCall_canCollectEnergy(final ClassLoader loader, String userId)
- {
-  try
-  {
-   JSONArray jsonArray = new JSONArray();
-   JSONObject json = new JSONObject();
-   json.put("av", "5");
-   json.put("ct", "android");
-   json.put("pageSize", 3);
-   json.put("startIndex", 0);
-   json.put("userId", userId);
-   jsonArray.put(json);
-   Log.i(TAG, "call cancollect energy params:" + jsonArray);
-
-   RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryNextAction", jsonArray.toString());
-
-   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", jsonArray.toString());
-
-  }catch(Exception e)
-  {
-   Log.i(TAG, "rpcCall_canCollectEnergy err:");
-   Log.printStackTrace(TAG, e);
-  }
- }
-
- /**
-  * 收取能量命令
-  *
-  * @param loader
-  * @param userId
-  * @param bubbleId
-  */
- private static void rpcCall_collectEnergy(final ClassLoader loader, String userId, Long bubbleId, String userName)
- {
-  try
-  {
-   JSONArray jsonArray = new JSONArray();
-   JSONArray bubbleAry = new JSONArray();
-   bubbleAry.put(bubbleId);
-   JSONObject json = new JSONObject();
-   //json.put("av", "5");
-   //json.put("ct", "android");
-   json.put("userId", userId);
-   json.put("bubbleIds", bubbleAry);
-   jsonArray.put(json);
-   Log.i(TAG, "call collect energy params:" + jsonArray);
-
-   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.collectEnergy", jsonArray.toString());
-   String response = RpcCall.getResponse(resp);
-   int collect = parseCollectEnergyResponse(response, false);
-   if(collect > 0)
+  new Thread(new Runnable()
    {
-    Log.showDialogAndRecordLog("偷取【" + userName + "】的能量【" + collect + "克】", "，UserID：" + userId + "，BubbleId：" + bubbleId);
+    ClassLoader loader;
+    int startPoint;
+
+    public Runnable setData(ClassLoader cl, int sp)
+    {
+     loader = cl;startPoint = sp;
+     return this;
+    }
+
+    @Override
+    public void run()
+    {
+     try
+     {
+      updateThreadCount(ThreadStatus.START,loader);
+      String s = rpcCall_queryEnergyRanking(loader, startPoint);
+      JSONObject jo = new JSONObject(s);
+      if(jo.getString("resultCode").equals("SUCCESS"))
+      {
+       hasMore = jo.getBoolean("hasMore");
+       if(hasMore)
+        queryEnergyRanking(loader, startPoint + 20);
+       JSONArray jaFriendRanking = jo.getJSONArray("friendRanking");
+       for(int i = 0; i < jaFriendRanking.length(); i++)
+       {
+        jo = jaFriendRanking.getJSONObject(i);
+        boolean optBoolean = jo.getBoolean("canCollectEnergy")
+         || jo.getBoolean("canHelpCollect");
+        String userId = jo.getString("userId");
+        if(optBoolean && !userId.equals(selfId))
+        {
+         canCollectEnergy(loader, userId);
+        }
+       }
+      }else
+      {
+       Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+      }
+     }catch(Exception e)
+     {
+      Log.i(TAG, "queryEnergyRanking err:");
+      Log.printStackTrace(TAG, e);
+      hasMore = false;
+     }
+     updateThreadCount(ThreadStatus.END,loader);
+    }
+   }.setData(loader, startPoint)).start();
+ }
+
+ private static void canCollectSelfEnergy(ClassLoader loader, String resp)
+ {
+  try
+  {
+   JSONObject jo = new JSONObject(resp);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    JSONArray jaBubbles = jo.getJSONArray("bubbles");
+    jo = jo.getJSONObject("userEnergy");
+    String userId = selfId;
+    String userName = jo.getString("displayName");
+    Config.putIdMap(userId, userName);
+    for(int i = 0; i < jaBubbles.length(); i++)
+    {
+     jo = jaBubbles.getJSONObject(i);
+     long bubbleId = jo.getLong("id");
+     if("AVAILABLE".equals(jo.getString("collectStatus")))
+     {
+      if(Config.dontCollect(userId))
+       Log.showDialog("不偷取【"+userName+"】",", userId="+userId);
+      else
+       collectEnergy(loader, userId, bubbleId, userName);
+     }
+    }
    }else
    {
-    Log.showDialogAndRecordLog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
    }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "canCollectSelfEnergy err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static void canCollectEnergy(ClassLoader loader, String userId)
+ {
+  try
+  {
+   String s = rpcCall_queryNextAction(loader, userId);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    JSONArray jaBubbles = jo.getJSONArray("bubbles");
+    jo = jo.getJSONObject("userEnergy");
+    String userName = jo.getString("displayName");
+    for(int i = 0; i < jaBubbles.length(); i++)
+    {
+     jo = jaBubbles.getJSONObject(i);
+     long bubbleId = jo.getLong("id");
+     if("AVAILABLE".equals(jo.getString("collectStatus")))
+     {
+      if(Config.dontCollect(userId))
+       Log.showDialog("不偷取【"+userName+"】",", userId="+userId);
+      else
+       collectEnergy(loader, userId, bubbleId, userName);
+     }
+     if(jo.getBoolean("canHelpCollect"))
+     {
+      if(Config.helpFriend())
+      {
+       if(Config.dontHelp(userId))
+        Log.showDialog("不帮收【"+userName+"】",", userId="+userId);
+       else
+        forFriendCollectEnergy(loader, userId, bubbleId, userName);
+      }else
+       Log.showDialog("不帮收【"+userName+"】",", userId="+userId);
+     }
+    }
+   }else
+   {
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "canCollectEnergy err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static void collectEnergy(ClassLoader loader, String userId, Long bubbleId, String userName)
+ {
+  try
+  {
+   String s = rpcCall_collectEnergy(loader,userId,bubbleId);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    JSONArray jaBubbles = jo.getJSONArray("bubbles");
+    int collected = 0;
+    for(int i = 0; i < jaBubbles.length(); i++)
+    {
+     jo = jaBubbles.getJSONObject(i);
+     collected += jo.getInt("collectedEnergy");
+    }
+    if(collected > 0)
+    {
+     Log.showDialogAndRecordLog("偷取【"+userName+"】的能量【"+collected+"克】","，UserID："+userId+"，BubbleId："+bubbleId);
+     collectedEnergy += collected;
+    }else
+    {
+     Log.showDialogAndRecordLog("偷取【"+userName+"】的能量失败","，UserID："+userId+"，BubbleId："+bubbleId);
+    }
+   }else
+   {
+    s = jo.getString("resultDesc");
+    if(s.contains("TA"))
+     s = s.replace("TA","【"+userName+"】");
+    Log.showDialogAndRecordLog(s,"");
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "collectEnergy err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static void forFriendCollectEnergy(ClassLoader loader, String targetUserId, Long bubbleId, String userName)
+ {
+  try
+  {
+   String s = rpcCall_forFriendCollectEnergy(loader,targetUserId,bubbleId);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    JSONArray jaBubbles = jo.getJSONArray("bubbles");
+    int helped = 0;
+    for(int i = 0; i < jaBubbles.length(); i++)
+    {
+     jo = jaBubbles.getJSONObject(i);
+     helped += jo.getInt("collectedEnergy");
+    }
+    if(helped > 0)
+    {
+     Log.showDialogAndRecordLog("帮【"+userName+"】收取【"+helped+"克】","，UserID："+targetUserId+"，BubbleId："+bubbleId);
+     onceHelpCollected += helped;
+    }else
+    {
+     Log.showDialogAndRecordLog("帮【"+userName+"】收取失败","，UserID："+targetUserId+"，BubbleId"+bubbleId);
+    }
+   }else
+   {
+    s = jo.getString("resultDesc");
+    if(s.contains("TA"))
+     s = s.replace("TA","【"+userName+"】");
+    Log.showDialogAndRecordLog(s,"");
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "forFriendCollectEnergy err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static void waterFriendEnergy(ClassLoader loader, String userId)
+ {
+  try
+  {
+   String s = rpcCall_queryNextAction(loader,userId);
+   JSONObject jo = new JSONObject(s);
+   s = jo.getString("resultCode");
+   if(s.equals("SUCCESS"))
+   {
+    String bizNo = jo.getString("bizNo");
+    jo = jo.getJSONObject("userEnergy");
+    String userName = jo.getString("displayName");
+    for(int waterCount = 1; waterCount <= 3;)
+    {
+     s = rpcCall_transferEnergy(loader,userId,bizNo,waterCount);
+     jo = new JSONObject(s);
+     s = jo.getString("resultCode");
+     if(s.equals("SUCCESS"))
+     {
+      s = jo.getJSONObject("treeEnergy").getString("currentEnergy");
+      Log.showDialogAndRecordLog("给【"+userName+"】浇水成功，剩余能量【"+s+"克】","");
+      waterCount++;
+      Thread.sleep(2000);
+     }else if(s.equals("WATERING_TIMES_LIMIT"))
+     {
+      Log.showDialogAndRecordLog("今日给【"+userName+"】浇水已达上限","");
+      break;
+     }else if(s.equals("LOW_VERSION"))
+     {
+      Log.showDialogAndRecordLog("给【"+userName+"】浇水失败，"+s,"");
+      break;
+     }else
+     {
+      Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+     }
+    }
+   }else
+   {
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "waterFriendEnergy err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static void receiveTaskAward(ClassLoader loader)
+ {
+  try
+  {
+   String s = rpcCall_queryTaskList(loader);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    JSONArray jaForestTaskVOList = jo.getJSONArray("forestTaskVOList");
+    for(int i = 0; i < jaForestTaskVOList.length(); i++)
+    {
+     jo = jaForestTaskVOList.getJSONObject(i);
+     if(TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
+     {
+      TaskAwardType taskAwardType = TaskAwardType.valueOf(jo.getString("awardType"));
+      int awardCount = jo.getInt("awardCount");
+      String taskType = jo.getString("taskType");
+      s = rpcCall_receiveTaskAward(loader,taskType);
+      jo = new JSONObject(s);
+      s = jo.getString("desc");
+      if(s.equals("SUCCESS"))
+       Log.showDialogAndRecordLog("已领取【"+awardCount+"个】【"+taskAwardType.nickName()+"】","");
+      else
+       Log.showDialogAndRecordLog("领取失败，"+s,"");
+     }
+    }
+   }else
+   {
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "receiveTaskAward err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static void queryPropList(ClassLoader loader)
+ {
+  try
+  {
+   String s = rpcCall_queryTaskList(loader);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    JSONArray jaForestPropVOList = jo.getJSONArray("forestPropVOList");
+    for(int i = 0; i < jaForestPropVOList.length(); i++)
+    {
+     jo = jaForestPropVOList.getJSONObject(i);
+     if(TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
+     {
+      String taskType = jo.getString("taskType");
+
+     }
+    }
+   }else
+   {
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "queryTaskList err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
+ private static String rpcCall_queryEnergyRanking(ClassLoader loader, int startPoint)
+ {
+  try
+  {
+   String args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":20,\"startPoint\":"
+    +startPoint+"}]";
+   Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryEnergyRanking", args1);
+   return RpcCall.getResponse(o);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_queryEnergyRanking err:");
+   Log.printStackTrace(TAG, e);
+  }
+  return null;
+ }
+
+ private static String rpcCall_queryNextAction(ClassLoader loader, String userId)
+ {
+  try
+  {
+   String args1 = "[{\"userId\":\""+userId+"\"}]";
+   Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryNextAction", args1);
+
+   args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":3,\"startIndex\":0,\"userId\":\""
+    +userId+"\"}]";
+   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", args1);
+
+   return RpcCall.getResponse(o);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_queryNextAction err:");
+   Log.printStackTrace(TAG, e);
+  }
+  return null;
+ }
+
+ private static String rpcCall_collectEnergy(ClassLoader loader, String userId, Long bubbleId)
+ {
+  try
+  {
+   String args1 = "[{\"bubbleIds\":["+bubbleId+"],\"userId\":\""+userId+"\"}]";
+   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.collectEnergy", args1);
+   return RpcCall.getResponse(resp);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_collectEnergy err:");
    Log.printStackTrace(TAG, e);
   }
+  return null;
  }
- 
- /**
-  * 帮好友收取能量命令
-  *
-  * @param loader
-  * @param userId
-  * @param bubbleId
-  */
- private static void rpcCall_forFriendCollectEnergy(ClassLoader loader, String targetUserId, Long bubbleId, String userName)
+
+ private static String rpcCall_transferEnergy(ClassLoader loader, String targetUser, String bizNo, int ordinal)
  {
   try
   {
-   JSONArray jsonArray = new JSONArray();
-   JSONArray bubbleAry = new JSONArray();
-   bubbleAry.put(bubbleId);
-   JSONObject json = new JSONObject();
-   json.put("bubbleIds", bubbleAry);
-   json.put("targetUserId", targetUserId);
-   jsonArray.put(json);
-   Log.i(TAG, "call help collect energy params:" + jsonArray);
-   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.forFriendCollectEnergy", jsonArray.toString());
-   String response = RpcCall.getResponse(resp);
-   int helped = parseCollectEnergyResponse(response, true);
-   if (helped > 0)
-   {
-    Log.showDialogAndRecordLog("帮【" + userName + "】收取【" + helped + "克】", "，UserID：" + targetUserId + "，BubbleId：" + bubbleId);
-   }else
-   {
-    Log.showDialogAndRecordLog("帮【" + userName + "】收取失败", "，UserID：" + targetUserId + "，BubbleId" + bubbleId);
-   }
+   String args1 = "[{\"bizNo\":\""+bizNo+ordinal+"\",\"targetUser\":\""
+    +targetUser+"\",\"transferType\":\"WATERING\",\"version\":\"\"}]";//20181217
+   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.transferEnergy", args1);
+   return RpcCall.getResponse(resp);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_transferEnergy err:");
+   Log.printStackTrace(TAG, e);
+  }
+  return null;
+ }
+
+ private static String rpcCall_forFriendCollectEnergy(ClassLoader loader, String targetUserId, Long bubbleId)
+ {
+  try
+  {
+   String args1 = "[{\"bubbleIds\":["+bubbleId+"],\"targetUserId\":\""+targetUserId+"\"}]";
+   Object resp = RpcCall.invoke(loader, "alipay.antmember.forest.h5.forFriendCollectEnergy", args1);
+   return RpcCall.getResponse(resp);
   }catch(Exception e)
   {
    Log.i(TAG, "rpcCall_forFriendCollectEnergy err:");
    Log.printStackTrace(TAG, e);
   }
-
+  return null;
  }
- 
- private static int parseCollectEnergyResponse(String response, boolean isForFriend)
+
+ private static String rpcCall_queryTaskList(ClassLoader loader)
  {
-  if(!TextUtils.isEmpty(response) && response.contains("failedBubbleIds"))
+  try
   {
-   try
-   {
-    int count = 0;
-    JSONObject jsonObject = new JSONObject(response);
-    JSONArray jsonArray = jsonObject.getJSONArray("bubbles");
-    for(int i = 0; i < jsonArray.length(); i++)
-     count += jsonArray.getJSONObject(i).getInt("collectedEnergy");
-    if(isForFriend)
-    {
-     helpCollectedEnergy += count;
-    }else
-    {
-     collectedEnergy += count;
-    }
-    if("SUCCESS".equals(jsonObject.getString("resultCode")))
-    {
-     return count;
-    }
-   }catch(Exception e)
-   {
-    Log.i(TAG, "parseCollectEnergyResponse err:");
-    Log.printStackTrace(TAG, e);
-   }
+   String args1 = "[{\"version\":\"\"}]"; //20190321
+   Object resp = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryTaskList", args1);
+   return RpcCall.getResponse(resp);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_queryTaskList err:");
+   Log.printStackTrace(TAG, e);
   }
-  return -1;
+  return null;
  }
 
+ private static String rpcCall_receiveTaskAward(ClassLoader loader, String taskType)
+ {
+  try
+  {
+   String args1 =
+    "[{\"ignoreLimit\":false,\"requestType\":\"H5\",\"sceneCode\":\"ANTFOREST_TASK\",\"source\":\"ANTFOREST\",\"taskType\":\""
+    +taskType+"\"}]";
+   Object resp = RpcCall.invoke(loader, "com.alipay.antiep.receiveTaskAward", args1);
+   return RpcCall.getResponse(resp);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_receiveTaskAward err:");
+   Log.printStackTrace(TAG, e);
+  }
+  return null;
+ }
  
- 
+ private static String rpcCall_queryPropList(ClassLoader loader)
+ {
+  try
+  {
+   String args1 = "[{\"version\":\"\"}]"; //20181217
+   Object resp = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryPropList", args1);
+   return RpcCall.getResponse(resp);
+  }catch(Exception e)
+  {
+   Log.i(TAG, "rpcCall_queryPropList err:");
+   Log.printStackTrace(TAG, e);
+  }
+  return null;
+ }
+
+ private static void updateThreadCount(ThreadStatus ts, ClassLoader loader)
+ {
+  switch(ts)
+  {
+   case START:
+    threadCount++;
+    Log.showDialog("新线程开始"+threadCount,"");
+    break;
+
+   case END:
+    threadCount--;
+    Log.showDialog("线程结束"+threadCount,"");
+    if(!hasMore && threadCount == 0)
+    {
+     hasMore = true;
+     if(collectedEnergy == 0 &&
+      helpCollectedEnergy == 0 && onceHelpCollected == 0)
+     {
+      Log.showDialogOrToast("暂时没有可收取的能量","");
+     }else if(onceHelpCollected != 0)
+     {
+      helpCollectedEnergy += onceHelpCollected;
+      onceHelpCollected = 0;
+      Log.showDialog("再次收取能量…","");
+      queryEnergyRanking(loader, 1);
+     }else
+     {
+      Log.showDialogOrToast("共收取【"+collectedEnergy+"克】，帮收【"+helpCollectedEnergy+"克】","");
+      collectedEnergy = 0;
+      helpCollectedEnergy = 0;
+      Config.saveIdMap();
+     }
+    }
+    break;
+  }
+ }
+
+ public static void saveUserIdAndName(String args0, String resp)
+ {
+  if(!args0.equals("alipay.antmember.forest.h5.queryNextAction"))
+   return;
+  try
+  {
+   JSONObject jo = new JSONObject(resp);
+   if(jo.has("userEnergy"))
+   {
+    jo = jo.getJSONObject("userEnergy");
+    String userName = jo.getString("displayName");
+    String loginId = userName;
+    if(jo.has("loginId"))
+     loginId += "(" + jo.getString("loginId") + ")";
+    Config.putIdMap(jo.getString("userId"), loginId);
+    Config.saveIdMap();
+   }
+  }catch(Exception e)
+  {
+   Log.i(TAG, "saveUserIdAndName err:");
+   Log.printStackTrace(TAG, e);
+  }
+ }
+
 }

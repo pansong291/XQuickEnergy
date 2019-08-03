@@ -144,22 +144,11 @@ public class XposedHook implements IXposedHookLoadPackage
         {
          String response = RpcCall.getResponse(resp);
          Log.i(TAG, "response: " + response);
+         
+         AntForest.saveUserIdAndName(args0, response);
 
          if(Config.enableForest())
-         {
-          if(AntForest.isRankList(response))
-          {
-           Log.i(TAG, "autoGetCanCollectUserIdList");
-           AntForest.autoGetCanCollectUserIdList(loader, response);
-          }
-
-          // 第一次是自己的能量，比上面的获取用户信息还要早，所以这里可以记录当前自己的userid值
-          if(AntForest.isUserDetail(response))
-          {
-           Log.i(TAG, "autoGetCanCollectBubbleIdList");
-           AntForest.autoGetCanCollectBubbleIdList(loader, response);
-          }
-         }
+          AntForest.start(loader, args0, args1, response);
          
          if(Config.enableFarm())
           AntFarm.start(loader, args0, args1, response);
