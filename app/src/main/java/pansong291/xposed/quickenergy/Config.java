@@ -200,6 +200,11 @@ public class Config
   return getConfig().notifyFriend;
  }
  
+ public static boolean feedFriendAnimal()
+ {
+  return getConfig().feedFriendAnimalList.size() > 0;
+ }
+ 
  public static boolean feedFriendAnimal(String id)
  {
   return getConfig().feedFriendAnimalList.contains(id);

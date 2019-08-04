@@ -1,12 +1,8 @@
 package pansong291.xposed.quickenergy;
 
-import android.os.Handler;
-import android.os.Message;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
-import android.os.Looper;
-import java.util.List;
 
 public class AntForest
 {
@@ -54,11 +50,12 @@ public class AntForest
     @Override
     public void run()
     {
+     Log.showToast("森林功能开始…","");
      try
      {
       if(Config.collectEnergy())
       {
-       Log.showDialogOrToast("开始收取能量…","");
+       Log.showDialogAndRecordLog("开始收取能量…","");
        queryEnergyRanking(loader, 1);
        JSONObject jo = new JSONObject(resp);
        if(jo.getString("resultCode").equals("SUCCESS"))
@@ -68,7 +65,7 @@ public class AntForest
         canCollectSelfEnergy(loader, resp);
        }else
        {
-        Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+        Log.showDialogAndRecordLog(jo.getString("resultDesc"),resp);
        }
       }
 
@@ -83,6 +80,7 @@ public class AntForest
       Log.i(TAG, "start err:");
       Log.printStackTrace(TAG, e);
      }
+     Log.showToast("森林功能结束","");
     }
    }.setData(loader, resp)).start();
 
@@ -129,7 +127,7 @@ public class AntForest
        }
       }else
       {
-       Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+       Log.showDialogAndRecordLog(jo.getString("resultDesc"),s);
       }
      }catch(Exception e)
      {
@@ -161,14 +159,14 @@ public class AntForest
      if("AVAILABLE".equals(jo.getString("collectStatus")))
      {
       if(Config.dontCollect(userId))
-       Log.showDialog("不偷取【"+userName+"】",", userId="+userId);
+       Log.showDialogAndRecordLog("不偷取【"+userName+"】",", userId="+userId);
       else
        collectEnergy(loader, userId, bubbleId, userName);
      }
     }
    }else
    {
-    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),resp);
    }
   }catch(Exception e)
   {
@@ -195,7 +193,7 @@ public class AntForest
      if("AVAILABLE".equals(jo.getString("collectStatus")))
      {
       if(Config.dontCollect(userId))
-       Log.showDialog("不偷取【"+userName+"】",", userId="+userId);
+       Log.showDialogAndRecordLog("不偷取【"+userName+"】",", userId="+userId);
       else
        collectEnergy(loader, userId, bubbleId, userName);
      }
@@ -204,16 +202,16 @@ public class AntForest
       if(Config.helpFriend())
       {
        if(Config.dontHelp(userId))
-        Log.showDialog("不帮收【"+userName+"】",", userId="+userId);
+        Log.showDialogAndRecordLog("不帮收【"+userName+"】",", userId="+userId);
        else
         forFriendCollectEnergy(loader, userId, bubbleId, userName);
       }else
-       Log.showDialog("不帮收【"+userName+"】",", userId="+userId);
+       Log.showDialogAndRecordLog("不帮收【"+userName+"】",", userId="+userId);
      }
     }
    }else
    {
-    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),s);
    }
   }catch(Exception e)
   {
@@ -228,7 +226,8 @@ public class AntForest
   {
    String s = rpcCall_collectEnergy(loader,userId,bubbleId);
    JSONObject jo = new JSONObject(s);
-   if(jo.getString("resultCode").equals("SUCCESS"))
+   s = jo.getString("resultDesc");
+   if(s.equals("SUCCESS"))
    {
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     int collected = 0;
@@ -247,10 +246,9 @@ public class AntForest
     }
    }else
    {
-    s = jo.getString("resultDesc");
     if(s.contains("TA"))
      s = s.replace("TA","【"+userName+"】");
-    Log.showDialogAndRecordLog(s,"");
+    Log.showDialogAndRecordLog(s,jo.toString());
    }
   }catch(Exception e)
   {
@@ -265,7 +263,8 @@ public class AntForest
   {
    String s = rpcCall_forFriendCollectEnergy(loader,targetUserId,bubbleId);
    JSONObject jo = new JSONObject(s);
-   if(jo.getString("resultCode").equals("SUCCESS"))
+   s = jo.getString("resultDesc");
+   if(s.equals("SUCCESS"))
    {
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     int helped = 0;
@@ -284,10 +283,9 @@ public class AntForest
     }
    }else
    {
-    s = jo.getString("resultDesc");
     if(s.contains("TA"))
      s = s.replace("TA","【"+userName+"】");
-    Log.showDialogAndRecordLog(s,"");
+    Log.showDialogAndRecordLog(s,jo.toString());
    }
   }catch(Exception e)
   {
@@ -308,7 +306,7 @@ public class AntForest
     String bizNo = jo.getString("bizNo");
     jo = jo.getJSONObject("userEnergy");
     String userName = jo.getString("displayName");
-    for(int waterCount = 1; waterCount <= 3;)
+    for(int waterCount = 1; waterCount <= 3; waterCount++)
     {
      s = rpcCall_transferEnergy(loader,userId,bizNo,waterCount);
      jo = new JSONObject(s);
@@ -317,7 +315,6 @@ public class AntForest
      {
       s = jo.getJSONObject("treeEnergy").getString("currentEnergy");
       Log.showDialogAndRecordLog("给【"+userName+"】浇水成功，剩余能量【"+s+"克】","");
-      waterCount++;
       Thread.sleep(2000);
      }else if(s.equals("WATERING_TIMES_LIMIT"))
      {
@@ -329,12 +326,12 @@ public class AntForest
       break;
      }else
      {
-      Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+      Log.showDialogAndRecordLog(s,jo.toString());
      }
     }
    }else
    {
-    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+    Log.showDialogAndRecordLog(s,jo.toString());
    }
   }catch(Exception e)
   {
@@ -347,16 +344,19 @@ public class AntForest
  {
   try
   {
+   Log.showDialogAndRecordLog("开始领取任务奖励…","");
    String s = rpcCall_queryTaskList(loader);
    JSONObject jo = new JSONObject(s);
    if(jo.getString("resultCode").equals("SUCCESS"))
    {
+    boolean hasCanReceive = false;
     JSONArray jaForestTaskVOList = jo.getJSONArray("forestTaskVOList");
     for(int i = 0; i < jaForestTaskVOList.length(); i++)
     {
      jo = jaForestTaskVOList.getJSONObject(i);
      if(TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
      {
+      hasCanReceive = true;
       TaskAwardType taskAwardType = TaskAwardType.valueOf(jo.getString("awardType"));
       int awardCount = jo.getInt("awardCount");
       String taskType = jo.getString("taskType");
@@ -366,12 +366,14 @@ public class AntForest
       if(s.equals("SUCCESS"))
        Log.showDialogAndRecordLog("已领取【"+awardCount+"个】【"+taskAwardType.nickName()+"】","");
       else
-       Log.showDialogAndRecordLog("领取失败，"+s,"");
+       Log.showDialogAndRecordLog("领取失败，"+s,jo.toString());
      }
     }
+    if(!hasCanReceive)
+     Log.showDialogAndRecordLog("暂时没有可领取的任务奖励","");
    }else
    {
-    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),s);
    }
   }catch(Exception e)
   {
@@ -400,7 +402,7 @@ public class AntForest
     }
    }else
    {
-    Log.showDialogAndRecordLog(jo.getString("resultDesc"),"");
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),s);
    }
   }catch(Exception e)
   {
@@ -432,9 +434,9 @@ public class AntForest
    String args1 = "[{\"userId\":\""+userId+"\"}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryNextAction", args1);
 
-   args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":3,\"startIndex\":0,\"userId\":\""
-    +userId+"\"}]";
-   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", args1);
+//   args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":3,\"startIndex\":0,\"userId\":\""
+//    +userId+"\"}]";
+//   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", args1);
 
    return RpcCall.getResponse(o);
   }catch(Exception e)
@@ -465,7 +467,7 @@ public class AntForest
   try
   {
    String args1 = "[{\"bizNo\":\""+bizNo+ordinal+"\",\"targetUser\":\""
-    +targetUser+"\",\"transferType\":\"WATERING\",\"version\":\"\"}]";//20181217
+    +targetUser+"\",\"transferType\":\"WATERING\"}]";// ,\"version\":\"\" 20181217
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.transferEnergy", args1);
    return RpcCall.getResponse(o);
   }catch(Exception e)
@@ -495,7 +497,7 @@ public class AntForest
  {
   try
   {
-   String args1 = "[{\"version\":\"\"}]"; //20190321
+   String args1 = "[{\"version\":\"20190321\"}]"; // 
    Object o = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryTaskList", args1);
    return RpcCall.getResponse(o);
   }catch(Exception e)
@@ -544,28 +546,28 @@ public class AntForest
   {
    case START:
     threadCount++;
-    Log.showDialog("新线程开始"+threadCount,"");
+    //Log.showDialog("新线程开始"+threadCount,"");
     break;
 
    case END:
     threadCount--;
-    Log.showDialog("线程结束"+threadCount,"");
+    //Log.showDialog("线程结束"+threadCount,"");
     if(!hasMore && threadCount == 0)
     {
      hasMore = true;
      if(collectedEnergy == 0 &&
       helpCollectedEnergy == 0 && onceHelpCollected == 0)
      {
-      Log.showDialogOrToast("暂时没有可收取的能量","");
+      Log.showDialogOrToastAndRecordLog("暂时没有可收取的能量","");
      }else if(onceHelpCollected != 0)
      {
       helpCollectedEnergy += onceHelpCollected;
       onceHelpCollected = 0;
-      Log.showDialog("再次收取能量…","");
+      Log.showDialogAndRecordLog("再次收取能量…","");
       queryEnergyRanking(loader, 1);
      }else
      {
-      Log.showDialogOrToast("共收取【"+collectedEnergy+"克】，帮收【"+helpCollectedEnergy+"克】","");
+      Log.showDialogOrToastAndRecordLog("共收取【"+collectedEnergy+"克】，帮收【"+helpCollectedEnergy+"克】","");
       collectedEnergy = 0;
       helpCollectedEnergy = 0;
       Config.saveIdMap();
@@ -590,6 +592,7 @@ public class AntForest
     if(jo.has("loginId"))
      loginId += "(" + jo.getString("loginId") + ")";
     Config.putIdMap(jo.getString("userId"), loginId);
+    Log.recordLog("进入〔"+loginId+"〕的蚂蚁森林","");
     Config.saveIdMap();
    }
   }catch(Exception e)

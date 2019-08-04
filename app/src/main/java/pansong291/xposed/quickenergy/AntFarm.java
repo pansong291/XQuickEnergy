@@ -1,7 +1,6 @@
 package pansong291.xposed.quickenergy;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.List;
 import java.util.ArrayList;
@@ -97,7 +96,7 @@ public class AntFarm
     cityAdCode = jo.getString("cityAdCode");
     districtAdCode = jo.getString("districtAdCode");
     version = jo.getString("version");
-   }catch(JSONException e)
+   }catch(Exception e)
    {
     Log.i(TAG, "start err: args1= "+args1);
     Log.printStackTrace(TAG, e);
@@ -121,6 +120,7 @@ public class AntFarm
      @Override
      public void run()
      {
+      Log.showToast("庄园功能开始…","");
       try
       {
        JSONObject jo = new JSONObject(resp);
@@ -144,8 +144,10 @@ public class AntFarm
           Log.showDialogAndRecordLog("小鸡到好友家去做客了","");
           break;
          case NORMAL:
-         case PIRATE:
           Log.showDialogAndRecordLog("小鸡太饿，离家出走了","");
+          break;
+         case PIRATE:
+          Log.showDialogAndRecordLog("小鸡外出探险了","");
           break;
          default:
           Log.showDialogAndRecordLog("小鸡不在庄园",ownerAnimal.subAnimalType);
@@ -223,13 +225,15 @@ public class AntFarm
        }
 
        // 通知好友赶鸡并帮好友喂鸡
-       notifyFriendAndFeedAnimal(loader);
+       if(Config.notifyFriend() || Config.feedFriendAnimal())
+        notifyFriendAndFeedAnimal(loader);
 
       }catch(Exception e)
       {
        Log.i(TAG, "run err:");
        Log.printStackTrace(TAG, e);
       }
+      Log.showToast("庄园功能结束","");
      }
     }.setData(response, loader)).start();
   }
@@ -285,7 +289,7 @@ public class AntFarm
       Log.showDialogAndRecordLog("打赏了〔"+Config.getNameById(rewardList[i].friendId)+"〕〔"+rewardCount+"颗〕爱心鸡蛋","");
      }else
      {
-      Log.showDialogAndRecordLog("失败，"+memo,s);
+      Log.showDialogAndRecordLog(memo,s);
      }
     }
     rewardList = null;
@@ -313,7 +317,7 @@ public class AntFarm
     // add2FoodStock((int)foodHaveStolen);
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -350,7 +354,8 @@ public class AntFarm
        if(jo.has("hitLossFood"))
        {
         s += "胖揍了〔"+user+"〕的小鸡，掉落了〔"+jo.getInt("hitLossFood")+"克〕饲料";
-        foodStock = jo.getInt("finalFoodStorage");
+        if(jo.has("finalFoodStorage"))
+         foodStock = jo.getInt("finalFoodStorage");
         s += "\n剩余〔"+foodStock+"克〕饲料";
        }else
         s += "〔"+user+"〕的小鸡躲开了你的攻击";
@@ -358,11 +363,11 @@ public class AntFarm
       {
        s = "已赶走〔"+user+"〕的小鸡";
       }
+      Log.showDialogAndRecordLog(s,"");
      }else
      {
-      Log.showDialogAndRecordLog("失败，"+memo,s);
+      Log.showDialogAndRecordLog(memo,s);
      }
-     Log.showDialogAndRecordLog(s,"");
     }
    }
    if(!hasStealingAnimal)
@@ -389,7 +394,7 @@ public class AntFarm
     Log.showDialogAndRecordLog("收取了〔"+harvest+"颗〕爱心鸡蛋，剩余〔"+harvestBenevolenceScore+"颗〕","");
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -435,12 +440,12 @@ public class AntFarm
       Log.showDialogAndRecordLog("捐赠活动〔"+activityName+"〕成功，累计捐赠"+jo.getInt("donationTimesStat")+"次","");
      }else
      {
-      Log.showDialogAndRecordLog("失败，"+memo,s);
+      Log.showDialogAndRecordLog(memo,s);
      }
     }
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -499,7 +504,7 @@ public class AntFarm
            Log.showDialogAndRecordLog("答题"+s+"，可领取［"+jo.getInt("awardCount")+"克］饲料", "");
           }else
           {
-           Log.showDialogAndRecordLog("失败，"+memo,s);
+           Log.showDialogAndRecordLog(memo,s);
           }
          }else
          {
@@ -507,7 +512,7 @@ public class AntFarm
          }
         }else
         {
-         Log.showDialogAndRecordLog("失败，"+memo,s);
+         Log.showDialogAndRecordLog(memo,s);
         }
         break;
 
@@ -524,7 +529,7 @@ public class AntFarm
     }
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -544,13 +549,13 @@ public class AntFarm
    if(memo.equals("SUCCESS"))
    {
     JSONArray jaFarmTaskList = jo.getJSONArray("farmTaskList");
-    boolean hasAwardFood = false;
+    boolean hasCanReceive = false;
     for(int i = 0; i < jaFarmTaskList.length(); i++)
     {
      jo = jaFarmTaskList.getJSONObject(i);
      if(TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
      {
-      hasAwardFood = true;
+      hasCanReceive = true;
       int awardCount = jo.getInt("awardCount");
       if(awardCount + foodStock > foodStockLimit)
       {
@@ -569,16 +574,16 @@ public class AntFarm
        if(unreceiveTaskAward > 0)unreceiveTaskAward--;
       }else
       {
-       Log.showDialogAndRecordLog("失败，"+memo,s);
+       Log.showDialogAndRecordLog(memo,s);
       }
      }
     }
-    if(!hasAwardFood)
+    if(!hasCanReceive)
      Log.showDialogAndRecordLog("暂时没有可领取的饲料","");
     Log.showDialogAndRecordLog("剩余〔"+foodStock+"克〕饲料","");
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -598,14 +603,14 @@ public class AntFarm
    if(memo.equals("SUCCESS"))
    {
     JSONArray jaList = jo.getJSONArray("list");
-    boolean hasRewardTool = false;
+    boolean hasCanReceive = false;
     for(int i = 0; i < jaList.length(); i++)
     {
      jo = jaList.getJSONObject(i);
      if(jo.has("taskStatus")
       && TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
      {
-      hasRewardTool = true;
+      hasCanReceive = true;
       int awardCount = jo.getInt("awardCount");
       String awardType = jo.getString("awardType");
       ToolType toolType = ToolType.valueOf(awardType);
@@ -626,15 +631,15 @@ public class AntFarm
        Log.showDialogAndRecordLog("已领取〔"+awardCount+"张〕〔"+toolType.nickName()+"〕，来源："+taskTitle,"");
       }else
       {
-       Log.showDialogAndRecordLog("失败，"+memo,s);
+       Log.showDialogAndRecordLog(memo,s);
       }
      }
     }
-    if(!hasRewardTool)
+    if(!hasCanReceive)
      Log.showDialogAndRecordLog("暂时没有可领取的道具卡","");
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -663,7 +668,7 @@ public class AntFarm
      Log.showDialogAndRecordLog("喂了小鸡［"+feedFood+"克］饲料，剩余〔"+foodStock+"克〕","");
     }else
     {
-     Log.showDialogAndRecordLog("失败，"+memo,s);
+     Log.showDialogAndRecordLog(memo,s);
     }
    }
   }catch(Exception e)
@@ -697,14 +702,14 @@ public class AntFarm
        memo = jo.getString("memo");
        if(memo.equals("SUCCESS"))
         Log.showDialogAndRecordLog("使用成功，剩余〔"+(toolCount-1)+"张〕","");
-       else Log.showDialogAndRecordLog("失败，"+memo,s);
+       else Log.showDialogAndRecordLog(memo,s);
       }else Log.showDialogAndRecordLog("没有"+toolType.nickName()+"可用","");
       break;
      }
     }
    }else
    {
-    Log.showDialogAndRecordLog("失败，"+memo,s);
+    Log.showDialogAndRecordLog(memo,s);
    }
   }catch(Exception e)
   {
@@ -719,8 +724,9 @@ public class AntFarm
   {
    if(Config.notifyFriend())
     Log.showDialogAndRecordLog("开始通知好友来赶鸡…","");
+   if(Config.feedFriendAnimal())
+    Log.showDialogAndRecordLog("开始帮好友喂鸡…","");
    boolean hasNext = false;
-   Object o;
    String s;
    JSONObject jo;
    do
@@ -770,18 +776,22 @@ public class AntFarm
         }
        }else
        {
-        Log.showDialogAndRecordLog("失败，"+memo,s);
+        Log.showDialogAndRecordLog(memo,s);
        }
       }
      }
     }else
     {
-     Log.showDialogAndRecordLog("失败，"+memo,s);
+     Log.showDialogAndRecordLog(memo,s);
     }
    }while(hasNext);
    pageStartSum = 0;
+   if(Config.feedFriendAnimal())
+    Log.showDialogAndRecordLog("帮好友喂鸡结束","");
    if(Config.notifyFriend())
-    Log.showDialogAndRecordLog("通知好友结束，饲料剩余〔"+foodStock+"克〕","");
+    Log.showDialogAndRecordLog("通知好友结束","");
+   if(Config.feedFriendAnimal() || Config.notifyFriend())
+    Log.showDialogAndRecordLog("饲料剩余〔"+foodStock+"克〕","");
   }catch(Exception e)
   {
    Log.i(TAG, "notifyFriendAndFeed err:");
@@ -799,17 +809,20 @@ public class AntFarm
     String user = Config.getNameById(farmId2UserId(friendFarmId));
     Log.showDialogAndRecordLog("有小鸡正在偷吃〔"+user+"〕的饲料","");
     String s = rpcCall_notifyFriend(loader, animalId, friendFarmId);
-    joAnimalStatusVO = new JSONObject(s);
-    String memo = joAnimalStatusVO.getString("memo");
+    JSONObject jo = new JSONObject(s);
+    String memo = jo.getString("memo");
     if(memo.equals("SUCCESS"))
     {
-     double rewardCount = joAnimalStatusVO.getDouble("rewardCount");
-     foodStock = (int)joAnimalStatusVO.getDouble("finalFoodStock");
+     double rewardCount = jo.getDouble("rewardCount");
+     if(jo.getBoolean("refreshFoodStock"))
+      foodStock = (int)jo.getDouble("finalFoodStock");
+     else
+      add2FoodStock((int)rewardCount);
      Log.showDialogAndRecordLog("已通知〔"+user+"〕，小鸡拿出〔"+rewardCount+"克〕饲料奖励你","");
      return true;
     }else
     {
-     Log.showDialogAndRecordLog("失败，"+memo,s);
+     Log.showDialogAndRecordLog(memo,s);
     }
    }
   }catch(Exception e)
@@ -857,7 +870,7 @@ public class AntFarm
      }
     }else
     {
-     Log.showDialogAndRecordLog("失败，"+memo,s);
+     Log.showDialogAndRecordLog(memo,s);
     }
    }
   }catch(Exception e)
