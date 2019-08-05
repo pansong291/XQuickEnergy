@@ -226,8 +226,7 @@ public class AntForest
   {
    String s = rpcCall_collectEnergy(loader,userId,bubbleId);
    JSONObject jo = new JSONObject(s);
-   s = jo.getString("resultDesc");
-   if(s.equals("SUCCESS"))
+   if(jo.getString("resultCode").equals("SUCCESS"))
    {
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     int collected = 0;
@@ -246,6 +245,7 @@ public class AntForest
     }
    }else
    {
+    s = jo.getString("resultDesc");
     if(s.contains("TA"))
      s = s.replace("TA","【"+userName+"】");
     Log.showDialogAndRecordLog(s,jo.toString());
@@ -263,8 +263,7 @@ public class AntForest
   {
    String s = rpcCall_forFriendCollectEnergy(loader,targetUserId,bubbleId);
    JSONObject jo = new JSONObject(s);
-   s = jo.getString("resultDesc");
-   if(s.equals("SUCCESS"))
+   if(jo.getString("resultCode").equals("SUCCESS"))
    {
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     int helped = 0;
@@ -283,6 +282,7 @@ public class AntForest
     }
    }else
    {
+    s = jo.getString("resultDesc");
     if(s.contains("TA"))
      s = s.replace("TA","【"+userName+"】");
     Log.showDialogAndRecordLog(s,jo.toString());
@@ -300,8 +300,7 @@ public class AntForest
   {
    String s = rpcCall_queryNextAction(loader,userId);
    JSONObject jo = new JSONObject(s);
-   s = jo.getString("resultCode");
-   if(s.equals("SUCCESS"))
+   if(jo.getString("resultCode").equals("SUCCESS"))
    {
     String bizNo = jo.getString("bizNo");
     jo = jo.getJSONObject("userEnergy");
@@ -326,12 +325,12 @@ public class AntForest
       break;
      }else
      {
-      Log.showDialogAndRecordLog(s,jo.toString());
+      Log.showDialogAndRecordLog(jo.getString("resultDesc"),jo.toString());
      }
     }
    }else
    {
-    Log.showDialogAndRecordLog(s,jo.toString());
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),s);
    }
   }catch(Exception e)
   {
@@ -362,11 +361,10 @@ public class AntForest
       String taskType = jo.getString("taskType");
       s = rpcCall_receiveTaskAward(loader,taskType);
       jo = new JSONObject(s);
-      s = jo.getString("desc");
-      if(s.equals("SUCCESS"))
+      if(jo.getString("resultCode").equals("SUCCESS"))
        Log.showDialogAndRecordLog("已领取【"+awardCount+"个】【"+taskAwardType.nickName()+"】","");
       else
-       Log.showDialogAndRecordLog("领取失败，"+s,jo.toString());
+       Log.showDialogAndRecordLog("领取失败，"+jo.getString("desc"),s);
      }
     }
     if(!hasCanReceive)
@@ -592,7 +590,7 @@ public class AntForest
     if(jo.has("loginId"))
      loginId += "(" + jo.getString("loginId") + ")";
     Config.putIdMap(jo.getString("userId"), loginId);
-    Log.recordLog("进入〔"+loginId+"〕的蚂蚁森林","");
+    Log.recordLog("进入【"+loginId+"】的蚂蚁森林","");
     Config.saveIdMap();
    }
   }catch(Exception e)

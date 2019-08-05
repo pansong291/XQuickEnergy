@@ -156,6 +156,7 @@ public class AntFarm
         boolean recall = false;
         switch(Config.recallAnimalType())
         {
+         // bug
          case ALWAYS:
           recall = true;
           break;
@@ -484,16 +485,16 @@ public class AntFarm
          Log.showDialogAndRecordLog(jo.getString("questionContent"),"");
          Log.showDialogAndRecordLog(jaOptionContents.toString(),"");
          String questionId = jo.getString("questionId");
-         int answer = -1;
+         int answer = 0;
          for(int j = 0; j < jaOptionContents.length(); j++)
          {
           if(rightReply.contains(jaOptionContents.getString(j)))
           {
-           answer = j + 1;
-           break;
+           answer += j + 1;
+           //break;
           }
          }
-         if(answer > 0)
+         if(0 < answer && answer < 3)
          {
           s = rpcCall_answerQuestion(loader, questionId, answer);
           jo = new JSONObject(s);
@@ -508,7 +509,7 @@ public class AntFarm
           }
          }else
          {
-          Log.showDialogAndRecordLog("未找到正确答案，放弃作答","");
+          Log.showDialogAndRecordLog("未找到正确答案，放弃作答。提示："+rightReply,"");
          }
         }else
         {
@@ -942,6 +943,7 @@ public class AntFarm
     Log.i(i+" animal","currentFarmId="+animals[i].currentFarmId);
     Log.i(i+" animal","masterFarmId="+animals[i].masterFarmId);
     Log.i(i+" animal","animalBuff="+animals[i].animalBuff);
+    Log.i(i+" animal","subAnimalType="+animals[i].subAnimalType);
     Log.i(i+" animal","animalFeedStatus="+animals[i].animalFeedStatus);
     Log.i(i+" animal","animalInteractStatus="+animals[i].animalInteractStatus);
    }

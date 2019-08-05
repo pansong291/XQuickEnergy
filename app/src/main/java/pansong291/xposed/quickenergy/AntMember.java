@@ -89,9 +89,12 @@ public class AntMember
        jo.getString("signinSumDay")+"天〕","");
      }else
      {
-      Log.showDialogAndRecordLog(jo.getString("resultDesc"),response);
+      Log.showDialogAndRecordLog(jo.getString("resultDesc"),s);
      }
     }
+   }else
+   {
+    Log.showDialogAndRecordLog(jo.getString("resultDesc"),response);
    }
   }catch(Exception e)
   {
