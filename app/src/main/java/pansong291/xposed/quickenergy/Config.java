@@ -12,10 +12,26 @@ import pansong291.xposed.quickenergy.AntFarm.SendType;
 public class Config
 {
  public enum ShowMode
- { DIALOG, TOAST }
- 
+ {
+  DIALOG, TOAST;
+  public static final CharSequence[] nickNames =
+  {"对话框", "toast气泡"};
+  public CharSequence nickName()
+  {
+   return nickNames[ordinal()];
+  }
+ }
+
  public enum RecallAnimalType
- { ALWAYS, WHEN_THIEF, WHEN_HUNGRY, NEVER }
+ {
+  ALWAYS, WHEN_THIEF, WHEN_HUNGRY, NEVER;
+  public static final CharSequence[] nickNames =
+  {"始终召回", "作贼时召回", "饥饿时召回", "不召回"};
+  public CharSequence nickName()
+  {
+   return nickNames[ordinal()];
+  }
+ }
 
  private static final String TAG = Config.class.getCanonicalName();
  private static final String
@@ -27,14 +43,15 @@ public class Config
  jn_dontHelpCollectList = "dontHelpCollectList", jn_receiveForestTaskAward = "receiveForestTaskAward", jn_waterFriendList = "waterFriendList",
  /* farm */
  jn_rewardFriend = "rewardFriend", jn_sendBackAnimal = "sendBackAnimal", jn_sendType = "sendType",
- jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_useNewEggTool = "useNewEggTool",
- jn_harvestProduce = "harvestProduce", jn_donation = "donation", jn_answerQuestion = "answerQuestion",
- jn_receiveFarmTaskAward = "receiveFarmTaskAward", jn_receiveFarmToolReward = "receiveFarmToolReward", jn_feedAnimal = "feedAnimal",
+ jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_receiveFarmToolReward = "receiveFarmToolReward",
+ jn_useNewEggTool = "useNewEggTool", jn_harvestProduce = "harvestProduce", jn_donation = "donation",
+ jn_answerQuestion = "answerQuestion", jn_receiveFarmTaskAward = "receiveFarmTaskAward", jn_feedAnimal = "feedAnimal",
  jn_useAccelerateTool = "useAccelerateTool", jn_notifyFriend = "notifyFriend", jn_feedFriendAnimalList = "feedFriendAnimalList",
  /* member */
  jn_receivePoint = "receivePoint";
 
  public static boolean shouldReloadConfig;
+ public static boolean hasConfigChanged;
 
  /* application */
  private boolean immediateEffect;
@@ -44,7 +61,7 @@ public class Config
  private boolean enableFarm;
 
  /* forest */
- private Boolean collectEnergy;
+ private boolean collectEnergy;
  private boolean helpFriendCollect;
  private List<String> dontCollectList;
  private List<String> dontHelpCollectList;
@@ -57,17 +74,17 @@ public class Config
  private SendType sendType;
  private List<String> sendTypeExcludeList;
  private RecallAnimalType recallAnimalType;
+ private boolean receiveFarmToolReward;
  private boolean useNewEggTool;
  private boolean harvestProduce;
  private boolean donation;
  private boolean answerQuestion;
  private boolean receiveFarmTaskAward;
- private boolean receiveFarmToolReward;
  private boolean feedAnimal;
  private boolean useAccelerateTool;
  private boolean notifyFriend;
  private List<String> feedFriendAnimalList;
- 
+
  /* member */
  private boolean receivePoint;
 
@@ -79,9 +96,32 @@ public class Config
  private static String selfId;
 
  /* application */
+ public static void setImmediateEffect(boolean b)
+ {
+  getConfig().immediateEffect = b;
+  hasConfigChanged = true;
+ }
+
+ public static boolean immediateEffect()
+ {
+  return getConfig().immediateEffect;
+ }
+
+ public static void setShowMode(int i)
+ {
+  getConfig().showMode = ShowMode.values()[i];
+  hasConfigChanged = true;
+ }
+
  public static ShowMode showMode()
  {
   return getConfig().showMode;
+ }
+
+ public static void setRecordLog(boolean b)
+ {
+  getConfig().recordLog = b;
+  hasConfigChanged = true;
  }
 
  public static boolean recordLog()
@@ -89,9 +129,21 @@ public class Config
   return getConfig().recordLog;
  }
 
+ public static void setEnableForest(boolean b)
+ {
+  getConfig().enableForest = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean enableForest()
  {
   return getConfig().enableForest;
+ }
+
+ public static void setEnableFarm(boolean b)
+ {
+  getConfig().enableFarm = b;
+  hasConfigChanged = true;
  }
 
  public static boolean enableFarm()
@@ -100,14 +152,31 @@ public class Config
  }
 
  /* forest */
+ public static void setCollectEnergy(boolean b)
+ {
+  getConfig().collectEnergy = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean collectEnergy()
  {
   return getConfig().collectEnergy;
  }
- 
- public static boolean helpFriend()
+
+ public static void setHelpFriendCollect(boolean b)
+ {
+  getConfig().helpFriendCollect = b;
+  hasConfigChanged = true;
+ }
+
+ public static boolean helpFriendCollect()
  {
   return getConfig().helpFriendCollect;
+ }
+
+ public static List<String> getDontCollectList()
+ {
+  return getConfig().dontCollectList;
  }
 
  public static boolean dontCollect(String id)
@@ -115,32 +184,66 @@ public class Config
   return getConfig().dontCollectList.contains(id);
  }
 
- public static boolean dontHelp(String id)
+ public static List<String> getDontHelpCollectList()
+ {
+  return getConfig().dontHelpCollectList;
+ }
+
+ public static boolean dontHelpCollect(String id)
  {
   return getConfig().dontHelpCollectList.contains(id);
  }
- 
+
+ public static void setReceiveForestTaskAward(boolean b)
+ {
+  getConfig().receiveForestTaskAward = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean receiveForestTaskAward()
  {
   return getConfig().receiveForestTaskAward;
  }
- 
- public static List<String> waterFriendList()
+
+ public static List<String> getWaterFriendList()
  {
   return getConfig().waterFriendList;
  }
 
  /* farm */
+ public static void setRewardFriend(boolean b)
+ {
+  getConfig().rewardFriend = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean rewardFriend()
  {
   return getConfig().rewardFriend;
  }
- 
+
+ public static void setSendBackAnimal(boolean b)
+ {
+  getConfig().sendBackAnimal = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean sendBackAnimal()
  {
   return getConfig().sendBackAnimal;
  }
- 
+
+ public static List<String> getSendTypeExcludeList()
+ {
+  return getConfig().sendTypeExcludeList;
+ }
+
+ public static void setSendType(int i)
+ {
+  getConfig().sendType = SendType.values()[i];
+  hasConfigChanged = true;
+ }
+
  public static SendType sendType(String id)
  {
   if(getConfig().sendTypeExcludeList.contains(id))
@@ -149,73 +252,144 @@ public class Config
   }
   return getConfig().sendType;
  }
- 
+
+ public static void setRecallAnimalType(int i)
+ {
+  getConfig().recallAnimalType = RecallAnimalType.values()[i];
+  hasConfigChanged = true;
+ }
+
  public static RecallAnimalType recallAnimalType()
  {
   return getConfig().recallAnimalType;
  }
- 
+
+ public static void setReceiveFarmToolReward(boolean b)
+ {
+  getConfig().receiveFarmToolReward = b;
+  hasConfigChanged = true;
+ }
+
+ public static boolean receiveFarmToolReward()
+ {
+  return getConfig().receiveFarmToolReward;
+ }
+
+ public static void setUseNewEggTool(boolean b)
+ {
+  getConfig().useNewEggTool = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean useNewEggTool()
  {
   return getConfig().useNewEggTool;
+ }
+
+ public static void setHarvestProduce(boolean b)
+ {
+  getConfig().harvestProduce = b;
+  hasConfigChanged = true;
  }
 
  public static boolean harvestProduce()
  {
   return getConfig().harvestProduce;
  }
- 
+
+ public static void setDonation(boolean b)
+ {
+  getConfig().donation = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean donation()
  {
   return getConfig().donation;
  }
- 
+
+ public static void setAnswerQuestion(boolean b)
+ {
+  getConfig().answerQuestion = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean answerQuestion()
  {
   return getConfig().answerQuestion;
  }
- 
+
+ public static void setReceiveFarmTaskAward(boolean b)
+ {
+  getConfig().receiveFarmTaskAward = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean receiveFarmTaskAward()
  {
   return getConfig().receiveFarmTaskAward;
  }
- 
- public static boolean receiveFarmToolReward()
+
+ public static void setFeedAnimal(boolean b)
  {
-  return getConfig().receiveFarmToolReward;
+  getConfig().feedAnimal = b;
+  hasConfigChanged = true;
  }
- 
+
  public static boolean feedAnimal()
  {
   return getConfig().feedAnimal;
  }
- 
+
+ public static void setUseAccelerateTool(boolean b)
+ {
+  getConfig().useAccelerateTool = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean useAccelerateTool()
  {
   return getConfig().useAccelerateTool;
  }
- 
+
+ public static void setNotifyFriend(boolean b)
+ {
+  getConfig().notifyFriend = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean notifyFriend()
  {
   return getConfig().notifyFriend;
  }
- 
+
+ public static List<String> getFeedFriendAnimal()
+ {
+  return getConfig().feedFriendAnimalList;
+ }
+
  public static boolean feedFriendAnimal()
  {
   return getConfig().feedFriendAnimalList.size() > 0;
  }
- 
+
  public static boolean feedFriendAnimal(String id)
  {
   return getConfig().feedFriendAnimalList.contains(id);
  }
 
  /* member */
+ public static void setReceivePoint(boolean b)
+ {
+  getConfig().receivePoint = b;
+  hasConfigChanged = true;
+ }
+
  public static boolean receivePoint()
  {
   return getConfig().receivePoint;
  }
- 
+
  /* other */
  private static Config getConfig()
  {
@@ -291,7 +465,7 @@ public class Config
   return id;
  }
 
- private static Map getIdMap()
+ public static Map getIdMap()
  {
   if(idMap == null)
   {
@@ -341,19 +515,24 @@ public class Config
   c.sendType = SendType.HIT;
   if(c.sendTypeExcludeList == null) c.sendTypeExcludeList = new ArrayList<>();
   c.recallAnimalType = RecallAnimalType.ALWAYS;
+  c.receiveFarmToolReward = true;
   c.useNewEggTool = true;
   c.harvestProduce = true;
   c.donation = true;
   c.answerQuestion = true;
   c.receiveFarmTaskAward = true;
-  c.receiveFarmToolReward = true;
   c.feedAnimal = true;
   c.useAccelerateTool = true;
   c.notifyFriend = true;
   if(c.feedFriendAnimalList == null) c.feedFriendAnimalList = new ArrayList<>();
-  
+
   c.receivePoint = true;
   return c;
+ }
+
+ public static boolean saveConfigFile()
+ {
+  return FileUtils.write2File(config2Json(config), FileUtils.getConfigFile());
  }
 
  public static Config json2Config(String json)
@@ -437,7 +616,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.dontCollectList.add(ja.getString(i));
-     Log.i(TAG, config.dontCollectList.get(i)+",");
+     Log.i(TAG, config.dontCollectList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -450,7 +629,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.dontHelpCollectList.add(ja.getString(i));
-     Log.i(TAG, config.dontHelpCollectList.get(i)+",");
+     Log.i(TAG, config.dontHelpCollectList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -472,7 +651,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.waterFriendList.add(ja.getString(i));
-     Log.i(TAG, config.waterFriendList.get(i)+",");
+     Log.i(TAG, config.waterFriendList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -513,7 +692,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.sendTypeExcludeList.add(ja.getString(i));
-     Log.i(TAG, config.sendTypeExcludeList.get(i)+",");
+     Log.i(TAG, config.sendTypeExcludeList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -526,6 +705,15 @@ public class Config
     config.recallAnimalType = RecallAnimalType.ALWAYS;
    }
    Log.i(TAG, jn_recallAnimalType + ":" + config.recallAnimalType.name());
+
+   if(jo.has(jn_receiveFarmToolReward))
+    config.receiveFarmToolReward = jo.getBoolean(jn_receiveFarmToolReward);
+   else
+   {
+    config.reInit = true;
+    config.receiveFarmToolReward = true;
+   }
+   Log.i(TAG, jn_receiveFarmToolReward + ":" + config.receiveFarmToolReward);
 
    if(jo.has(jn_useNewEggTool))
     config.useNewEggTool = jo.getBoolean(jn_useNewEggTool);
@@ -572,15 +760,6 @@ public class Config
    }
    Log.i(TAG, jn_receiveFarmTaskAward + ":" + config.receiveFarmTaskAward);
 
-   if(jo.has(jn_receiveFarmToolReward))
-    config.receiveFarmToolReward = jo.getBoolean(jn_receiveFarmToolReward);
-   else
-   {
-    config.reInit = true;
-    config.receiveFarmToolReward = true;
-   }
-   Log.i(TAG, jn_receiveFarmToolReward + ":" + config.receiveFarmToolReward);
-
    if(jo.has(jn_feedAnimal))
     config.feedAnimal = jo.getBoolean(jn_feedAnimal);
    else
@@ -616,7 +795,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.feedFriendAnimalList.add(ja.getString(i));
-     Log.i(TAG, config.feedFriendAnimalList.get(i)+",");
+     Log.i(TAG, config.feedFriendAnimalList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -635,14 +814,14 @@ public class Config
   {
    Log.printStackTrace(TAG, e);
    if(json != null)
-    Log.showDialogOrToastAndRecordLog("配置文件格式有误，已重置配置文件","");
+    Log.showDialogOrToastAndRecordLog("配置文件格式有误，已重置配置文件", "");
    config = defInit();
   }
   if(config.reInit)
   {
    Log.i(TAG, "config.json is Reinited");
    FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getConfigFile()));
-   FileUtils.write2File(config2Json(config), FileUtils.getConfigFile());
+   saveConfigFile();
   }else
   {
    String formated = config2Json(config);
@@ -658,32 +837,23 @@ public class Config
  public static String config2Json(Config config)
  {
   JSONObject jo = new JSONObject();
-  String trueAndFalse = "true为真，false为假",
-  userId = "用户id";
   try
   {
    if(config == null) config = Config.defInit();
 
-   jo.put("即时生效", trueAndFalse);
    jo.put(jn_immediateEffect, config.immediateEffect);
 
-   jo.put("展示模式", ShowMode.DIALOG.name()+"为展示对话框，"+ShowMode.TOAST.name()+"为展示toast气泡");
    jo.put(jn_showMode, config.showMode.name());
 
-   jo.put("记录log", trueAndFalse);
    jo.put(jn_recordLog, config.recordLog);
 
-   jo.put("启用森林功能", trueAndFalse);
    jo.put(jn_enableForest, config.enableForest);
 
-   jo.put("启用庄园功能", trueAndFalse);
    jo.put(jn_enableFarm, config.enableFarm);
 
    /* forest */
-   jo.put("收取能量", trueAndFalse);
    jo.put(jn_collectEnergy, config.collectEnergy);
-   
-   jo.put("帮好友收取能量", trueAndFalse);
+
    jo.put(jn_helpFriendCollect, config.helpFriendCollect);
 
    JSONArray ja = new JSONArray();
@@ -691,7 +861,6 @@ public class Config
    {
     ja.put(s);
    }
-   jo.put("不偷取能量的好友列表", userId);
    jo.put(jn_dontCollectList, ja);
 
    ja = new JSONArray();
@@ -699,28 +868,22 @@ public class Config
    {
     ja.put(s);
    }
-   jo.put("不帮收能量的好友列表", userId);
    jo.put(jn_dontHelpCollectList, ja);
 
-   jo.put("领取森林任务奖励", trueAndFalse);
    jo.put(jn_receiveForestTaskAward, config.receiveForestTaskAward);
-   
+
    ja = new JSONArray();
    for(String s: config.waterFriendList)
    {
     ja.put(s);
    }
-   jo.put("帮浇水的好友列表", userId);
    jo.put(jn_waterFriendList, ja);
-   
+
    /* farm */
-   jo.put("打赏好友", trueAndFalse);
    jo.put(jn_rewardFriend, config.rewardFriend);
-   
-   jo.put("赶鸡", trueAndFalse);
+
    jo.put(jn_sendBackAnimal, config.sendBackAnimal);
-   
-   jo.put("赶鸡方式", SendType.HIT.name()+"为攻击小鸡，"+SendType.NORMAL.name()+"为常规");
+
    jo.put(jn_sendType, config.sendType.name());
 
    ja = new JSONArray();
@@ -728,55 +891,38 @@ public class Config
    {
     ja.put(s);
    }
-   jo.put("赶鸡方式的排除列表", userId);
    jo.put(jn_sendTypeExcludeList, ja);
-   
-   jo.put("召回小鸡方式", RecallAnimalType.ALWAYS.name()+"为始终召回，"
-    +RecallAnimalType.WHEN_THIEF.name()+"为作贼时召回，"
-    +RecallAnimalType.WHEN_HUNGRY.name()+"为饥饿时召回，"
-    +RecallAnimalType.NEVER.name()+"为不召回");
+
    jo.put(jn_recallAnimalType, config.recallAnimalType);
 
-   jo.put("使用新蛋卡", trueAndFalse);
+   jo.put(jn_receiveFarmToolReward, config.receiveFarmToolReward);
+
    jo.put(jn_useNewEggTool, config.useNewEggTool);
-   
-   jo.put("收取爱心鸡蛋", trueAndFalse);
+
    jo.put(jn_harvestProduce, config.harvestProduce);
-   
-   jo.put("捐赠爱心鸡蛋", trueAndFalse);
+
    jo.put(jn_donation, config.donation);
-   
-   jo.put("答题", trueAndFalse);
+
    jo.put(jn_answerQuestion, config.answerQuestion);
-   
-   jo.put("领取庄园任务奖励", trueAndFalse);
+
    jo.put(jn_receiveFarmTaskAward, config.receiveFarmTaskAward);
 
-   jo.put("领取道具卡奖励", trueAndFalse);
-   jo.put(jn_receiveFarmToolReward, config.receiveFarmToolReward);
-   
-   jo.put("喂鸡", trueAndFalse);
    jo.put(jn_feedAnimal, config.feedAnimal);
-   
-   jo.put("使用加速卡", trueAndFalse);
+
    jo.put(jn_useAccelerateTool, config.useAccelerateTool);
-   
-   jo.put("通知好友赶鸡", trueAndFalse);
+
    jo.put(jn_notifyFriend, config.notifyFriend);
-   
+
    ja = new JSONArray();
    for(String s: config.feedFriendAnimalList)
    {
     ja.put(s);
    }
-   jo.put("帮好友喂鸡列表", userId);
    jo.put(jn_feedFriendAnimalList, ja);
 
    /* member */
-   jo.put("领取蚂蚁会员积分", trueAndFalse);
    jo.put(jn_receivePoint, config.receivePoint);
-   
-   jo.put("详细介绍", "请在模块管理器中启动XQuickEnergy");
+
   }catch(Exception e)
   {
    Log.printStackTrace(TAG, e);
@@ -801,22 +947,6 @@ public class Config
    currentChar = sb.charAt(i);
    switch(currentChar)
    {
-    case '\n':
-     int nextNL = sb.indexOf("\n", i + 1);
-     if(nextNL < 0) nextNL = sb.length();
-     for(int j = i + 1; j < nextNL; j++)
-     {
-      if(String.valueOf(sb.charAt(j)).getBytes().length > 1)
-      {
-       i = sb.indexOf("\"", i + 1);
-       sb.replace(i, i + 1, "// ");
-       sb.deleteCharAt(sb.indexOf("\"", i));
-       sb.deleteCharAt(sb.lastIndexOf(",", nextNL));
-       break;
-      }
-     }
-     break;
-
     case '"':
      switch(lastNonSpaceChar)
      {
@@ -833,9 +963,9 @@ public class Config
      break;
 
     default:
-    if(lastNonSpaceChar == '[' && currentChar != ']')
-     break;
-    lastNonSpaceChar = currentChar;
+     if(lastNonSpaceChar == '[' && currentChar != ']')
+      break;
+     lastNonSpaceChar = currentChar;
    }
   }
   formated = sb.toString();
@@ -859,5 +989,5 @@ public class Config
   }
   return sb.toString();
  }
- 
+
 }

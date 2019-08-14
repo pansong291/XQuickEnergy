@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<ListView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:fastScrollEnabled="true"
+		android:id="@+id/lv_list"
+		android:layout_weight="1"/>
+
+	<Button
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="?android:attr/buttonBarButtonStyle"
+		android:text="添加新的用户 ID 项"
+		android:minHeight="50dp"
+		android:background="@drawable/button"
+		android:id="@+id/btn_add_id"
+		android:gravity="left|center_vertical"
+		android:paddingLeft="12dp"/>
+
+</LinearLayout>
+

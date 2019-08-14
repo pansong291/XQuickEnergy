@@ -2,38 +2,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pansong291.xposed.quickenergy">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
+        android:theme="@style/AppTheme"
         android:allowBackup="true"
         android:icon="@android:drawable/sym_def_app_icon"
-        android:label="XQuickEnergy">
+        android:label="@string/app_name">
 
-        <!-- 作为xposed模块 -->
         <meta-data
             android:name="xposedmodule"
-            android:value="true" />
+            android:value="true"/>
 
-        <!-- 模块描述 -->
         <meta-data
             android:name="xposeddescription"
-            android:value="蚂蚁森林快速收取能量\n（适配支付宝 10.1.68.7434）" />
+            android:value="蚂蚁森林快速收取能量\n（适配支付宝 10.1.68.7434）"/>
 
-        <!-- XposedBridgeApi的最低版本号 -->
         <meta-data
             android:name="xposedminversion"
-            android:value="54" />
+            android:value="54"/>
 
         <activity
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:name=".MainActivity"
-            android:excludeFromRecents="true">
+            android:name=".ui.MainActivity"
+            android:resizeableActivity="true">
             <intent-filter>
                 <action
-                    android:name="android.intent.action.MAIN" />
+                    android:name="android.intent.action.MAIN"/>
                 <category
-                    android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
+                    android:name="de.robv.android.xposed.category.MODULE_SETTINGS"/>
             </intent-filter>
         </activity>
-        
+
     </application>
 
 </manifest>
