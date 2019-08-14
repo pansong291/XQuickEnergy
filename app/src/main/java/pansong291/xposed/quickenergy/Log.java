@@ -12,13 +12,7 @@ public class Log
  private static final String TAG = Log.class.getCanonicalName();
  private static AlertDialog dlg;
  private static StringBuffer sb;
- /*
-  Intent it = new Intent();
-  it.setAction(it.ACTION_VIEW);
-  it.addFlags(it.FLAG_INCLUDE_STOPPED_PACKAGES);
-  it.addFlags(it.FLAG_RECEIVER_FOREGROUND);
-  it.setData(Uri.parse("alipays://platformapi/startapp?appId=60000002"));
-  */
+
  public static void i(String tag, String s)
  {
   try
@@ -33,7 +27,9 @@ public class Log
    }
   }catch(Throwable e)
   {
-   e.printStackTrace();
+   // when hooking self, this XposedBridge.class will
+   // not be found, ignore it.
+   android.util.Log.i(tag, s);
   }
  }
 

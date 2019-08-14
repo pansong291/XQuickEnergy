@@ -31,7 +31,8 @@ public class ChoiceDialog
   if(showModeDialog == null)
    showModeDialog = new AlertDialog.Builder(c)
     .setTitle(title)
-    .setSingleChoiceItems(ShowMode.nickNames, 0, new OnClickListener()
+    .setSingleChoiceItems(ShowMode.nickNames, Config.showMode().ordinal(),
+    new OnClickListener()
     {
      @Override
      public void onClick(DialogInterface p1, int p2)
@@ -61,7 +62,8 @@ public class ChoiceDialog
   if(sendTypeDialog == null)
    sendTypeDialog = new AlertDialog.Builder(c)
     .setTitle(title)
-    .setSingleChoiceItems(SendType.nickNames, 0, new OnClickListener()
+    .setSingleChoiceItems(SendType.nickNames, Config.sendType(null).ordinal(),
+    new OnClickListener()
     {
      @Override
      public void onClick(DialogInterface p1, int p2)
@@ -91,7 +93,8 @@ public class ChoiceDialog
   if(recallAnimalTypeDialog == null)
    recallAnimalTypeDialog = new AlertDialog.Builder(c)
     .setTitle(title)
-    .setSingleChoiceItems(RecallAnimalType.nickNames, 0, new OnClickListener()
+    .setSingleChoiceItems(RecallAnimalType.nickNames, Config.recallAnimalType().ordinal(),
+    new OnClickListener()
     {
      @Override
      public void onClick(DialogInterface p1, int p2)
