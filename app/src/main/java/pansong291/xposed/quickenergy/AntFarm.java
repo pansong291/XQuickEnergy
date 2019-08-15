@@ -134,9 +134,11 @@ public class AntFarm
        if(!AnimalInteractStatus.HOME.name().equals(ownerAnimal.animalInteractStatus))
        {
         syncAnimalStatusAtOtherFarm(loader, ownerAnimal.currentFarmId, "");
+        boolean guest = false;
         switch(SubAnimalType.valueOf(ownerAnimal.subAnimalType))
         {
          case GUEST:
+          guest = true;
           Log.showDialogAndRecordLog("小鸡到好友家去做客了", "");
           break;
          case NORMAL:
@@ -149,6 +151,20 @@ public class AntFarm
           Log.showDialogAndRecordLog("小鸡不在庄园", ownerAnimal.subAnimalType);
         }
 
+        boolean hungry = false;
+        String userName = Config.getNameById(farmId2UserId(ownerAnimal.currentFarmId));
+        switch(AnimalFeedStatus.valueOf(ownerAnimal.animalFeedStatus))
+        {
+         case HUNGRY:
+          hungry = true;
+          Log.showDialogAndRecordLog("你的小鸡在〔" + userName + "〕的庄园里挨饿", "");
+          break;
+
+         case EATING:
+          Log.showDialogAndRecordLog("你的小鸡在〔" + userName + "〕的庄园里吃得津津有味", "");
+          break;
+        }
+
         boolean recall = false;
         switch(Config.recallAnimalType())
         {
@@ -156,10 +172,10 @@ public class AntFarm
           recall = true;
           break;
          case WHEN_THIEF:
-          recall = !SubAnimalType.GUEST.name().equals(ownerAnimal.subAnimalType);
+          recall = !guest;
           break;
          case WHEN_HUNGRY:
-          recall = AnimalFeedStatus.HUNGRY.name().equals(ownerAnimal.animalFeedStatus);
+          recall = hungry;
           break;
         }
         if(recall)
@@ -289,13 +305,13 @@ public class AntFarm
      jo = jo.getJSONObject("animalStatusVO");
      ownerAnimal.animalFeedStatus = jo.getString("animalFeedStatus");
      ownerAnimal.animalInteractStatus = jo.getString("animalInteractStatus");
-     Log.i("owner", "animalId=" + animals[i].animalId);
-     Log.i("owner", "currentFarmId=" + animals[i].currentFarmId);
-     Log.i("owner", "masterFarmId=" + animals[i].masterFarmId);
-     Log.i("owner", "animalBuff=" + animals[i].animalBuff);
-     Log.i("owner", "subAnimalType=" + animals[i].subAnimalType);
-     Log.i("owner", "animalFeedStatus=" + animals[i].animalFeedStatus);
-     Log.i("owner", "animalInteractStatus=" + animals[i].animalInteractStatus);
+     Log.i("owner", "animalId=" + ownerAnimal.animalId);
+     Log.i("owner", "currentFarmId=" + ownerAnimal.currentFarmId);
+     Log.i("owner", "masterFarmId=" + ownerAnimal.masterFarmId);
+     Log.i("owner", "animalBuff=" + ownerAnimal.animalBuff);
+     Log.i("owner", "subAnimalType=" + ownerAnimal.subAnimalType);
+     Log.i("owner", "animalFeedStatus=" + ownerAnimal.animalFeedStatus);
+     Log.i("owner", "animalInteractStatus=" + ownerAnimal.animalInteractStatus);
      break;
     }
    }
