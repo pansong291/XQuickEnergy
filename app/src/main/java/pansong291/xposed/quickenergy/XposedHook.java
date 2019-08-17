@@ -77,37 +77,31 @@ public class XposedHook implements IXposedHookLoadPackage
  private void hookRpcCall(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
  {
   final ClassLoader loader = lpparam.classLoader;
-  Class<?> clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5FragmentManager);
-  if(clazz != null)
+  Class<?> clazz = null;
+  try
   {
+   clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5FragmentManager);
    Class<?> h5FragmentClazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Fragment);
-   if(h5FragmentClazz != null)
-   {
-    XposedHelpers.findAndHookMethod(clazz, ClassMember.pushFragment, h5FragmentClazz,
-     boolean.class, Bundle.class, boolean.class, boolean.class, new XC_MethodHook()
+   XposedHelpers.findAndHookMethod(clazz, ClassMember.pushFragment, h5FragmentClazz,
+    boolean.class, Bundle.class, boolean.class, boolean.class, new XC_MethodHook()
+    {
+     @Override
+     protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
-      @Override
-      protected void afterHookedMethod(MethodHookParam param) throws Throwable
-      {
-       Log.i(TAG, "cur fragment: " + param.args[0]);
-       RpcCall.curH5Fragment = param.args[0];
-      }
-     });
-    Log.i(TAG, "hook pushFragment successfully");
-   }else
-   {
-    Log.i(TAG, "hook出错：\ncouldn't find class "
-          + ClassMember.com_alipay_mobile_nebulacore_ui_H5Fragment);
-   }
-  }else
+      Log.i(TAG, "cur fragment: " + param.args[0]);
+      RpcCall.curH5Fragment = param.args[0];
+     }
+    });
+   Log.i(TAG, "hook " + ClassMember.pushFragment + " successfully");
+  }catch(Exception e)
   {
-   Log.i(TAG, "hook出错：\ncouldn't find class "
-         + ClassMember.com_alipay_mobile_nebulacore_ui_H5FragmentManager);
+   Log.i(TAG, "hook " + ClassMember.pushFragment + " err:");
+   Log.printStackTrace(TAG, e);
   }
 
-  clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Activity);
-  if(clazz != null)
+  try
   {
+   clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Activity);
    XposedHelpers.findAndHookMethod(clazz, ClassMember.onResume, new XC_MethodHook()
     {
      @Override
@@ -122,86 +116,95 @@ public class XposedHook implements IXposedHookLoadPackage
       RpcCall.h5Activity = act;
      }
     });
-   Log.i(TAG, "hook onResume successfully");
-  }else
+   Log.i(TAG, "hook " + ClassMember.onResume + " successfully");
+  }catch(Exception e)
   {
-   Log.i(TAG, "hook出错：\ncouldn't find class "
-         + ClassMember.com_alipay_mobile_nebulacore_ui_H5Activity);
+   Log.i(TAG, "hook " + ClassMember.onResume + " err:");
+   Log.printStackTrace(TAG, e);
   }
 
-  clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulaappproxy_api_rpc_H5RpcUtil);
-  if(clazz != null)
+  boolean hookRpcCallSuccess = false;
+  try
   {
+   clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulabiz_rpc_H5RpcUtil);
    Class<?> h5PageClazz = loader.loadClass(ClassMember.com_alipay_mobile_h5container_api_H5Page);
    Class<?> jsonClazz = loader.loadClass(ClassMember.com_alibaba_fastjson_JSONObject);
-   if(h5PageClazz != null && jsonClazz != null)
-   {
-    try
+   XposedHelpers.findAndHookMethod(clazz, ClassMember.rpcCall, String.class, String.class, String.class,
+    boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
+    int.class, String.class, boolean.class, int.class, new XC_MethodHook()
     {
-     XposedHelpers.findAndHookMethod(clazz, ClassMember.rpcCall, String.class, String.class, String.class,
-      boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
-      int.class, String.class, boolean.class, int.class, String.class, new XC_MethodHook()
-      {
-       @Override
-       protected void beforeHookedMethod(MethodHookParam param) throws Throwable
-       {
-        // Log.i(TAG, "param" + param.args);
-       }
-
-       @Override
-       protected void afterHookedMethod(MethodHookParam param) throws Throwable
-       {
-        String args0 = (String)param.args[0],
-         args1 = (String)param.args[1];
-        if(args0 == null ||
-           !args0.contains("forest") &&
-           !args0.contains("antfarm") &&
-           !args0.contains("antmember"))
-         return;
-        Log.i(TAG, args0 + ", " + args1);
-        Object resp = param.getResult();
-        if(resp != null)
-        {
-         String response = RpcCall.getResponse(resp);
-         Log.i(TAG, "response: " + response);
-
-         AntForest.saveUserIdAndName(args0, response);
-
-         if(Config.enableForest())
-          AntForest.start(loader, args0, args1, response);
-
-         if(Config.enableFarm())
-          AntFarm.start(loader, args0, args1, response);
-
-         if(AntFarm.isEnterFriendFarm(response))
-         {
-          JSONObject jo = new JSONArray(args1).getJSONObject(0);
-          String userId = jo.getString("userId");
-          if(userId == null || userId.isEmpty())
-           userId = AntFarm.farmId2UserId(jo.getString("farmId"));
-          Log.recordLog("进入〔" + Config.getNameById(userId) + "〕的蚂蚁庄园", "");
-         }
-
-         if(Config.receivePoint())AntMember.receivePoint(loader, args0, args1, response);
-        }
-       }
-      });
-     Log.i(TAG, "hook rpcCall successfully");
-    }catch(Exception e)
-    {
-     Log.i(TAG, "hook rpcCall err:");
-     Log.printStackTrace(TAG, e);
-    }
-   }else
-   {
-    Log.i(TAG, "hook出错：\ncouldn't find class "
-          + ClassMember.com_alipay_mobile_h5container_api_H5Page
-          + " or " + ClassMember.com_alibaba_fastjson_JSONObject);
-   }
-  }else
+     @Override
+     protected void afterHookedMethod(MethodHookParam param) throws Throwable
+     {
+      afterHookRpcCall(param, loader);
+     }
+    });
+   hookRpcCallSuccess = true;
+   Log.i(TAG, "hook " + ClassMember.rpcCall + " successfully");
+  }catch(Exception e)
   {
-   Log.i(TAG, "hook出错：\ncouldn't find class "
-         + ClassMember.com_alipay_mobile_nebulaappproxy_api_rpc_H5RpcUtil);
+   Log.i(TAG, "hook " + ClassMember.rpcCall + " err:");
+   //Log.printStackTrace(TAG, e);
+  }
+
+  if(!hookRpcCallSuccess)
+   try
+   {
+    clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulaappproxy_api_rpc_H5RpcUtil);
+    Class<?> h5PageClazz = loader.loadClass(ClassMember.com_alipay_mobile_h5container_api_H5Page);
+    Class<?> jsonClazz = loader.loadClass(ClassMember.com_alibaba_fastjson_JSONObject);
+    XposedHelpers.findAndHookMethod(clazz, ClassMember.rpcCall, String.class, String.class, String.class,
+     boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
+     int.class, String.class, boolean.class, int.class, String.class, new XC_MethodHook()
+     {
+      @Override
+      protected void afterHookedMethod(MethodHookParam param) throws Throwable
+      {
+       afterHookRpcCall(param, loader);
+      }
+     });
+    Log.i(TAG, "hook " + ClassMember.rpcCall + " successfully");
+   }catch(Exception e)
+   {
+    Log.i(TAG, "hook " + ClassMember.rpcCall + " err:");
+    Log.printStackTrace(TAG, e);
+   }
+ }
+
+ private void afterHookRpcCall(XC_MethodHook.MethodHookParam param, ClassLoader loader) throws Throwable
+ {
+  String args0 = (String)param.args[0], args1 = (String)param.args[1];
+  if(args0 == null ||
+     !args0.contains("forest") &&
+     !args0.contains("antfarm") &&
+     !args0.contains("antmember"))
+   return;
+  Log.i(TAG, args0 + ", " + args1);
+  Object resp = param.getResult();
+  if(resp != null)
+  {
+   String response = RpcCall.getResponse(resp);
+   Log.i(TAG, "response: " + response);
+
+   AntForest.saveUserIdAndName(args0, response);
+
+   if(Config.enableForest())
+    AntForest.start(loader, args0, args1, response);
+
+   if(Config.enableFarm())
+    AntFarm.start(loader, args0, args1, response);
+
+   if(AntFarm.isEnterFriendFarm(response))
+   {
+    JSONObject jo = new JSONArray(args1).getJSONObject(0);
+    String userId = jo.getString("userId");
+    if(userId == null || userId.isEmpty())
+     userId = AntFarm.farmId2UserId(jo.getString("farmId"));
+    Log.recordLog("进入〔" + Config.getNameById(userId) + "〕的蚂蚁庄园", "");
+   }
+
+   if(Config.receivePoint())
+    AntMember.receivePoint(loader, args0, args1, response);
   }
  }
 

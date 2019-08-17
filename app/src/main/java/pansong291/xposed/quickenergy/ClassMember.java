@@ -15,4 +15,7 @@ public class ClassMember
  com_alipay_mobile_nebulacore_ui_H5Activity = "com.alipay.mobile.nebulacore.ui.H5Activity",
  onResume = "onResume",
  getResponse = "getResponse";
+
+ public static final String
+ com_alipay_mobile_nebulabiz_rpc_H5RpcUtil = "com.alipay.mobile.nebulabiz.rpc.H5RpcUtil";
 }
