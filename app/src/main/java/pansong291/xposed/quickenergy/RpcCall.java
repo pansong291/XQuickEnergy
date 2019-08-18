@@ -33,11 +33,12 @@ public class RpcCall
      rpcCallMethod = rpcClazz.getMethod(
       ClassMember.rpcCall, String.class, String.class, String.class,
       boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
-      int.class, String.class, boolean.class, int.class, String.class);
+      int.class, String.class, boolean.class, int.class);
     }
    }catch(Exception e)
    {
-    Log.i(TAG, "get RpcCallMethod err:");
+    Log.i(TAG, "get Old RpcCallMethod err:");
+    Log.printStackTrace(TAG, e);
    }
 
    if(rpcCallMethod == null)
