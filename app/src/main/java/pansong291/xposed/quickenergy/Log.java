@@ -57,10 +57,15 @@ public class Log
   recordLog(str, str2);
  }
 
- public static void showToast(final String str, String str2)
+ public static void showToast(String str, String str2)
  {
   if(Config.showMode() != Config.ShowMode.TOAST)
    return;
+  showToastIgnoreConfig(str, str2);
+ }
+ 
+ public static void showToastIgnoreConfig(final String str, String str2)
+ {
   Log.i(TAG, str + str2);
   final Activity activity = RpcCall.h5Activity;
   if(activity != null)

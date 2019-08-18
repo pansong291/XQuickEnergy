@@ -814,7 +814,7 @@ public class Config
   {
    Log.printStackTrace(TAG, e);
    if(json != null)
-    Log.showDialogOrToastAndRecordLog("配置文件格式有误，已重置配置文件", "");
+    Log.showToastIgnoreConfig("配置文件格式有误，已重置配置文件", "");
    config = defInit();
   }
   if(config.reInit)

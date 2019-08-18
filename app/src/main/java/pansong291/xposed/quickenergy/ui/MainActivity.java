@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import pansong291.xposed.quickenergy.Config;
 import pansong291.xposed.quickenergy.R;
+import pansong291.xposed.quickenergy.RpcCall;
 
 public class MainActivity extends Activity
 { 
@@ -30,6 +31,7 @@ public class MainActivity extends Activity
   super.onCreate(savedInstanceState);
   setContentView(R.layout.activity_main);
   setModuleActive(false);
+  RpcCall.h5Activity = this;
 
   Config.shouldReloadConfig = true;
 

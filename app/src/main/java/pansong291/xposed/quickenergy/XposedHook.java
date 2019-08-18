@@ -30,7 +30,6 @@ public class XposedHook implements IXposedHookLoadPackage
      protected void beforeHookedMethod(MethodHookParam param) throws Throwable
      {
       param.args[0] = true;
-      RpcCall.h5Activity = (Activity)param.thisObject;
      }
     });
   }
