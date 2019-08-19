@@ -807,13 +807,14 @@ public class AntFarm
         {
          jo = jaAnimals.getJSONObject(j);
          String animalId = jo.getString("animalId");
-         if(jo.getString("masterFarmId").equals(friendFarmId))
+         String masterFarmId = jo.getString("masterFarmId");
+         if(masterFarmId.equals(friendFarmId))
          {
           jo = jo.getJSONObject("animalStatusVO");
           feedFriendAnimal &= AnimalInteractStatus.HOME.name().equals(jo.getString("animalInteractStatus"));
           if(feedFriendAnimal)
            feedFriendAnimal(loader, jaAnimals, friendFarmId, user);
-         }else
+         }else if(!masterFarmId.equals(ownerFarmId))
          {
           if(notified) continue;
           jo = jo.getJSONObject("animalStatusVO");
