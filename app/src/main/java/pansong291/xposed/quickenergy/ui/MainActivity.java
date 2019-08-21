@@ -14,6 +14,10 @@ import android.widget.Toast;
 import pansong291.xposed.quickenergy.Config;
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.RpcCall;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.content.pm.PackageManager;
+import android.content.ComponentName;
 
 public class MainActivity extends Activity
 { 
@@ -217,6 +221,27 @@ public class MainActivity extends Activity
    Toast.makeText(this, "配置已保存", 0).show();
   }
   Config.saveIdMap();
+ }
+
+ @Override
+ public boolean onCreateOptionsMenu(Menu menu)
+ {
+  int state = getPackageManager()
+   .getComponentEnabledSetting(new ComponentName(this, getClass().getCanonicalName() + "Alias"));
+  menu.add(0, 1, 0, "隐藏应用图标")
+   .setCheckable(true)
+   .setChecked(state > PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+  return super.onCreateOptionsMenu(menu);
+ }
+
+ @Override
+ public boolean onOptionsItemSelected(MenuItem item)
+ {
+  int state = item.isChecked() ? PackageManager.COMPONENT_ENABLED_STATE_DEFAULT: PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+  getPackageManager()
+   .setComponentEnabledSetting(new ComponentName(this, getClass().getCanonicalName() + "Alias"), state, PackageManager.DONT_KILL_APP);
+  item.setChecked(!item.isChecked());
+  return super.onOptionsItemSelected(item);
  }
 
  private void setModuleActive(boolean b)
