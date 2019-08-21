@@ -34,6 +34,7 @@ public class RpcCall
       ClassMember.rpcCall, String.class, String.class, String.class,
       boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
       int.class, String.class, boolean.class, int.class);
+     Log.i(TAG, "get Old RpcCallMethod successfully");
     }
    }catch(Exception e)
    {
@@ -59,6 +60,7 @@ public class RpcCall
        ClassMember.rpcCall, String.class, String.class, String.class,
        boolean.class, jsonClazz, String.class, boolean.class, h5PageClazz,
        int.class, String.class, boolean.class, int.class, String.class);
+      Log.i(TAG, "get RpcCallMethod successfully");
      }
     }catch(Exception e)
     {
@@ -67,7 +69,8 @@ public class RpcCall
     }
   }
 
-  switch(rpcCallMethod.getParameterCount())
+  Log.i(TAG, "rpcCall params count: "+rpcCallMethod.getParameterTypes().length);
+  switch(rpcCallMethod.getParameterTypes().length)
   {
    case 13:
     return rpcCallMethod.invoke(

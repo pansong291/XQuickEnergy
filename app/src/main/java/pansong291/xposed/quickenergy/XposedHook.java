@@ -139,10 +139,10 @@ public class XposedHook implements IXposedHookLoadPackage
      }
     });
    hookRpcCallSuccess = true;
-   Log.i(TAG, "hook " + ClassMember.rpcCall + " successfully");
+   Log.i(TAG, "hook old " + ClassMember.rpcCall + " successfully");
   }catch(Exception e)
   {
-   Log.i(TAG, "hook " + ClassMember.rpcCall + " err:");
+   Log.i(TAG, "hook old " + ClassMember.rpcCall + " err:");
    //Log.printStackTrace(TAG, e);
   }
 
