@@ -18,7 +18,7 @@ public class AntForest
   {"时光加速器"};
   public CharSequence nickName()
   {
-     return nickNames[ordinal()];
+   return nickNames[ordinal()];
   }
  }
 
@@ -358,13 +358,20 @@ public class AntForest
      if(TaskStatus.FINISHED.name().equals(jo.getString("taskStatus")))
      {
       hasCanReceive = true;
-      TaskAwardType taskAwardType = TaskAwardType.valueOf(jo.getString("awardType"));
+      String taskAwardTypeStr = jo.getString("awardType");
+      String awardName = null;
+      if(taskAwardTypeStr.endsWith("DRESS"))
+      {
+       awardName = "节气装扮";
+      }else if(TaskAwardType.BUBBLE_BOOST.name().equals(taskAwardTypeStr))
+      {
+       awardName = TaskAwardType.BUBBLE_BOOST.nickName().toString();
+      }
       int awardCount = jo.getInt("awardCount");
-      String taskType = jo.getString("taskType");
-      s = rpcCall_receiveTaskAward(loader, taskType);
+      s = rpcCall_receiveTaskAward(loader, jo.getString("taskType"));
       jo = new JSONObject(s);
       if(jo.getString("resultCode").equals("SUCCESS"))
-       Log.showDialogAndRecordLog("已领取【" + awardCount + "个】【" + taskAwardType.nickName() + "】", "");
+       Log.showDialogAndRecordLog("已领取【" + awardCount + "个】【" + awardName + "】", "");
       else
        Log.showDialogAndRecordLog("领取失败，" + jo.getString("desc"), s);
      }
