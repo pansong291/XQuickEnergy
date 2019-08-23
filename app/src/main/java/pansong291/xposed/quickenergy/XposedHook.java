@@ -190,6 +190,8 @@ public class XposedHook implements IXposedHookLoadPackage
    if(Config.enableForest())
     AntForest.start(loader, args0, args1, response);
 
+   AntForest.checkUnknownId(loader);
+
    if(Config.enableFarm())
     AntFarm.start(loader, args0, args1, response);
 

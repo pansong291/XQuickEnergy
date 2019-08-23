@@ -128,7 +128,6 @@ public class AntFarm
 
        if(Config.rewardFriend())rewardFriend(loader);
 
-       // 赶鸡
        if(Config.sendBackAnimal())sendBackAnimal(loader);
 
        if(!AnimalInteractStatus.HOME.name().equals(ownerAnimal.animalInteractStatus))
@@ -180,7 +179,7 @@ public class AntFarm
         }
         if(recall)
         {
-         recallAnimal(loader, ownerAnimal.animalId, ownerAnimal.currentFarmId, ownerFarmId);
+         recallAnimal(loader, ownerAnimal.animalId, ownerAnimal.currentFarmId, ownerFarmId, userName);
          syncAnimalStatus(loader, ownerFarmId);
         }
        }
@@ -214,7 +213,6 @@ public class AntFarm
         if(Config.feedAnimal() && AnimalFeedStatus.HUNGRY.name().equals(ownerAnimal.animalFeedStatus))
         {
          Log.showDialogAndRecordLog("你的小鸡在挨饿", "");
-         // 喂鸡
          feedAnimal(loader, ownerFarmId);
          //syncAnimalStatus(loader,ownerFarmId);
         }
@@ -353,7 +351,7 @@ public class AntFarm
   }
  }
 
- private static void recallAnimal(ClassLoader loader, String animalId, String currentFarmId, String masterFarmId)
+ private static void recallAnimal(ClassLoader loader, String animalId, String currentFarmId, String masterFarmId, String user)
  {
   try
   {
@@ -364,7 +362,7 @@ public class AntFarm
    if(memo.equals("SUCCESS"))
    {
     double foodHaveStolen = jo.getDouble("foodHaveStolen");
-    Log.showDialogAndRecordLog("已召回小鸡，偷吃了〔" + Config.getNameById(farmId2UserId(currentFarmId)) + "〕的〔" + foodHaveStolen + "克〕饲料", "");
+    Log.showDialogAndRecordLog("已召回小鸡，偷吃了〔" + user + "〕的〔" + foodHaveStolen + "克〕饲料", "");
     // 这里不需要加
     // add2FoodStock((int)foodHaveStolen);
    }else
@@ -539,7 +537,7 @@ public class AntFarm
      {
       jo = jo.getJSONObject("donation");
       harvestBenevolenceScore = jo.getDouble("harvestBenevolenceScore");
-      Log.showDialogAndRecordLog("捐赠活动〔" + activityName + "〕成功，累计捐赠" + jo.getInt("donationTimesStat") + "次", "");
+      Log.showDialogAndRecordLog("捐赠活动〔" + activityName + "〕成功，累计捐赠〔" + jo.getInt("donationTimesStat") + "次〕", "");
      }else
      {
       Log.showDialogAndRecordLog(memo, s);
@@ -818,7 +816,7 @@ public class AntFarm
          {
           if(notified) continue;
           jo = jo.getJSONObject("animalStatusVO");
-          notified = notifyFriend(loader, jo, friendFarmId, animalId);
+          notified = notifyFriend(loader, jo, friendFarmId, animalId, user);
          }
         }
        }else
@@ -846,14 +844,13 @@ public class AntFarm
   }
  }
 
- private static boolean notifyFriend(ClassLoader loader, JSONObject joAnimalStatusVO, String friendFarmId, String animalId)
+ private static boolean notifyFriend(ClassLoader loader, JSONObject joAnimalStatusVO, String friendFarmId, String animalId, String user)
  {
   try
   {
    if(AnimalInteractStatus.STEALING.name().equals(joAnimalStatusVO.getString("animalInteractStatus"))
       && AnimalFeedStatus.EATING.name().equals(joAnimalStatusVO.getString("animalFeedStatus")))
    {
-    String user = Config.getNameById(farmId2UserId(friendFarmId));
     Log.showDialogAndRecordLog("有小鸡正在偷吃〔" + user + "〕的饲料", "");
     String s = rpcCall_notifyFriend(loader, animalId, friendFarmId);
     JSONObject jo = new JSONObject(s);

@@ -26,6 +26,7 @@ public class AntForest
  { START, END }
  private static int threadCount = 0;
  private static boolean hasMore = true;
+ private static boolean checkingIds = false;
 
  public static void start(ClassLoader loader, String args0, String args1, String resp)
  {
@@ -121,6 +122,9 @@ public class AntForest
         if(optBoolean && !userId.equals(selfId))
         {
          canCollectEnergy(loader, userId);
+        }else
+        {
+         Config.getNameById(userId);
         }
        }
       }else
@@ -596,6 +600,36 @@ public class AntForest
    Log.i(TAG, "saveUserIdAndName err:");
    Log.printStackTrace(TAG, e);
   }
+ }
+
+ public static void checkUnknownId(ClassLoader loader)
+ {
+  if(checkingIds) return;
+  checkingIds = true;
+  String[] unknownIds = Config.getUnknownIds();
+  if(unknownIds != null)
+   new Thread(
+    new Runnable()
+    {
+     ClassLoader loader;
+     String[] unknownIds;
+     public Runnable setData(ClassLoader cl, String[] ss)
+     {
+      loader = cl;unknownIds = ss;
+      return this;
+     }
+
+     @Override
+     public void run()
+     {
+      Log.i(TAG, "start to check " + unknownIds.length + " unknown ids");
+      for(int i = 0; i < unknownIds.length; i++)
+      {
+       rpcCall_queryNextAction(loader, unknownIds[i]);
+      }
+      checkingIds = false;
+     }
+    }.setData(loader, unknownIds)).start();
  }
 
 }

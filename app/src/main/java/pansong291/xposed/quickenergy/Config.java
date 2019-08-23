@@ -460,9 +460,29 @@ public class Config
    String n = getIdMap().get(id).toString();
    int ind = n.indexOf('(');
    if(ind > 0) n = n.substring(0, ind);
-   return n;
+   if(!n.endsWith("*")) return n;
+  }else
+  {
+   putIdMap(id, "*(*)");
   }
   return id;
+ }
+
+ public static String[] getUnknownIds()
+ {
+  List<String> idList = new ArrayList<String>();
+  Set idSet = getIdMap().entrySet();
+  for(Map.Entry entry: idSet)
+   if(entry.getValue().toString().contains("(*)"))
+    idList.add(entry.getKey().toString());
+  if(idList.size() > 0)
+  {
+   String[] ids = new String[idList.size()];
+   for(int i = 0; i < idList.size(); i++)
+    ids[i] = idList.get(i);
+   return ids;
+  }
+  return null;
  }
 
  public static Map getIdMap()
@@ -814,13 +834,15 @@ public class Config
   {
    Log.printStackTrace(TAG, e);
    if(json != null)
-    Log.showToastIgnoreConfig("配置文件格式有误，已重置配置文件", "");
+   {
+    Log.showToastIgnoreConfig("配置文件格式有误，已重置配置文件并备份原文件", "");
+    FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getConfigFile()));
+   }
    config = defInit();
   }
   if(config.reInit)
   {
-   Log.i(TAG, "config.json is Reinited");
-   FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getConfigFile()));
+   Log.i(TAG, "Reset config.json");
    saveConfigFile();
   }else
   {
