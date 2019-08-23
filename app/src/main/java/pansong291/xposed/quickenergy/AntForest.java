@@ -474,7 +474,7 @@ public class AntForest
   try
   {
    String args1 = "[{\"bizNo\":\"" + bizNo + ordinal + "\",\"targetUser\":\""
-    + targetUser + "\",\"transferType\":\"WATERING\"}]";// ,\"version\":\"\" 20181217
+    + targetUser + "\",\"transferType\":\"WATERING\",\"version\":\"20181217\"}]";// 
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.transferEnergy", args1);
    return RpcCall.getResponse(o);
   }catch(Exception e)
