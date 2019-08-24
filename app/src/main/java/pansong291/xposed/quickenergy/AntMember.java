@@ -15,6 +15,7 @@ public class AntMember
   
   try
   {
+   AntForest.checkUnknownId(loader);
    JSONObject jo = new JSONArray(args1).getJSONObject(0);
    int page = jo.getInt("page");
    int pageSize = jo.getInt("pageSize");

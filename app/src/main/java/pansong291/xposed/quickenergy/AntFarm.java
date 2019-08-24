@@ -118,6 +118,7 @@ public class AntFarm
       Log.showToast("庄园功能开始…", "");
       try
       {
+       AntForest.checkUnknownId(loader);
        JSONObject jo = new JSONObject(resp);
        rewardProductNum = jo.getJSONObject("dynamicGlobalConfig").getDouble("rewardProductNum");
        JSONObject joFarmVO = jo.getJSONObject("farmVO");

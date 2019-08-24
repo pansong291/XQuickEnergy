@@ -51,6 +51,7 @@ public class AntForest
      Log.showToast("森林功能开始…", "");
      try
      {
+      checkUnknownId(loader);
       if(Config.collectEnergy())
       {
        Log.showDialogAndRecordLog("开始收取能量…", "");
