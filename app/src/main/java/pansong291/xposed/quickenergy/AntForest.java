@@ -631,7 +631,7 @@ public class AntForest
      @Override
      public void run()
      {
-      Log.i(TAG, "start to check " + unknownIds.length + " unknown ids");
+      Log.i(TAG, "checking " + unknownIds.length + " unknown ids");
       for(int i = 0; i < unknownIds.length; i++)
       {
        rpcCall_queryNextAction(loader, unknownIds[i]);
