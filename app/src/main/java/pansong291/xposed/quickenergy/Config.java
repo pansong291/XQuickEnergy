@@ -13,9 +13,9 @@ public class Config
 {
  public enum ShowMode
  {
-  DIALOG, TOAST;
+  DIALOG, TOAST, NONE;
   public static final CharSequence[] nickNames =
-  {"对话框", "toast气泡"};
+  {"对话框", "toast气泡", "无"};
   public CharSequence nickName()
   {
    return nickNames[ordinal()];
