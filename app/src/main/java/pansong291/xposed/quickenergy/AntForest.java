@@ -370,10 +370,11 @@ public class AntForest
       int awardCount = jo.getInt("awardCount");
       s = rpcCall_receiveTaskAward(loader, jo.getString("taskType"));
       jo = new JSONObject(s);
-      if(jo.getString("resultCode").equals("SUCCESS"))
+      s = jo.getString("desc");
+      if(s.equals("SUCCESS"))
        Log.showDialogAndRecordLog("已领取【" + awardCount + "个】【" + awardName + "】", "");
       else
-       Log.showDialogAndRecordLog("领取失败，" + jo.getString("desc"), s);
+       Log.showDialogAndRecordLog("领取失败，" + s, jo.toString());
      }
     }
     if(!hasCanReceive)

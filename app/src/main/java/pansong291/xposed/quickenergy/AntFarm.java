@@ -243,6 +243,7 @@ public class AntFarm
        Log.i(TAG, "run err:");
        Log.printStackTrace(TAG, e);
       }
+      Config.saveIdMap();
       Log.showToast("庄园功能结束", "");
      }
     }.setData(response, loader)).start();

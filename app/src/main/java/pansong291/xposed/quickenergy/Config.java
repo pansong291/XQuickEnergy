@@ -478,7 +478,7 @@ public class Config
   if(idList.size() > 0)
   {
    String[] ids = new String[idList.size()];
-   for(int i = 0; i < idList.size(); i++)
+   for(int i = 0; i < ids.length; i++)
     ids[i] = idList.get(i);
    return ids;
   }
