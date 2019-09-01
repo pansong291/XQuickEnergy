@@ -90,10 +90,10 @@ public class AntFarm
     cityAdCode = jo.getString("cityAdCode");
     districtAdCode = jo.getString("districtAdCode");
     version = jo.getString("version");
-   }catch(Exception e)
+   }catch(Throwable t)
    {
     Log.i(TAG, "start err: args1= " + args1);
-    Log.printStackTrace(TAG, e);
+    Log.printStackTrace(TAG, t);
    }
   }
 
@@ -240,10 +240,10 @@ public class AntFarm
        if(Config.notifyFriend() || Config.feedFriendAnimal())
         notifyFriendAndFeedAnimal(loader);
 
-      }catch(Exception e)
+      }catch(Throwable t)
       {
        Log.i(TAG, "run err:");
-       Log.printStackTrace(TAG, e);
+       Log.printStackTrace(TAG, t);
       }
       Config.saveIdMap();
       Log.showToast("庄园功能结束", "");
@@ -276,10 +276,10 @@ public class AntFarm
   {
    String s = rpcCall_syncAnimalStatus(loader, farmId);
    parseSyncAnimalStatusResponse(s);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "syncAnimalStatus err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -316,10 +316,10 @@ public class AntFarm
      break;
     }
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "syncAnimalStatusAtOtherFarm err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -347,10 +347,10 @@ public class AntFarm
     }
     rewardList = null;
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rewardFriend err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -372,10 +372,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "recallAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -425,10 +425,10 @@ public class AntFarm
    }
    if(!hasStealingAnimal)
     Log.showDialogAndRecordLog("没有来偷吃的小鸡", "");
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "sendBackAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -475,10 +475,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "receiveToolTaskReward err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -499,10 +499,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "harvestProduce err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -550,10 +550,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "donation err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -634,10 +634,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "answerQuestion err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -688,10 +688,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "receiveFarmTaskAward err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -718,10 +718,10 @@ public class AntFarm
      Log.showDialogAndRecordLog(memo, s);
     }
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "feedAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -758,10 +758,10 @@ public class AntFarm
    {
     Log.showDialogAndRecordLog(memo, s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "useFarmTool err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -840,10 +840,10 @@ public class AntFarm
     Log.showDialogAndRecordLog("通知好友结束", "");
    if(Config.feedFriendAnimal() || Config.notifyFriend())
     Log.showDialogAndRecordLog("饲料剩余〔" + foodStock + "克〕", "");
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "notifyFriendAndFeed err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -872,10 +872,10 @@ public class AntFarm
      Log.showDialogAndRecordLog(memo, s);
     }
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "notifyFriend err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return false;
  }
@@ -920,10 +920,10 @@ public class AntFarm
      Log.showDialogAndRecordLog(memo, s);
     }
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "feedFriendAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -936,10 +936,10 @@ public class AntFarm
     + farmId2UserId(farmId) + "\",\"version\":\"" + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.syncAnimalStatus", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_syncAnimalStatus err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -993,10 +993,10 @@ public class AntFarm
     Log.i(i + " animal", "animalFeedStatus=" + animals[i].animalFeedStatus);
     Log.i(i + " animal", "animalInteractStatus=" + animals[i].animalInteractStatus);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "parseSyncAnimalStatusResponse err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -1010,10 +1010,10 @@ public class AntFarm
     + time + ",\"version\":\"" + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.rewardFriend", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_rewardFriend err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1028,10 +1028,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.recallAnimal", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_recallAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1047,10 +1047,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.sendBackAnimal", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_sendBackAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1064,10 +1064,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.harvestProduce", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_harvestProduce err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1080,10 +1080,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.listActivityInfo", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_listActivityInfo err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1097,10 +1097,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.donation", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_donation err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1113,10 +1113,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.listFarmTask", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_listFarmTask err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1129,10 +1129,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.getAnswerInfo", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_getAnswerInfo err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1146,10 +1146,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.doFarmTask", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_answerQuestion err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1162,10 +1162,10 @@ public class AntFarm
     + taskId + "\",\"version\":\"" + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.receiveFarmTaskAward", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_receiveFarmTaskAward err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1178,10 +1178,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.listToolTaskDetails", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_listToolTaskDetails err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1197,10 +1197,10 @@ public class AntFarm
     + taskType + "\",\"version\":\"" + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.receiveToolTaskReward", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_receiveToolTaskReward err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1214,10 +1214,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.feedAnimal", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_feedAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1230,10 +1230,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.listFarmTool", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_listFarmTool err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1246,10 +1246,10 @@ public class AntFarm
     + targetFarmId + "\",\"toolId\":\"" + toolId + "\",\"toolType\":\"" + toolType + "\",\"version\":\"" + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.useFarmTool", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_useFarmTool err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1263,10 +1263,10 @@ public class AntFarm
    pageStartSum += 20;
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.rankingList", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_rankingList err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1280,10 +1280,10 @@ public class AntFarm
     + userId + "\",\"version\":\"" + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.enterFarm", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_enterFarm err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1298,10 +1298,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.notifyFriend", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_notifyFriend err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -1315,10 +1315,10 @@ public class AntFarm
     + version + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antfarm.feedFriendAnimal", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_feedFriendAnimal err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }

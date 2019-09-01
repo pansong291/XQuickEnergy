@@ -66,10 +66,10 @@ public class XposedHook implements IXposedHookLoadPackage
       }
      });
    }
-  }catch(Throwable e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "hookSecurity err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -92,10 +92,10 @@ public class XposedHook implements IXposedHookLoadPackage
      }
     });
    Log.i(TAG, "hook " + ClassMember.pushFragment + " successfully");
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "hook " + ClassMember.pushFragment + " err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
 
   try
@@ -116,10 +116,10 @@ public class XposedHook implements IXposedHookLoadPackage
      }
     });
    Log.i(TAG, "hook " + ClassMember.onResume + " successfully");
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "hook " + ClassMember.onResume + " err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
 
   boolean hookRpcCallSuccess = false;
@@ -140,7 +140,7 @@ public class XposedHook implements IXposedHookLoadPackage
     });
    hookRpcCallSuccess = true;
    Log.i(TAG, "hook old " + ClassMember.rpcCall + " successfully");
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "hook old " + ClassMember.rpcCall + " err:");
    //Log.printStackTrace(TAG, e);
@@ -163,10 +163,10 @@ public class XposedHook implements IXposedHookLoadPackage
       }
      });
     Log.i(TAG, "hook " + ClassMember.rpcCall + " successfully");
-   }catch(Exception e)
+   }catch(Throwable t)
    {
     Log.i(TAG, "hook " + ClassMember.rpcCall + " err:");
-    Log.printStackTrace(TAG, e);
+    Log.printStackTrace(TAG, t);
    }
  }
 

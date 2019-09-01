@@ -63,10 +63,10 @@ public class AntMember
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"),response);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "receivePoint err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
  
@@ -97,10 +97,10 @@ public class AntMember
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"),response);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "memberSignin err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
  
@@ -111,10 +111,10 @@ public class AntMember
    String args1 = "[{\"page\":"+page+",\"pageSize\":"+pageSize+"}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.queryPointCert", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryPointCert err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -126,10 +126,10 @@ public class AntMember
    String args1 = "[{\"certId\":"+certId+"}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.receivePointByUser", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_receivePointByUser err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -141,10 +141,10 @@ public class AntMember
    String args1 = "[{}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.h5.queryPoint", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryPoint err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -156,10 +156,10 @@ public class AntMember
    String args1 = "[{}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.memberSignin", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_memberSignin err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }

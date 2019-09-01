@@ -31,7 +31,7 @@ public class ListDialog
   try
   {
    getListDialog(c).show();
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    listDialog = null;
    getListDialog(c).show();
@@ -66,7 +66,7 @@ public class ListDialog
      try
      {
       getEdtDialog(p1.getContext()).show();
-     }catch(Exception e)
+     }catch(Throwable t)
      {
       edtDialog = null;
       getEdtDialog(p1.getContext()).show();

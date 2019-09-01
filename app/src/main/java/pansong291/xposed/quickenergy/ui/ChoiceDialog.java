@@ -19,7 +19,7 @@ public class ChoiceDialog
   try
   {
    getShowModeDialog(c, title).show();
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    showModeDialog = null;
    getShowModeDialog(c, title).show();
@@ -50,7 +50,7 @@ public class ChoiceDialog
   try
   {
    getSendTypeDialog(c, title).show();
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    sendTypeDialog = null;
    getSendTypeDialog(c, title).show();
@@ -81,7 +81,7 @@ public class ChoiceDialog
   try
   {
    getRecallAnimalTypeDialog(c, title).show();
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    recallAnimalTypeDialog = null;
    getRecallAnimalTypeDialog(c, title).show();

@@ -36,10 +36,10 @@ public class RpcCall
       int.class, String.class, boolean.class, int.class);
      Log.i(TAG, "get Old RpcCallMethod successfully");
     }
-   }catch(Exception e)
+   }catch(Throwable t)
    {
     Log.i(TAG, "get Old RpcCallMethod err:");
-    Log.printStackTrace(TAG, e);
+    //Log.printStackTrace(TAG, t);
    }
 
    if(rpcCallMethod == null)
@@ -62,10 +62,10 @@ public class RpcCall
        int.class, String.class, boolean.class, int.class, String.class);
       Log.i(TAG, "get RpcCallMethod successfully");
      }
-    }catch(Exception e)
+    }catch(Throwable t)
     {
      Log.i(TAG, "get RpcCallMethod err:");
-     Log.printStackTrace(TAG, e);
+     Log.printStackTrace(TAG, t);
     }
   }
 

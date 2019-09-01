@@ -25,7 +25,7 @@ public class Log
     else
      XposedBridge.log(sb.substring(i, i + 2000));
    }
-  }catch(Throwable e)
+  }catch(Throwable t)
   {
    // when hooking self, this XposedBridge.class will
    // not be found, ignore it.
@@ -90,10 +90,10 @@ public class Log
        Toast.makeText(activity, str, 1).show();
       }
      });
-   }catch(Exception e)
+   }catch(Throwable t)
    {
     Log.i(TAG, "showToast err:");
-    Log.printStackTrace(TAG, e);
+    Log.printStackTrace(TAG, t);
    }
   }
  }
@@ -139,7 +139,7 @@ public class Log
         try
         {
          dlg.show();
-        }catch(Exception e)
+        }catch(Throwable t)
         {
          Log.i(TAG, "Dialog show error");
          dlg = createNewDialog();
@@ -149,10 +149,10 @@ public class Log
        dlg.setMessage(sb.toString());
       }
      });
-   }catch(Exception e)
+   }catch(Throwable t)
    {
     Log.i(TAG, "showDialog err:");
-    Log.printStackTrace(TAG, e);
+    Log.printStackTrace(TAG, t);
    }
   }
  }

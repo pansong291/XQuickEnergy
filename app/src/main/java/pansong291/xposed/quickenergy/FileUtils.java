@@ -85,9 +85,9 @@ public class FileUtils
    {
     result .append(chs, 0, len);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   close(fr);
   return result.toString();
@@ -108,9 +108,9 @@ public class FileUtils
    fw.write(s);
    fw.flush();
    success = true;
-  }catch(Exception e)
+  }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   close(fw);
   return success;
@@ -126,9 +126,9 @@ public class FileUtils
    fw.append(s);
    fw.flush();
    success = true;
-  }catch(Exception e)
+  }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   close(fw);
   return success;
@@ -139,9 +139,9 @@ public class FileUtils
   try
   {
    if(c != null) c.close();
-  }catch(Exception e)
+  }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
  

@@ -77,10 +77,10 @@ public class AntForest
       }
 
       if(Config.receiveForestTaskAward())receiveTaskAward(loader);
-     }catch(Exception e)
+     }catch(Throwable t)
      {
       Log.i(TAG, "start err:");
-      Log.printStackTrace(TAG, e);
+      Log.printStackTrace(TAG, t);
      }
      if(forestEnd) Log.showToast("森林功能结束", "");
      else forestEnd = true;
@@ -135,10 +135,10 @@ public class AntForest
       {
        Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
       }
-     }catch(Exception e)
+     }catch(Throwable t)
      {
       Log.i(TAG, "queryEnergyRanking err:");
-      Log.printStackTrace(TAG, e);
+      Log.printStackTrace(TAG, t);
       hasMore = false;
      }
      updateThreadCount(ThreadStatus.END, loader);
@@ -174,10 +174,10 @@ public class AntForest
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), resp);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "canCollectSelfEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -219,10 +219,10 @@ public class AntForest
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "canCollectEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -256,10 +256,10 @@ public class AntForest
      s = s.replace("TA", "【" + userName + "】");
     Log.showDialogAndRecordLog(s, jo.toString());
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "collectEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -293,10 +293,10 @@ public class AntForest
      s = s.replace("TA", "【" + userName + "】");
     Log.showDialogAndRecordLog(s, jo.toString());
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "forFriendCollectEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -338,10 +338,10 @@ public class AntForest
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "waterFriendEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -387,10 +387,10 @@ public class AntForest
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "receiveTaskAward err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -416,10 +416,10 @@ public class AntForest
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "queryTaskList err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 
@@ -431,10 +431,10 @@ public class AntForest
     + startPoint + "}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryEnergyRanking", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryEnergyRanking err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -451,10 +451,10 @@ public class AntForest
 //   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", args1);
 
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryNextAction err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -466,10 +466,10 @@ public class AntForest
    String args1 = "[{\"bubbleIds\":[" + bubbleId + "],\"userId\":\"" + userId + "\"}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.collectEnergy", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_collectEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -482,10 +482,10 @@ public class AntForest
     + targetUser + "\",\"transferType\":\"WATERING\",\"version\":\"20181217\"}]";// 
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.transferEnergy", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_transferEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -497,10 +497,10 @@ public class AntForest
    String args1 = "[{\"bubbleIds\":[" + bubbleId + "],\"targetUserId\":\"" + targetUserId + "\"}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.forFriendCollectEnergy", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_forFriendCollectEnergy err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -512,10 +512,10 @@ public class AntForest
    String args1 = "[{\"version\":\"20190321\"}]"; // 
    Object o = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryTaskList", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryTaskList err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -529,10 +529,10 @@ public class AntForest
     + taskType + "\"}]";
    Object o = RpcCall.invoke(loader, "com.alipay.antiep.receiveTaskAward", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_receiveTaskAward err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -544,10 +544,10 @@ public class AntForest
    String args1 = "[{\"version\":\"\"}]"; //20181217
    Object o = RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryPropList", args1);
    return RpcCall.getResponse(o);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryPropList err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return null;
  }
@@ -613,10 +613,10 @@ public class AntForest
     Log.recordLog("进入【" + loginId + "】的蚂蚁森林", "");
     Config.saveIdMap();
    }
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    Log.i(TAG, "saveUserIdAndName err:");
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
  }
 

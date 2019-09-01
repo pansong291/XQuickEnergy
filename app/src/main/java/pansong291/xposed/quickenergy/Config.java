@@ -502,9 +502,9 @@ public class Config
       String[] entry = s.split(":");
       idMap.put(entry[0], entry[1]);
      }
-    }catch(Exception e)
+    }catch(Throwable t)
     {
-     Log.printStackTrace(TAG, e);
+     Log.printStackTrace(TAG, t);
      idMap.clear();
     }
    }
@@ -830,9 +830,9 @@ public class Config
    }
    Log.i(TAG, jn_receivePoint + ":" + config.receivePoint);
 
-  }catch(Exception e)
+  }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
    if(json != null)
    {
     Log.showToastIgnoreConfig("配置文件格式有误，已重置配置文件并备份原文件", "");
@@ -945,9 +945,9 @@ public class Config
    /* member */
    jo.put(jn_receivePoint, config.receivePoint);
 
-  }catch(Exception e)
+  }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, e);
+   Log.printStackTrace(TAG, t);
   }
   return formatJson(jo);
  }
@@ -958,7 +958,7 @@ public class Config
   try
   {
    formated = jo.toString(4);
-  }catch(Exception e)
+  }catch(Throwable t)
   {
    return jo.toString();
   }
