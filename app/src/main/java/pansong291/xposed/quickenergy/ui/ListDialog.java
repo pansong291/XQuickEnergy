@@ -148,9 +148,11 @@ public class ListDialog
   String name = edt_name.getText().toString();
   if(id.length() > 0)
   {
-   if(!Config.getIdMap().containsKey(id) && name.length() > 0)
+   if(!Config.getIdMap().containsKey(id))
    {
-    if(!name.contains("*") || !name.contains("("))
+    if(name == null || name.isEmpty())
+     name = "*(*)";
+    if(!name.endsWith("(*)"))
      name += "(*)";
     Config.putIdMap(id, name);
     AlipayUser.getAlipayUserList().add(new AlipayUser(id, name));

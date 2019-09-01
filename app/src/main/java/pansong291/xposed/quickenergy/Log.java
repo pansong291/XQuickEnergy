@@ -40,33 +40,44 @@ public class Log
 
  public static void showDialogOrToast(String str, String str2)
  {
-  showDialog(str, str2);
-  showToast(str, str2);
+  showDialog(str, str2, true);
+  showToast(str, str2, false);
  }
 
  public static void showDialogOrToastAndRecordLog(String str, String str2)
  {
-  showDialog(str, str2);
-  showToast(str, str2);
-  recordLog(str, str2);
+  showDialog(str, str2, true);
+  showToast(str, str2, false);
+  recordLog(str, str2, false);
  }
 
  public static void showDialogAndRecordLog(String str, String str2)
  {
-  showDialog(str, str2);
-  recordLog(str, str2);
+  showDialog(str, str2, true);
+  recordLog(str, str2, false);
  }
 
  public static void showToast(String str, String str2)
  {
-  if(Config.showMode() != Config.ShowMode.TOAST)
-   return;
-  showToastIgnoreConfig(str, str2);
+  showToast(str, str2, true);
  }
  
- public static void showToastIgnoreConfig(final String str, String str2)
+ private static void showToast(String str, String str2, boolean log)
  {
-  Log.i(TAG, str + str2);
+  if(log) Log.i(TAG, str + str2);
+  if(Config.showMode() != Config.ShowMode.TOAST)
+   return;
+  showToastIgnoreConfig(str, str2, false);
+ }
+ 
+ public static void showToastIgnoreConfig(String str, String str2)
+ {
+  showToastIgnoreConfig(str, str2, true);
+ }
+ 
+ private static void showToastIgnoreConfig(final String str, String str2, boolean log)
+ {
+  if(log) Log.i(TAG, str + str2);
   final Activity activity = RpcCall.h5Activity;
   if(activity != null)
   {
@@ -89,17 +100,28 @@ public class Log
 
  public static boolean recordLog(String str, String str2)
  {
+  return recordLog(str, str2, true);
+ }
+ 
+ private static boolean recordLog(String str, String str2, boolean log)
+ {
+  if(log) Log.i(TAG, str + str2);
   if(!Config.recordLog())
    return false;
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss  ");
   return FileUtils.append2LogFile(sdf.format(new Date()) + str + str2);
  }
 
- public static void showDialog(final String str, String str2)
+ public static void resetDialog()
  {
+  dlg = null;
+ }
+
+ private static void showDialog(final String str, String str2, boolean log)
+ {
+  if(log) Log.i(TAG, str + str2);
   if(Config.showMode() != Config.ShowMode.DIALOG)
    return;
-  Log.i(TAG, str + str2);
   Activity activity = RpcCall.h5Activity;
   if(activity != null)
   {
@@ -122,7 +144,6 @@ public class Log
          Log.i(TAG, "Dialog show error");
          dlg = createNewDialog();
          dlg.show();
-         sb.delete(0, sb.length());
         }
        sb.append(str).append('\n');
        dlg.setMessage(sb.toString());
@@ -138,10 +159,10 @@ public class Log
 
  private static AlertDialog createNewDialog()
  {
-  Activity activity = RpcCall.h5Activity;
-  return new AlertDialog.Builder(activity)
+  if(sb != null) sb.delete(0, sb.length());
+  return new AlertDialog.Builder(RpcCall.h5Activity)
    .setTitle("XQuickEnergy")
-   .setMessage("")
+   .setMessage("msg")
    .setPositiveButton("OK", null)
    .create();
  }

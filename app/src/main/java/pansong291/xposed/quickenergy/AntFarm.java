@@ -72,7 +72,7 @@ public class AntFarm
  private static Animal ownerAnimal;
  private static int foodStock;
  private static int foodStockLimit;
- private static double rewardProductNum;
+ private static String rewardProductNum;
  private static RewardFriend[] rewardList;
  private static double benevolenceScore;
  private static double harvestBenevolenceScore;
@@ -116,11 +116,12 @@ public class AntFarm
      public void run()
      {
       Log.showToast("庄园功能开始…", "");
+      Log.resetDialog();
       try
       {
        AntForest.checkUnknownId(loader);
        JSONObject jo = new JSONObject(resp);
-       rewardProductNum = jo.getJSONObject("dynamicGlobalConfig").getDouble("rewardProductNum");
+       rewardProductNum = jo.getJSONObject("dynamicGlobalConfig").getString("rewardProductNum");
        JSONObject joFarmVO = jo.getJSONObject("farmVO");
        foodStock = joFarmVO.getInt("foodStock");
        foodStockLimit = joFarmVO.getInt("foodStockLimit");
@@ -999,7 +1000,7 @@ public class AntFarm
   }
  }
 
- private static String rpcCall_rewardFriend(ClassLoader loader, String consistencyKey, String friendId, double productNum, String time)
+ private static String rpcCall_rewardFriend(ClassLoader loader, String consistencyKey, String friendId, String productNum, String time)
  {
   try
   {

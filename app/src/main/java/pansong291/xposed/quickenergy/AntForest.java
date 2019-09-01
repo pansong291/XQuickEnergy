@@ -13,9 +13,9 @@ public class AntForest
  private static int onceHelpCollected = 0;
  public enum TaskAwardType
  {
-  BUBBLE_BOOST;
+  BUBBLE_BOOST, DRESS;
   public static final CharSequence[] nickNames =
-  {"时光加速器"};
+  {"时光加速器","装扮"};
   public CharSequence nickName()
   {
    return nickNames[ordinal()];
@@ -25,6 +25,7 @@ public class AntForest
  public enum ThreadStatus
  { START, END }
  private static int threadCount = 0;
+ private static boolean forestEnd = false;
  private static boolean hasMore = true;
  private static boolean checkingIds = false;
 
@@ -48,7 +49,9 @@ public class AntForest
     @Override
     public void run()
     {
+     forestEnd = false;
      Log.showToast("森林功能开始…", "");
+     Log.resetDialog();
      try
      {
       checkUnknownId(loader);
@@ -79,10 +82,10 @@ public class AntForest
       Log.i(TAG, "start err:");
       Log.printStackTrace(TAG, e);
      }
-     Log.showToast("森林功能结束", "");
+     if(forestEnd) Log.showToast("森林功能结束", "");
+     else forestEnd = true;
     }
    }.setData(loader, resp)).start();
-
 
  }
 
@@ -361,9 +364,9 @@ public class AntForest
       hasCanReceive = true;
       String taskAwardTypeStr = jo.getString("awardType");
       String awardName = null;
-      if(taskAwardTypeStr.endsWith("DRESS"))
+      if(taskAwardTypeStr.endsWith(TaskAwardType.DRESS.name()))
       {
-       awardName = "节气装扮";
+       awardName = TaskAwardType.DRESS.nickName().toString();
       }else if(TaskAwardType.BUBBLE_BOOST.name().equals(taskAwardTypeStr))
       {
        awardName = TaskAwardType.BUBBLE_BOOST.nickName().toString();
@@ -568,6 +571,8 @@ public class AntForest
         helpCollectedEnergy == 0 && onceHelpCollected == 0)
      {
       Log.showDialogOrToastAndRecordLog("暂时没有可收取的能量", "");
+      if(forestEnd) Log.showToast("森林功能结束", "");
+      else forestEnd = true;
      }else if(onceHelpCollected != 0)
      {
       helpCollectedEnergy += onceHelpCollected;
@@ -580,6 +585,8 @@ public class AntForest
       collectedEnergy = 0;
       helpCollectedEnergy = 0;
       Config.saveIdMap();
+      if(forestEnd) Log.showToast("森林功能结束", "");
+      else forestEnd = true;
      }
     }
     break;
@@ -600,6 +607,8 @@ public class AntForest
     String loginId = userName;
     if(jo.has("loginId"))
      loginId += "(" + jo.getString("loginId") + ")";
+    if(loginId == null || loginId.isEmpty())
+     loginId = "*null*";
     Config.putIdMap(jo.getString("userId"), loginId);
     Log.recordLog("进入【" + loginId + "】的蚂蚁森林", "");
     Config.saveIdMap();

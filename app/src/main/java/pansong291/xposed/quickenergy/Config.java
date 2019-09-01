@@ -460,7 +460,7 @@ public class Config
    String n = getIdMap().get(id).toString();
    int ind = n.indexOf('(');
    if(ind > 0) n = n.substring(0, ind);
-   if(!n.endsWith("*")) return n;
+   if(!n.equals("*")) return n;
   }else
   {
    putIdMap(id, "*(*)");
@@ -636,7 +636,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.dontCollectList.add(ja.getString(i));
-     Log.i(TAG, config.dontCollectList.get(i) + ",");
+     Log.i(TAG, "  " + config.dontCollectList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -649,7 +649,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.dontHelpCollectList.add(ja.getString(i));
-     Log.i(TAG, config.dontHelpCollectList.get(i) + ",");
+     Log.i(TAG, "  " + config.dontHelpCollectList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -671,7 +671,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.waterFriendList.add(ja.getString(i));
-     Log.i(TAG, config.waterFriendList.get(i) + ",");
+     Log.i(TAG, "  " + config.waterFriendList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -712,7 +712,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.sendTypeExcludeList.add(ja.getString(i));
-     Log.i(TAG, config.sendTypeExcludeList.get(i) + ",");
+     Log.i(TAG, "  " + config.sendTypeExcludeList.get(i) + ",");
     }
    }else
     config.reInit = true;
@@ -815,7 +815,7 @@ public class Config
     for(int i = 0; i < ja.length(); i++)
     {
      config.feedFriendAnimalList.add(ja.getString(i));
-     Log.i(TAG, config.feedFriendAnimalList.get(i) + ",");
+     Log.i(TAG, "  " + config.feedFriendAnimalList.get(i) + ",");
     }
    }else
     config.reInit = true;
