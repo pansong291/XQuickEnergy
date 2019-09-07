@@ -623,9 +623,10 @@ public class AntForest
  public static void checkUnknownId(ClassLoader loader)
  {
   if(checkingIds) return;
-  checkingIds = true;
   String[] unknownIds = Config.getUnknownIds();
   if(unknownIds != null)
+  {
+   checkingIds = true;
    new Thread(
     new Runnable()
     {
@@ -648,6 +649,7 @@ public class AntForest
       checkingIds = false;
      }
     }.setData(loader, unknownIds)).start();
+  }
  }
 
 }

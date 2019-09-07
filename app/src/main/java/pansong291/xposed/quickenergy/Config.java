@@ -410,7 +410,8 @@ public class Config
   {
    if(!getIdMap().get(key).equals(value))
    {
-    getIdMap().replace(key, value);
+    getIdMap().remove(key);
+    getIdMap().put(key, value);
     hasIdMapChanged = true;
    }
   }else
@@ -479,9 +480,13 @@ public class Config
   {
    String[] ids = new String[idList.size()];
    for(int i = 0; i < ids.length; i++)
+   {
     ids[i] = idList.get(i);
+    Log.i(TAG, "unknown id: "+ids[i]);
+   }
    return ids;
   }
+  Log.i(TAG, "There is no unknown ids.");
   return null;
  }
 
