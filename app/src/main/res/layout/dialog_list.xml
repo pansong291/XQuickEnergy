@@ -12,16 +12,53 @@
 		android:id="@+id/lv_list"
 		android:layout_weight="1"/>
 
-	<Button
+	<LinearLayout
+		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		style="?android:attr/buttonBarButtonStyle"
-		android:text="添加新的用户 ID 项"
-		android:minHeight="50dp"
-		android:background="@drawable/button"
-		android:id="@+id/btn_add_id"
-		android:gravity="left|center_vertical"
-		android:paddingLeft="12dp"/>
+		android:gravity="center">
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="添加新的用户 ID 项"
+			android:minHeight="50dp"
+			android:background="@drawable/button"
+			android:id="@+id/btn_add_id"
+			android:padding="12dp"
+			android:layout_weight="1"
+			android:gravity="left|center_vertical"/>
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:id="@+id/edt_find"
+			android:visibility="gone"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="下个"
+			android:minHeight="50dp"
+			android:background="@drawable/button"
+			android:id="@+id/btn_find_next"
+			android:padding="12dp"
+			android:visibility="gone"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="查找"
+			android:minHeight="50dp"
+			android:background="@drawable/button"
+			android:id="@+id/btn_find"
+			android:padding="12dp"/>
+
+	</LinearLayout>
 
 </LinearLayout>
 

@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import java.util.List;
 import pansong291.xposed.quickenergy.R;
+import android.graphics.Color;
 
 public class ListAdapter extends BaseAdapter
 {
@@ -24,6 +25,8 @@ public class ListAdapter extends BaseAdapter
  Context context;
  List<AlipayUser>list;
  List<String> selects;
+ int findIndex = -1;
+ CharSequence findWord = null;
 
  private ListAdapter(Context c)
  {
@@ -38,6 +41,34 @@ public class ListAdapter extends BaseAdapter
  public void setSelectedList(List<String> l)
  {
   selects = l;
+ }
+
+ public int find(CharSequence cs)
+ {
+  if(!cs.equals(findWord))
+  {
+   findIndex = -1;
+  }
+  findWord = cs;
+  int i = findIndex + 1;
+  if(i == list.size()) i = 0;
+  for(;i < list.size(); i++)
+  {
+   if(list.get(i).name.contains(cs))
+   {
+    findIndex = i;
+    break;
+   }
+   if(findIndex >= 0 && i == list.size() - 1) i = -1;
+  }
+  notifyDataSetChanged();
+  return findIndex;
+ }
+
+ public void exitFind()
+ {
+  findIndex = -1;
+  notifyDataSetChanged();
  }
 
  @Override
@@ -76,6 +107,7 @@ public class ListAdapter extends BaseAdapter
 
   AlipayUser au = list.get(p1);
   vh.tv.setText(au.name);
+  vh.tv.setTextColor(findIndex == p1 ? Color.RED: Color.BLACK);
   vh.cb.setChecked(selects == null ? false: selects.contains(au.id));
   return p2;
  }

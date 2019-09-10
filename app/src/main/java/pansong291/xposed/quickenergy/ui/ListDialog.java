@@ -14,11 +14,13 @@ import android.widget.ListView;
 import java.util.List;
 import pansong291.xposed.quickenergy.Config;
 import pansong291.xposed.quickenergy.R;
+import android.widget.Toast;
 
 public class ListDialog
 {
  static AlertDialog listDialog;
- static Button btn_add_id;
+ static Button btn_add_id, btn_find, btn_find_next;
+ static EditText edt_find;
  static ListView lv_list;
  static List<String> selectedList;
 
@@ -56,23 +58,14 @@ public class ListDialog
  private static View getListView(Context c)
  {
   View v = LayoutInflater.from(c).inflate(R.layout.dialog_list, null);
+  OnBtnClickListener onBtnClickListener = new OnBtnClickListener();
   btn_add_id = v.findViewById(R.id.btn_add_id);
-  btn_add_id.setOnClickListener(
-   new View.OnClickListener()
-   {
-    @Override
-    public void onClick(View p1)
-    {
-     try
-     {
-      getEdtDialog(p1.getContext()).show();
-     }catch(Throwable t)
-     {
-      edtDialog = null;
-      getEdtDialog(p1.getContext()).show();
-     }
-    }
-   });
+  btn_find = v.findViewById(R.id.btn_find);
+  btn_find_next = v.findViewById(R.id.btn_find_next);
+  btn_add_id.setOnClickListener(onBtnClickListener);
+  btn_find.setOnClickListener(onBtnClickListener);
+  btn_find_next.setOnClickListener(onBtnClickListener);
+  edt_find = v.findViewById(R.id.edt_find);
   lv_list = v.findViewById(R.id.lv_list);
   ListAdapter la = ListAdapter.get(c);
   la.setAlipayUserList(AlipayUser.getAlipayUserList());
@@ -171,6 +164,57 @@ public class ListDialog
   edt_id = v.findViewById(R.id.edt_id);
   edt_name = v.findViewById(R.id.edt_name);
   return v;
+ }
+
+ static class OnBtnClickListener implements View.OnClickListener
+ {
+  @Override
+  public void onClick(View p1)
+  {
+   switch(p1.getId())
+   {
+    case R.id.btn_add_id:
+     try
+     {
+      getEdtDialog(p1.getContext()).show();
+     }catch(Throwable t)
+     {
+      edtDialog = null;
+      getEdtDialog(p1.getContext()).show();
+     }
+     break;
+
+    case R.id.btn_find:
+     int visible = edt_find.getVisibility();
+     if(visible == View.VISIBLE)
+     {
+      btn_find.setText("查找");
+      ListAdapter la = ListAdapter.get(p1.getContext());
+      la.exitFind();
+     }else
+     {
+      btn_find.setText("关闭");
+     }
+     edt_find.setVisibility(View.GONE - visible);
+     btn_find_next.setVisibility(View.GONE - visible);
+     btn_add_id.setVisibility(visible);
+     break;
+
+    case R.id.btn_find_next:
+     if(edt_find.length() <= 0) break;
+     ListAdapter la = ListAdapter.get(p1.getContext());
+     // 下面Text一定要转String，不然判断equals会出问题
+     int index = la.find(edt_find.getText().toString());
+     if(index < 0)
+     {
+      Toast.makeText(p1.getContext(), "未找到", Toast.LENGTH_SHORT).show();
+     }else
+     {
+      lv_list.setSelection(index);
+     }
+     break;
+   }
+  }
  }
 
 }
