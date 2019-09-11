@@ -13,7 +13,8 @@ public class FileUtils
  private static File configFile;
  private static File friendIdMapFile;
  private static File logFile;
- 
+ private static File runtimeLogFile;
+
  public static File getDirectoryPath()
  {
   if(directory == null)
@@ -33,7 +34,7 @@ public class FileUtils
   }
   return directory;
  }
- 
+
  public static File getConfigFile()
  {
   if(configFile == null)
@@ -44,7 +45,7 @@ public class FileUtils
   }
   return configFile;
  }
- 
+
  public static File getFriendIdMapFile()
  {
   if(friendIdMapFile == null)
@@ -55,7 +56,7 @@ public class FileUtils
   }
   return friendIdMapFile;
  }
- 
+
  public static File getLogFile()
  {
   if(logFile == null)
@@ -66,12 +67,23 @@ public class FileUtils
   }
   return logFile;
  }
- 
+
+ public static File getRuntimeLogFile()
+ {
+  if(runtimeLogFile == null)
+  {
+   runtimeLogFile = new File(getDirectoryPath(), "runtime.log");
+   if(runtimeLogFile.exists() && runtimeLogFile.isDirectory())
+    runtimeLogFile.delete();
+  }
+  return runtimeLogFile;
+ }
+
  public static File getBackupFile(File f)
  {
   return new File(f.getAbsolutePath() + ".bak");
  }
- 
+
  public static String readFromFile(File f)
  {
   StringBuilder result = new StringBuilder();
@@ -92,12 +104,17 @@ public class FileUtils
   close(fr);
   return result.toString();
  }
- 
+
  public static boolean append2LogFile(String s)
  {
-  return append2File(s + "\n", getLogFile());
+  return append2File(Log.getFormatDate() + "  " + s + "\n", getLogFile());
  }
- 
+
+ public static boolean append2RuntimeLogFile(String s)
+ {
+  return append2File(Log.getFormatDate() + "  " + s + "\n", getRuntimeLogFile());
+ }
+
  public static boolean write2File(String s, File f)
  {
   boolean success = false;
@@ -115,7 +132,7 @@ public class FileUtils
   close(fw);
   return success;
  }
- 
+
  public static boolean append2File(String s, File f)
  {
   boolean success = false;
@@ -133,7 +150,7 @@ public class FileUtils
   close(fw);
   return success;
  }
- 
+
  public static void close(Closeable c)
  {
   try
@@ -144,5 +161,5 @@ public class FileUtils
    Log.printStackTrace(TAG, t);
   }
  }
- 
+
 }

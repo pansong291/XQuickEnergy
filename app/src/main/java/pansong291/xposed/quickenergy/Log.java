@@ -12,12 +12,13 @@ public class Log
  private static final String TAG = Log.class.getCanonicalName();
  private static AlertDialog dlg;
  private static StringBuffer sb;
+ private static SimpleDateFormat sdf;
 
  public static void i(String tag, String s)
  {
+  StringBuilder sb = new StringBuilder(tag + ", " + s);
   try
   {
-   StringBuilder sb = new StringBuilder(tag + ", " + s);
    for(int i = 0; i < sb.length(); i += 2000)
    {
     if(sb.length() < i + 2000)
@@ -31,6 +32,7 @@ public class Log
    // not be found, ignore it.
    android.util.Log.i(tag, s);
   }
+  FileUtils.append2RuntimeLogFile(sb.toString());
  }
 
  public static void printStackTrace(String tag, Throwable t)
@@ -61,7 +63,7 @@ public class Log
  {
   showToast(str, str2, true);
  }
- 
+
  private static void showToast(String str, String str2, boolean log)
  {
   if(log) Log.i(TAG, str + str2);
@@ -69,12 +71,12 @@ public class Log
    return;
   showToastIgnoreConfig(str, str2, false);
  }
- 
+
  public static void showToastIgnoreConfig(String str, String str2)
  {
   showToastIgnoreConfig(str, str2, true);
  }
- 
+
  private static void showToastIgnoreConfig(final String str, String str2, boolean log)
  {
   if(log) Log.i(TAG, str + str2);
@@ -102,14 +104,12 @@ public class Log
  {
   return recordLog(str, str2, true);
  }
- 
+
  private static boolean recordLog(String str, String str2, boolean log)
  {
   if(log) Log.i(TAG, str + str2);
-  if(!Config.recordLog())
-   return false;
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss  ");
-  return FileUtils.append2LogFile(sdf.format(new Date()) + str + str2);
+  if(!Config.recordLog()) return false;
+  return FileUtils.append2LogFile(str + str2);
  }
 
  public static void resetDialog()
@@ -165,6 +165,12 @@ public class Log
    .setMessage("msg")
    .setPositiveButton("OK", null)
    .create();
+ }
+
+ public static String getFormatDate()
+ {
+  if(sdf == null) sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  return sdf.format(new Date());
  }
 
 }
