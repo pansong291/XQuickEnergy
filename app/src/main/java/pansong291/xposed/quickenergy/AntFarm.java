@@ -115,7 +115,7 @@ public class AntFarm
      @Override
      public void run()
      {
-      Log.showToast("庄园功能开始…", "");
+      Log.showToastAndRecordLog("庄园功能开始…", "");
       Log.resetDialog();
       try
       {
@@ -236,17 +236,21 @@ public class AntFarm
 
        }
 
-       // 通知好友赶鸡并帮好友喂鸡
-       if(Config.notifyFriend() || Config.feedFriendAnimal())
-        notifyFriendAndFeedAnimal(loader);
+       // 帮好友喂鸡
+       if(Config.feedFriendAnimal()) feedFriend(loader);
+       
+       // 通知好友赶鸡
+       if(Config.notifyFriend()) notifyFriend(loader);
 
+       if(Config.feedFriendAnimal() || Config.notifyFriend())
+        Log.showDialogAndRecordLog("饲料剩余〔" + foodStock + "克〕", "");
       }catch(Throwable t)
       {
        Log.i(TAG, "run err:");
        Log.printStackTrace(TAG, t);
       }
       Config.saveIdMap();
-      Log.showToast("庄园功能结束", "");
+      Log.showToastAndRecordLog("庄园功能结束", "");
      }
     }.setData(response, loader)).start();
   }
@@ -765,14 +769,93 @@ public class AntFarm
   }
  }
 
- private static void notifyFriendAndFeedAnimal(ClassLoader loader)
+ private static void feedFriend(ClassLoader loader)
  {
   try
   {
-   if(Config.notifyFriend())
-    Log.showDialogAndRecordLog("开始通知好友来赶鸡…", "");
-   if(Config.feedFriendAnimal())
-    Log.showDialogAndRecordLog("开始帮好友喂鸡…", "");
+   Log.showDialogAndRecordLog("开始帮好友喂鸡…", "");
+   String s, memo;
+   JSONObject jo;
+   for(String userId: Config.getFeedFriendAnimal())
+   {
+    s = rpcCall_enterFarm(loader, "", userId);
+    jo = new JSONObject(s);
+    memo = jo.getString("memo");
+    if(memo.equals("SUCCESS"))
+    {
+     jo = jo.getJSONObject("farmVO").getJSONObject("subFarmVO");
+     String friendFarmId = jo.getString("farmId");
+     JSONArray jaAnimals = jo.getJSONArray("animals");
+     for(int j = 0; j < jaAnimals.length(); j++)
+     {
+      jo = jaAnimals.getJSONObject(j);
+      String masterFarmId = jo.getString("masterFarmId");
+      if(masterFarmId.equals(friendFarmId))
+      {
+       jo = jo.getJSONObject("animalStatusVO");
+       if(AnimalInteractStatus.HOME.name().equals(jo.getString("animalInteractStatus"))
+          && AnimalFeedStatus.HUNGRY.name().equals(jo.getString("animalFeedStatus")))
+        feedFriendAnimal(loader, friendFarmId, Config.getNameById(userId));
+       break;
+      }
+     }
+    }else
+    {
+     Log.showDialogAndRecordLog(memo, s);
+    }
+   }
+   Log.showDialogAndRecordLog("帮好友喂鸡结束", "");
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "feedFriend err:");
+   Log.printStackTrace(TAG, t);
+  }
+ }
+
+ private static void feedFriendAnimal(ClassLoader loader, String friendFarmId, String user)
+ {
+  try
+  {
+   Log.showDialogAndRecordLog("〔" + user + "〕的小鸡在挨饿", "");
+   if(foodStock < 180)
+   {
+    Log.showDialogAndRecordLog("饲料不足", "");
+    if(unreceiveTaskAward > 0)
+    {
+     Log.showDialogAndRecordLog("还有待领取的饲料", "");
+     receiveFarmTaskAward(loader);
+    }
+   }
+   if(foodStock >= 180)
+   {
+    String s = rpcCall_feedFriendAnimal(loader, friendFarmId);
+    JSONObject jo = new JSONObject(s);
+    String memo = jo.getString("memo");
+    if(memo.equals("SUCCESS"))
+    {
+     int feedFood = foodStock - jo.getInt("foodStock");
+     if(feedFood > 0)
+     {
+      add2FoodStock(-feedFood);
+      Log.showDialogAndRecordLog("喂了〔" + user + "〕的小鸡〔" + feedFood + "克〕饲料，剩余〔" + foodStock + "克〕", "");
+     }
+    }else
+    {
+     Log.showDialogAndRecordLog(memo, s);
+    }
+   }
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "feedFriendAnimal err:");
+   Log.printStackTrace(TAG, t);
+  }
+ }
+ 
+ private static void notifyFriend(ClassLoader loader)
+ {
+  try
+  {
+   Log.showDialogAndRecordLog("开始通知好友来赶鸡…", "");
    boolean hasNext = false;
    String s;
    JSONObject jo;
@@ -789,11 +872,8 @@ public class AntFarm
      {
       jo = jaRankingList.getJSONObject(i);
       String userId = jo.getString("userId");
-      String user = Config.getNameById(userId);
-      boolean starve = jo.has("actionType") && 
-       jo.getString("actionType").equals("starve_action");
-      boolean feedFriendAnimal = starve && Config.feedFriendAnimal(userId);
-      if(jo.getBoolean("stealingAnimal") && !starve || feedFriendAnimal)
+      boolean starve = jo.has("actionType") &&  jo.getString("actionType").equals("starve_action");
+      if(jo.getBoolean("stealingAnimal") && !starve)
       {
        s = rpcCall_enterFarm(loader, "", userId);
        jo = new JSONObject(s);
@@ -809,17 +889,11 @@ public class AntFarm
          jo = jaAnimals.getJSONObject(j);
          String animalId = jo.getString("animalId");
          String masterFarmId = jo.getString("masterFarmId");
-         if(masterFarmId.equals(friendFarmId))
-         {
-          jo = jo.getJSONObject("animalStatusVO");
-          feedFriendAnimal &= AnimalInteractStatus.HOME.name().equals(jo.getString("animalInteractStatus"));
-          if(feedFriendAnimal)
-           feedFriendAnimal(loader, jaAnimals, friendFarmId, user);
-         }else if(!masterFarmId.equals(ownerFarmId))
+         if(!masterFarmId.equals(friendFarmId) && !masterFarmId.equals(ownerFarmId))
          {
           if(notified) continue;
           jo = jo.getJSONObject("animalStatusVO");
-          notified = notifyFriend(loader, jo, friendFarmId, animalId, user);
+          notified = notifyFriend(loader, jo, friendFarmId, animalId, Config.getNameById(userId));
          }
         }
        }else
@@ -834,15 +908,10 @@ public class AntFarm
     }
    }while(hasNext);
    pageStartSum = 0;
-   if(Config.feedFriendAnimal())
-    Log.showDialogAndRecordLog("帮好友喂鸡结束", "");
-   if(Config.notifyFriend())
-    Log.showDialogAndRecordLog("通知好友结束", "");
-   if(Config.feedFriendAnimal() || Config.notifyFriend())
-    Log.showDialogAndRecordLog("饲料剩余〔" + foodStock + "克〕", "");
+   Log.showDialogAndRecordLog("通知好友结束", "");
   }catch(Throwable t)
   {
-   Log.i(TAG, "notifyFriendAndFeed err:");
+   Log.i(TAG, "notifyFriend err:");
    Log.printStackTrace(TAG, t);
   }
  }
@@ -878,53 +947,6 @@ public class AntFarm
    Log.printStackTrace(TAG, t);
   }
   return false;
- }
-
- private static void feedFriendAnimal(ClassLoader loader, JSONArray jaAnimals, String friendFarmId, String user)
- {
-  try
-  {
-   Log.showDialogAndRecordLog("〔" + user + "〕的小鸡在挨饿", "");
-   if(foodStock < 180)
-   {
-    Log.showDialogAndRecordLog("饲料不足", "");
-    if(unreceiveTaskAward > 0)
-    {
-     Log.showDialogAndRecordLog("还有待领取的饲料", "");
-     receiveFarmTaskAward(loader);
-    }
-   }
-   if(foodStock >= 180)
-   {
-    String s = rpcCall_feedFriendAnimal(loader, friendFarmId);
-    JSONObject jo = new JSONObject(s);
-    String memo = jo.getString("memo");
-    if(memo.equals("SUCCESS"))
-    {
-     int feedFood = foodStock - jo.getInt("foodStock");
-     if(feedFood > 0)
-     {
-      add2FoodStock(-feedFood);
-      Log.showDialogAndRecordLog("喂了〔" + user + "〕的小鸡〔" + feedFood + "克〕饲料，剩余〔" + foodStock + "克〕", "");
-      for(int i = 0; i < jaAnimals.length(); i++)
-      {
-       jo = jaAnimals.getJSONObject(i);
-       JSONObject joo = jo.getJSONObject("animalStatusVO");
-       joo.put("animalFeedStatus", AnimalFeedStatus.EATING.name());
-       jo.put("animalStatusVO", joo);
-       jaAnimals.put(i, jo);
-      }
-     }
-    }else
-    {
-     Log.showDialogAndRecordLog(memo, s);
-    }
-   }
-  }catch(Throwable t)
-  {
-   Log.i(TAG, "feedFriendAnimal err:");
-   Log.printStackTrace(TAG, t);
-  }
  }
 
  private static String rpcCall_syncAnimalStatus(ClassLoader loader, String farmId)

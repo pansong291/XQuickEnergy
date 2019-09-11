@@ -59,9 +59,10 @@ public class Log
   recordLog(str, str2, false);
  }
 
- public static void showToast(String str, String str2)
+ public static void showToastAndRecordLog(String str, String str2)
  {
   showToast(str, str2, true);
+  recordLog(str, str2, false);
  }
 
  private static void showToast(String str, String str2, boolean log)

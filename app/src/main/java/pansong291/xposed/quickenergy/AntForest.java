@@ -50,7 +50,7 @@ public class AntForest
     public void run()
     {
      forestEnd = false;
-     Log.showToast("森林功能开始…", "");
+     Log.showToastAndRecordLog("森林功能开始…", "");
      Log.resetDialog();
      try
      {
@@ -58,7 +58,7 @@ public class AntForest
       if(Config.collectEnergy())
       {
        Log.showDialogAndRecordLog("开始收取能量…", "");
-       queryEnergyRanking(loader, 1);
+       queryEnergyRanking(loader, "1");
        JSONObject jo = new JSONObject(resp);
        if(jo.getString("resultCode").equals("SUCCESS"))
        {
@@ -82,22 +82,22 @@ public class AntForest
       Log.i(TAG, "start err:");
       Log.printStackTrace(TAG, t);
      }
-     if(forestEnd) Log.showToast("森林功能结束", "");
+     if(forestEnd) Log.showToastAndRecordLog("森林功能结束", "");
      else forestEnd = true;
     }
    }.setData(loader, resp)).start();
 
  }
 
- private static void queryEnergyRanking(ClassLoader loader, int startPoint)
+ private static void queryEnergyRanking(ClassLoader loader, String startPoint)
  {
   new Thread(
    new Runnable()
    {
     ClassLoader loader;
-    int startPoint;
+    String startPoint;
 
-    public Runnable setData(ClassLoader cl, int sp)
+    public Runnable setData(ClassLoader cl, String sp)
     {
      loader = cl;startPoint = sp;
      return this;
@@ -115,7 +115,7 @@ public class AntForest
       {
        hasMore = jo.getBoolean("hasMore");
        if(hasMore)
-        queryEnergyRanking(loader, startPoint + 20);
+        queryEnergyRanking(loader, jo.getString("nextStartPoint"));
        JSONArray jaFriendRanking = jo.getJSONArray("friendRanking");
        for(int i = 0; i < jaFriendRanking.length(); i++)
        {
@@ -423,12 +423,12 @@ public class AntForest
   }
  }
 
- private static String rpcCall_queryEnergyRanking(ClassLoader loader, int startPoint)
+ private static String rpcCall_queryEnergyRanking(ClassLoader loader, String startPoint)
  {
   try
   {
-   String args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":20,\"startPoint\":"
-    + startPoint + "}]";
+   String args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":20,\"startPoint\":\""
+    + startPoint + "\"}]";
    Object o = RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryEnergyRanking", args1);
    return RpcCall.getResponse(o);
   }catch(Throwable t)
@@ -571,21 +571,21 @@ public class AntForest
         helpCollectedEnergy == 0 && onceHelpCollected == 0)
      {
       Log.showDialogOrToastAndRecordLog("暂时没有可收取的能量", "");
-      if(forestEnd) Log.showToast("森林功能结束", "");
+      if(forestEnd) Log.showToastAndRecordLog("森林功能结束", "");
       else forestEnd = true;
      }else if(onceHelpCollected != 0)
      {
       helpCollectedEnergy += onceHelpCollected;
       onceHelpCollected = 0;
       Log.showDialogAndRecordLog("再次收取能量…", "");
-      queryEnergyRanking(loader, 1);
+      queryEnergyRanking(loader, "1");
      }else
      {
       Log.showDialogOrToastAndRecordLog("共收取【" + collectedEnergy + "克】，帮收【" + helpCollectedEnergy + "克】", "");
       collectedEnergy = 0;
       helpCollectedEnergy = 0;
       Config.saveIdMap();
-      if(forestEnd) Log.showToast("森林功能结束", "");
+      if(forestEnd) Log.showToastAndRecordLog("森林功能结束", "");
       else forestEnd = true;
      }
     }
