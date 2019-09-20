@@ -86,6 +86,42 @@
 			android:minHeight="50dp"
 			android:id="@+id/cb_collectEnergy"/>
 
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="偷X克反水30克"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_returnWater30"
+			android:paddingLeft="8dp"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="偷X克反水20克"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_returnWater20"
+			android:paddingLeft="8dp"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="偷X克反水10克"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_returnWater10"
+			android:paddingLeft="8dp"/>
+
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -116,6 +152,26 @@
 			android:gravity="left|center_vertical"
 			android:background="@drawable/button"
 			android:id="@+id/btn_dontHelpCollectList"
+			android:paddingLeft="8dp"/>
+
+		<CheckBox
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="定时收取"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:id="@+id/cb_onTimeCollect"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="最大检测间隔（毫秒）"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_timeInterval"
 			android:paddingLeft="8dp"/>
 
 		<CheckBox
@@ -205,13 +261,13 @@
 			android:id="@+id/btn_recallAnimalType"
 			android:paddingLeft="8dp"/>
 
-        <CheckBox
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="领取道具卡奖励"
-            android:onClick="onClick"
-            android:minHeight="50dp"
-            android:id="@+id/cb_receiveFarmToolReward"/>
+		<CheckBox
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="领取道具卡奖励"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:id="@+id/cb_receiveFarmToolReward"/>
 
 		<CheckBox
 			android:layout_width="match_parent"

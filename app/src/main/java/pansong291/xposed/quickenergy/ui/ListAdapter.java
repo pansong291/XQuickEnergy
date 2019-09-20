@@ -1,6 +1,7 @@
 package pansong291.xposed.quickenergy.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import java.util.List;
 import pansong291.xposed.quickenergy.R;
-import android.graphics.Color;
 
 public class ListAdapter extends BaseAdapter
 {

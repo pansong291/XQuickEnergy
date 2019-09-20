@@ -1,8 +1,12 @@
 package pansong291.xposed.quickenergy;
 
+import android.content.Intent;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
+import pansong291.xposed.quickenergy.AntForestNotification;
 
 public class AntForest
 {
@@ -11,6 +15,8 @@ public class AntForest
  private static int collectedEnergy = 0;
  private static int helpCollectedEnergy = 0;
  private static int onceHelpCollected = 0;
+ private static int totalCollected = 0;
+ private static int totalHelpCollected = 0;
  public enum TaskAwardType
  {
   BUBBLE_BOOST, DRESS;
@@ -28,11 +34,18 @@ public class AntForest
  private static boolean forestEnd = false;
  private static boolean hasMore = true;
  private static boolean checkingIds = false;
+ private static long serverTime = -1;
+ private static long offsetTime = -1;
+ private static long laterTime = -1;
+ private static final Timer timer = new Timer(true);
+ private static boolean hasNextTask = false;
+ private static long nextTime = -1;
 
  public static void start(ClassLoader loader, String args0, String args1, String resp)
  {
-  if(!args0.equals("alipay.antmember.forest.h5.queryNextAction")
-     || args1.contains("\"userId\"")) return;
+  if(!args0.equals("alipay.antmember.forest.h5.queryNextAction") ||
+     !args1.contains("\"userId\":\"\"") && args1.contains("\"userId\""))
+   return;
 
   new Thread(
    new Runnable()
@@ -73,7 +86,7 @@ public class AntForest
 
       for(String userId: Config.getWaterFriendList())
       {
-       waterFriendEnergy(loader, userId);
+       waterFriendEnergy(loader, userId, 3);
       }
 
       if(Config.receiveForestTaskAward())receiveTaskAward(loader);
@@ -82,7 +95,7 @@ public class AntForest
       Log.i(TAG, "start err:");
       Log.printStackTrace(TAG, t);
      }
-     if(forestEnd) Log.showToastAndRecordLog("森林功能结束", "");
+     if(forestEnd) onForestEnd(loader);
      else forestEnd = true;
     }
    }.setData(loader, resp)).start();
@@ -120,6 +133,13 @@ public class AntForest
        for(int i = 0; i < jaFriendRanking.length(); i++)
        {
         jo = jaFriendRanking.getJSONObject(i);
+        long canCollectLaterTime = jo.getLong("canCollectLaterTime");
+        if(canCollectLaterTime > 0 && canCollectLaterTime > serverTime)
+         if(laterTime < 0 || canCollectLaterTime < laterTime)
+         {
+          laterTime = canCollectLaterTime;
+          Log.i(TAG, laterTime - serverTime + "ms 后能量成熟");
+         }
         boolean optBoolean = jo.getBoolean("canCollectEnergy")
          || jo.getBoolean("canHelpCollect");
         String userId = jo.getString("userId");
@@ -187,11 +207,14 @@ public class AntForest
   {
    String s = rpcCall_queryNextAction(loader, userId);
    JSONObject jo = new JSONObject(s);
+   String bizNo;
    if(jo.getString("resultCode").equals("SUCCESS"))
    {
+    bizNo = jo.getString("bizNo");
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     jo = jo.getJSONObject("userEnergy");
     String userName = jo.getString("displayName");
+    int collected = 0;
     for(int i = 0; i < jaBubbles.length(); i++)
     {
      jo = jaBubbles.getJSONObject(i);
@@ -201,7 +224,7 @@ public class AntForest
       if(Config.dontCollect(userId))
        Log.showDialogAndRecordLog("不偷取【" + userName + "】", ", userId=" + userId);
       else
-       collectEnergy(loader, userId, bubbleId, userName);
+       collected += collectEnergy(loader, userId, bubbleId, userName);
      }
      if(jo.getBoolean("canHelpCollect"))
      {
@@ -215,6 +238,16 @@ public class AntForest
        Log.showDialogAndRecordLog("不帮收【" + userName + "】", ", userId=" + userId);
      }
     }
+    if(Config.returnWater30() > 0 && collected >= Config.returnWater30())
+    {
+     returnFriendWater(loader, userId, userName, bizNo, 3);
+    }else if(Config.returnWater20() > 0 && collected >= Config.returnWater20())
+    {
+     returnFriendWater(loader, userId, userName, bizNo, 2);
+    }else if(Config.returnWater10() > 0 && collected >= Config.returnWater10())
+    {
+     returnFriendWater(loader, userId, userName, bizNo, 1);
+    }
    }else
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
@@ -226,7 +259,7 @@ public class AntForest
   }
  }
 
- private static void collectEnergy(ClassLoader loader, String userId, Long bubbleId, String userName)
+ private static int collectEnergy(ClassLoader loader, String userId, Long bubbleId, String userName)
  {
   try
   {
@@ -249,6 +282,7 @@ public class AntForest
     {
      Log.showDialogAndRecordLog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
     }
+    return collected;
    }else
    {
     s = jo.getString("resultDesc");
@@ -261,6 +295,7 @@ public class AntForest
    Log.i(TAG, "collectEnergy err:");
    Log.printStackTrace(TAG, t);
   }
+  return 0;
  }
 
  private static void forFriendCollectEnergy(ClassLoader loader, String targetUserId, Long bubbleId, String userName)
@@ -300,7 +335,7 @@ public class AntForest
   }
  }
 
- private static void waterFriendEnergy(ClassLoader loader, String userId)
+ private static void waterFriendEnergy(ClassLoader loader, String userId, int count)
  {
   try
   {
@@ -311,29 +346,7 @@ public class AntForest
     String bizNo = jo.getString("bizNo");
     jo = jo.getJSONObject("userEnergy");
     String userName = jo.getString("displayName");
-    for(int waterCount = 1; waterCount <= 3; waterCount++)
-    {
-     s = rpcCall_transferEnergy(loader, userId, bizNo, waterCount);
-     jo = new JSONObject(s);
-     s = jo.getString("resultCode");
-     if(s.equals("SUCCESS"))
-     {
-      s = jo.getJSONObject("treeEnergy").getString("currentEnergy");
-      Log.showDialogAndRecordLog("给【" + userName + "】浇水成功，剩余能量【" + s + "克】", "");
-      Thread.sleep(2000);
-     }else if(s.equals("WATERING_TIMES_LIMIT"))
-     {
-      Log.showDialogAndRecordLog("今日给【" + userName + "】浇水已达上限", "");
-      break;
-     }else if(s.equals("LOW_VERSION"))
-     {
-      Log.showDialogAndRecordLog("给【" + userName + "】浇水失败，" + s, "");
-      break;
-     }else
-     {
-      Log.showDialogAndRecordLog(jo.getString("resultDesc"), jo.toString());
-     }
-    }
+    returnFriendWater(loader, userId, userName, bizNo, count);
    }else
    {
     Log.showDialogAndRecordLog(jo.getString("resultDesc"), s);
@@ -341,6 +354,42 @@ public class AntForest
   }catch(Throwable t)
   {
    Log.i(TAG, "waterFriendEnergy err:");
+   Log.printStackTrace(TAG, t);
+  }
+ }
+
+ private static void returnFriendWater(ClassLoader loader, String userId, String userName, String bizNo, int count)
+ {
+  try
+  {
+   String s;
+   JSONObject jo;
+   for(int waterCount = 1; waterCount <= count; waterCount++)
+   {
+    s = rpcCall_transferEnergy(loader, userId, bizNo, waterCount);
+    jo = new JSONObject(s);
+    s = jo.getString("resultCode");
+    if(s.equals("SUCCESS"))
+    {
+     s = jo.getJSONObject("treeEnergy").getString("currentEnergy");
+     Log.showDialogAndRecordLog("给【" + userName + "】浇水成功，剩余能量【" + s + "克】", "");
+     Thread.sleep(2000);
+    }else if(s.equals("WATERING_TIMES_LIMIT"))
+    {
+     Log.showDialogAndRecordLog("今日给【" + userName + "】浇水已达上限", "");
+     break;
+    }else if(s.equals("LOW_VERSION"))
+    {
+     Log.showDialogAndRecordLog("给【" + userName + "】浇水失败，" + s, "");
+     break;
+    }else
+    {
+     Log.showDialogAndRecordLog(jo.getString("resultDesc"), jo.toString());
+    }
+   }
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "returnFriendWater err:");
    Log.printStackTrace(TAG, t);
   }
  }
@@ -558,12 +607,12 @@ public class AntForest
   {
    case START:
     threadCount++;
-    //Log.showDialog("新线程开始"+threadCount,"");
+    Log.i(TAG, "新线程开始" + threadCount);
     break;
 
    case END:
     threadCount--;
-    //Log.showDialog("线程结束"+threadCount,"");
+    Log.i(TAG, "线程结束" + threadCount);
     if(!hasMore && threadCount == 0)
     {
      hasMore = true;
@@ -571,7 +620,7 @@ public class AntForest
         helpCollectedEnergy == 0 && onceHelpCollected == 0)
      {
       Log.showDialogOrToastAndRecordLog("暂时没有可收取的能量", "");
-      if(forestEnd) Log.showToastAndRecordLog("森林功能结束", "");
+      if(forestEnd) onForestEnd(loader);
       else forestEnd = true;
      }else if(onceHelpCollected != 0)
      {
@@ -582,15 +631,93 @@ public class AntForest
      }else
      {
       Log.showDialogOrToastAndRecordLog("共收取【" + collectedEnergy + "克】，帮收【" + helpCollectedEnergy + "克】", "");
+      totalCollected += collectedEnergy;
+      totalHelpCollected += helpCollectedEnergy;
+      Config.saveIdMap();
+      if(forestEnd) onForestEnd(loader);
+      else forestEnd = true;
       collectedEnergy = 0;
       helpCollectedEnergy = 0;
-      Config.saveIdMap();
-      if(forestEnd) Log.showToastAndRecordLog("森林功能结束", "");
-      else forestEnd = true;
      }
     }
     break;
   }
+ }
+
+ private static void onForestEnd(ClassLoader loader)
+ {
+  Log.showToastAndRecordLog("森林功能结束", "");
+  if(RpcCall.loginActivity != null && Config.onTimeCollect())
+  {
+   String str = "  收：" + totalCollected + "，帮：" + totalHelpCollected;
+   Log.recordLog(str, "");
+   AntForestNotification.setContentText(Log.getFormatDate() + str);
+  }
+  long delay = laterTime + offsetTime - System.currentTimeMillis();
+//  if(delay < 0)
+//  {
+//   delay = Config.TimeInterval();
+//  }
+  if(Config.onTimeCollect() && delay > 0 && delay < Config.timeInterval())
+  {
+   laterTime = -1;
+   if(nextTime < System.currentTimeMillis())
+    hasNextTask = false;
+   if(!hasNextTask)
+   {
+    hasNextTask = true;
+    delay += 1000;
+    nextTime = System.currentTimeMillis() + delay;
+    Log.showDialogOrToastAndRecordLog(delay / 1000 + "秒后尝试检测能量", "");
+    timer.schedule(
+     new TimerTask()
+     {
+      ClassLoader loader;
+
+      public TimerTask setData(ClassLoader cl)
+      {
+       loader = cl;
+       return this;
+      }
+
+      @Override
+      public void run()
+      {
+       //rpcCall_queryNextAction(loader, "");
+       //queryEnergyRanking(loader, "1");
+       checkEnergyRanking(loader);
+       hasNextTask = false;
+      }
+     }.setData(loader), delay);
+   }else
+   {
+    Log.showDialogOrToastAndRecordLog(
+     (nextTime - System.currentTimeMillis()) / 1000
+     + "秒后已有检测任务", "");
+   }
+  }
+ }
+
+ public static void checkEnergyRanking(ClassLoader loader)
+ {
+  Log.recordLog("定时执行开始", "");
+  new Thread(
+   new Runnable(){
+    ClassLoader loader;
+
+    public Runnable setData(ClassLoader cl)
+    {
+     loader = cl;
+     return this;
+    }
+
+    @Override
+    public void run()
+    {
+     rpcCall_queryNextAction(loader, Config.getSelfId());
+     queryEnergyRanking(loader, "1");
+    }
+   }.setData(loader)).start();
  }
 
  public static void saveUserIdAndName(String args0, String resp)
@@ -602,6 +729,8 @@ public class AntForest
    JSONObject jo = new JSONObject(resp);
    if(jo.has("userEnergy"))
    {
+    serverTime = jo.getLong("now");
+    offsetTime = System.currentTimeMillis() - serverTime;
     jo = jo.getJSONObject("userEnergy");
     String userName = jo.getString("displayName");
     String loginId = userName;

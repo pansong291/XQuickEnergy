@@ -1,23 +1,26 @@
 package pansong291.xposed.quickenergy;
 
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
 import android.os.Bundle;
+import android.os.PowerManager;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import java.lang.reflect.Method;
-import org.json.JSONObject;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.json.JSONArray;
+import org.json.JSONObject;
+import pansong291.xposed.quickenergy.AntForestNotification;
 import pansong291.xposed.quickenergy.ui.MainActivity;
 
 public class XposedHook implements IXposedHookLoadPackage
 {
-
  private static final String TAG = XposedHook.class.getCanonicalName();
+ private static PowerManager.WakeLock wakeLock;
+ private static Timer timer;
 
  @Override
  public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
@@ -38,7 +41,8 @@ public class XposedHook implements IXposedHookLoadPackage
   {
    Log.i(TAG, lpparam.packageName);
    //hookSecurity(lpparam);
-   hookRpcCall(lpparam);
+   hookLoginActivity(lpparam.classLoader);
+   hookRpcCall(lpparam.classLoader);
   }
  }
 
@@ -73,28 +77,103 @@ public class XposedHook implements IXposedHookLoadPackage
   }
  }
 
- private void hookRpcCall(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
+ private void hookLoginActivity(final ClassLoader loader)
  {
-  final ClassLoader loader = lpparam.classLoader;
+  XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onCreate, Bundle.class, new XC_MethodHook()
+   {
+    @Override
+    protected void afterHookedMethod(MethodHookParam param) throws Throwable
+    {
+     if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
+        .equals(param.thisObject.getClass().getCanonicalName()))
+     {
+      Activity activity = (Activity) param.thisObject;
+      RpcCall.loginActivity = activity;
+      PowerManager pm = (PowerManager) activity.getSystemService(activity.POWER_SERVICE);
+      wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, activity.getClass().getName());
+      wakeLock.acquire();
+      if(Config.onTimeCollect() && timer == null)
+      {
+       AntForestNotification.start(activity);
+       timer = new Timer(true);
+       timer.scheduleAtFixedRate(new TimerTask()
+        {
+         @Override
+         public void run()
+         {
+          AntForest.checkEnergyRanking(loader);
+         }
+        }, 0, Config.timeInterval());
+      }
+     }
+    }
+   });
+
+  XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onDestroy, new XC_MethodHook()
+   {
+    @Override
+    protected void afterHookedMethod(MethodHookParam param) throws Throwable
+    {
+     if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
+        .equals(param.thisObject.getClass().getCanonicalName()))
+     {
+      Activity activity = (Activity) param.thisObject;
+      if(wakeLock != null)
+      {
+       wakeLock.release();
+       wakeLock = null;
+      }
+      if(timer != null)
+      {
+       timer.cancel();
+       timer = null;
+      }
+     }
+    }
+   });
+ }
+
+ private void hookRpcCall(final ClassLoader loader)
+ {
   Class<?> clazz = null;
+//  try
+//  {
+//   clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5FragmentManager);
+//   Class<?> h5FragmentClazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Fragment);
+//   XposedHelpers.findAndHookMethod(clazz, ClassMember.pushFragment, h5FragmentClazz,
+//    boolean.class, Bundle.class, boolean.class, boolean.class, new XC_MethodHook()
+//    {
+//     @Override
+//     protected void afterHookedMethod(MethodHookParam param) throws Throwable
+//     {
+//      Log.i(TAG, "cur fragment: " + param.args[0]);
+//      if(RpcCall.curH5Fragment == null && param.args[0] != null)
+//       RpcCall.curH5Fragment = param.args[0];
+//     }
+//    });
+//   Log.i(TAG, "hook " + ClassMember.pushFragment + " successfully");
+//  }catch(Throwable t)
+//  {
+//   Log.i(TAG, "hook " + ClassMember.pushFragment + " err:");
+//   Log.printStackTrace(TAG, t);
+//  }
+
   try
   {
-   clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5FragmentManager);
-   Class<?> h5FragmentClazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulacore_ui_H5Fragment);
-   XposedHelpers.findAndHookMethod(clazz, ClassMember.pushFragment, h5FragmentClazz,
-    boolean.class, Bundle.class, boolean.class, boolean.class, new XC_MethodHook()
+   clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulaappproxy_api_rpc_H5AppRpcUpdate);
+   Class<?> H5PageClazz = loader.loadClass(ClassMember.com_alipay_mobile_h5container_api_H5Page);
+   XposedHelpers.findAndHookMethod(clazz, ClassMember.matchVersion, H5PageClazz, Map.class, String.class, new XC_MethodHook()
     {
      @Override
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
-      Log.i(TAG, "cur fragment: " + param.args[0]);
-      RpcCall.curH5Fragment = param.args[0];
+      param.setResult(false);
      }
     });
-   Log.i(TAG, "hook " + ClassMember.pushFragment + " successfully");
+   Log.i(TAG, "hook " + ClassMember.matchVersion + " successfully");
   }catch(Throwable t)
   {
-   Log.i(TAG, "hook " + ClassMember.pushFragment + " err:");
+   Log.i(TAG, "hook " + ClassMember.matchVersion + " err:");
    Log.printStackTrace(TAG, t);
   }
 

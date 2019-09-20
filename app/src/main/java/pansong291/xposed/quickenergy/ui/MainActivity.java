@@ -1,11 +1,15 @@
 package pansong291.xposed.quickenergy.ui;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,20 +18,16 @@ import android.widget.Toast;
 import pansong291.xposed.quickenergy.Config;
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.RpcCall;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.content.pm.PackageManager;
-import android.content.ComponentName;
 
 public class MainActivity extends Activity
 { 
  CheckBox cb_immediateEffect, cb_recordLog, cb_enableForest,
  cb_enableFarm, cb_collectEnergy, cb_helpFriendCollect,
- cb_receiveForestTaskAward, cb_rewardFriend, cb_sendBackAnimal,
- cb_receiveFarmToolReward, cb_useNewEggTool, cb_harvestProduce,
- cb_donation, cb_answerQuestion, cb_receiveFarmTaskAward,
- cb_feedAnimal, cb_useAccelerateTool, cb_notifyFriend,
- cb_receivePoint;
+ cb_onTimeCollect, cb_receiveForestTaskAward, cb_rewardFriend,
+ cb_sendBackAnimal, cb_receiveFarmToolReward, cb_useNewEggTool,
+ cb_harvestProduce, cb_donation, cb_answerQuestion,
+ cb_receiveFarmTaskAward, cb_feedAnimal, cb_useAccelerateTool,
+ cb_notifyFriend, cb_receivePoint;
 
  @Override
  protected void onCreate(Bundle savedInstanceState)
@@ -45,6 +45,7 @@ public class MainActivity extends Activity
   cb_enableFarm = findViewById(R.id.cb_enableFarm);
   cb_collectEnergy = findViewById(R.id.cb_collectEnergy);
   cb_helpFriendCollect = findViewById(R.id.cb_helpFriendCollect);
+  cb_onTimeCollect = findViewById(R.id.cb_onTimeCollect);
   cb_receiveForestTaskAward = findViewById(R.id.cb_receiveForestTaskAward);
   cb_rewardFriend = findViewById(R.id.cb_rewardFriend);
   cb_sendBackAnimal = findViewById(R.id.cb_sendBackAnimal);
@@ -70,6 +71,7 @@ public class MainActivity extends Activity
   cb_enableFarm.setChecked(Config.enableFarm());
   cb_collectEnergy.setChecked(Config.collectEnergy());
   cb_helpFriendCollect.setChecked(Config.helpFriendCollect());
+  cb_onTimeCollect.setChecked(Config.onTimeCollect());
   cb_receiveForestTaskAward.setChecked(Config.receiveForestTaskAward());
   cb_rewardFriend.setChecked(Config.rewardFriend());
   cb_sendBackAnimal.setChecked(Config.sendBackAnimal());
@@ -115,6 +117,18 @@ public class MainActivity extends Activity
     Config.setCollectEnergy(cb.isChecked());
     break;
 
+   case R.id.btn_returnWater30:
+    EditDialog.showReturnWaterDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_30);
+    break;
+
+   case R.id.btn_returnWater20:
+    EditDialog.showReturnWaterDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_20);
+    break;
+
+   case R.id.btn_returnWater10:
+    EditDialog.showReturnWaterDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_10);
+    break;
+
    case R.id.cb_helpFriendCollect:
     Config.setHelpFriendCollect(cb.isChecked());
     break;
@@ -125,6 +139,15 @@ public class MainActivity extends Activity
 
    case R.id.btn_dontHelpCollectList:
     ListDialog.show(this, btn.getText(), Config.getDontHelpCollectList());
+    break;
+
+   case R.id.cb_onTimeCollect:
+    Config.setOnTimeCollect(cb.isChecked());
+    Toast.makeText(this, "需要重启支付宝生效", 1).show();
+    break;
+
+   case R.id.btn_timeInterval:
+    EditDialog.showTimeIntervalDialog(this, btn.getText());
     break;
 
    case R.id.cb_receiveForestTaskAward:
