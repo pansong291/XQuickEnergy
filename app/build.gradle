@@ -8,8 +8,8 @@ android {
         applicationId "pansong291.xposed.quickenergy"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 20190912
-        versionName "1.1.6"
+        versionCode 20190920
+        versionName "1.2.0"
     }
     buildTypes {
         release {
