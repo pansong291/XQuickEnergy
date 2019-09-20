@@ -2,8 +2,6 @@ package pansong291.xposed.quickenergy;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.List;
-import java.util.ArrayList;
 
 public class AntFarm
 {
@@ -238,7 +236,7 @@ public class AntFarm
 
        // 帮好友喂鸡
        if(Config.feedFriendAnimal()) feedFriend(loader);
-       
+
        // 通知好友赶鸡
        if(Config.notifyFriend()) notifyFriend(loader);
 
@@ -748,7 +746,9 @@ public class AntFarm
       int toolCount = jo.getInt("toolCount");
       if(toolCount > 0)
       {
-       s = rpcCall_useFarmTool(loader, targetFarmId, jo.getString("toolId"), toolType.name());
+       String toolId = "";
+       if(jo.has("toolId")) toolId = jo.getString("toolId");
+       s = rpcCall_useFarmTool(loader, targetFarmId, toolId, toolType.name());
        jo = new JSONObject(s);
        memo = jo.getString("memo");
        if(memo.equals("SUCCESS"))
@@ -850,7 +850,7 @@ public class AntFarm
    Log.printStackTrace(TAG, t);
   }
  }
- 
+
  private static void notifyFriend(ClassLoader loader)
  {
   try
