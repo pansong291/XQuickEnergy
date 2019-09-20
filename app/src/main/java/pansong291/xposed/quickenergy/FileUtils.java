@@ -112,6 +112,8 @@ public class FileUtils
 
  public static boolean append2RuntimeLogFile(String s)
  {
+  if(getRuntimeLogFile().length() > 31_457_280) // 30MB
+   getRuntimeLogFile().delete();
   return append2File(Log.getFormatDate() + "  " + s + "\n", getRuntimeLogFile());
  }
 
