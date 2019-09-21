@@ -895,7 +895,6 @@ public class Config
     FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getConfigFile()));
    }
    config = defInit();
-   FileUtils.write2File(config2Json(config), FileUtils.getConfigFile());
   }
   String formated = config2Json(config);
   if(!formated.equals(json))
@@ -1019,7 +1018,7 @@ public class Config
   return formatJson(jo);
  }
 
- private static String formatJson(JSONObject jo)
+ public static String formatJson(JSONObject jo)
  {
   String formated = null;
   try

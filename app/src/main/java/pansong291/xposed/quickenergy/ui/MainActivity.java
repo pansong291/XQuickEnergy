@@ -18,9 +18,11 @@ import android.widget.Toast;
 import pansong291.xposed.quickenergy.Config;
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.RpcCall;
+import pansong291.xposed.quickenergy.Statistics;
 
 public class MainActivity extends Activity
-{ 
+{
+ TextView tv_statistics;
  CheckBox cb_immediateEffect, cb_recordLog, cb_enableForest,
  cb_enableFarm, cb_collectEnergy, cb_helpFriendCollect,
  cb_onTimeCollect, cb_receiveForestTaskAward, cb_rewardFriend,
@@ -39,6 +41,7 @@ public class MainActivity extends Activity
 
   Config.shouldReloadConfig = true;
 
+  tv_statistics = (TextView) findViewById(R.id.tv_statistics);
   cb_immediateEffect = (CheckBox) findViewById(R.id.cb_immediateEffect);
   cb_recordLog = (CheckBox) findViewById(R.id.cb_recordLog);
   cb_enableForest = (CheckBox) findViewById(R.id.cb_enableForest);
@@ -65,6 +68,7 @@ public class MainActivity extends Activity
  protected void onResume()
  {
   super.onResume();
+  tv_statistics.setText(Statistics.getText());
   cb_immediateEffect.setChecked(Config.immediateEffect());
   cb_recordLog.setChecked(Config.recordLog());
   cb_enableForest.setChecked(Config.enableForest());

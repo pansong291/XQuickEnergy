@@ -168,10 +168,20 @@ public class Log
    .create();
  }
 
- public static String getFormatDate()
+ public static String getFormatDateTime()
  {
   if(sdf == null) sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   return sdf.format(new Date());
  }
 
+ public static String getFormatDate()
+ {
+  return getFormatDateTime().split(" ")[0];
+ }
+ 
+ public static String getFormatTime()
+ {
+  return getFormatDateTime().split(" ")[1];
+ }
+ 
 }

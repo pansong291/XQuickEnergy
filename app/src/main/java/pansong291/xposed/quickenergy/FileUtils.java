@@ -12,6 +12,7 @@ public class FileUtils
  private static File directory;
  private static File configFile;
  private static File friendIdMapFile;
+ private static File statisticsFile;
  private static File logFile;
  private static File runtimeLogFile;
 
@@ -55,6 +56,17 @@ public class FileUtils
     friendIdMapFile.delete();
   }
   return friendIdMapFile;
+ }
+
+ public static File getStatisticsFile()
+ {
+  if(statisticsFile == null)
+  {
+   statisticsFile = new File(getDirectoryPath(), "statistics.json");
+   if(statisticsFile.exists() && statisticsFile.isDirectory())
+    statisticsFile.delete();
+  }
+  return statisticsFile;
  }
 
  public static File getLogFile()
@@ -107,14 +119,14 @@ public class FileUtils
 
  public static boolean append2LogFile(String s)
  {
-  return append2File(Log.getFormatDate() + "  " + s + "\n", getLogFile());
+  return append2File(Log.getFormatDateTime() + "  " + s + "\n", getLogFile());
  }
 
  public static boolean append2RuntimeLogFile(String s)
  {
   if(getRuntimeLogFile().length() > 31_457_280) // 30MB
    getRuntimeLogFile().delete();
-  return append2File(Log.getFormatDate() + "  " + s + "\n", getRuntimeLogFile());
+  return append2File(Log.getFormatDateTime() + "  " + s + "\n", getRuntimeLogFile());
  }
 
  public static boolean write2File(String s, File f)

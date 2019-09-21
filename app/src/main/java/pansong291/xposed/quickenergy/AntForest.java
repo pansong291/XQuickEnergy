@@ -274,6 +274,7 @@ public class AntForest
     {
      Log.showDialogAndRecordLog("偷取【" + userName + "】的能量【" + collected + "克】", "，UserID：" + userId + "，BubbleId：" + bubbleId);
      collectedEnergy += collected;
+     Statistics.addData(Statistics.DataType.COLLECTED, collected);
     }else
     {
      Log.showDialogAndRecordLog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
@@ -313,6 +314,7 @@ public class AntForest
     {
      Log.showDialogAndRecordLog("帮【" + userName + "】收取【" + helped + "克】", "，UserID：" + targetUserId + "，BubbleId：" + bubbleId);
      onceHelpCollected += helped;
+     Statistics.addData(Statistics.DataType.HELPED, helped);
     }else
     {
      Log.showDialogAndRecordLog("帮【" + userName + "】收取失败", "，UserID：" + targetUserId + "，BubbleId" + bubbleId);
@@ -369,6 +371,7 @@ public class AntForest
     {
      s = jo.getJSONObject("treeEnergy").getString("currentEnergy");
      Log.showDialogAndRecordLog("给【" + userName + "】浇水成功，剩余能量【" + s + "克】", "");
+     Statistics.addData(Statistics.DataType.WATERED, 10);
      Thread.sleep(2000);
     }else if(s.equals("WATERING_TIMES_LIMIT"))
     {
@@ -658,21 +661,22 @@ public class AntForest
   if(RpcCall.loginActivity != null && Config.enableForest()
      && Config.collectEnergy() && Config.onTimeCollect())
   {
-   String str = "  收：" + totalCollected + "，帮：" + totalHelpCollected;
+   StringBuilder sb = new StringBuilder();
+   sb.append("  收：" + totalCollected + "，帮：" + totalHelpCollected);
    if(laterTime > 0)
    {
-    str += "，下个：";
+    sb.append("，下个：");
     long second = (laterTime - serverTime) / 1000;
     long minute = second / 60;
     second %= 60;
     long hour = minute / 60;
     minute %= 60;
-    if(hour > 0) str +=  hour + "时";
-    if(minute > 0) str += minute + "分";
-    str += second + "秒";
+    if(hour > 0) sb.append(hour + "时");
+    if(minute > 0) sb.append(minute + "分");
+    sb.append(second + "秒");
    }
-   Log.recordLog(str, "");
-   AntForestNotification.setContentText(Log.getFormatDate().split(" ")[1] + str);
+   Log.recordLog(sb.toString(), "");
+   AntForestNotification.setContentText(Log.getFormatTime() + sb.toString());
   }
   long delay = laterTime + offsetTime - System.currentTimeMillis();
 //  if(delay < 0)

@@ -9,10 +9,16 @@
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:id="@+id/tv_unactive"
+		android:id="@+id/tv_unactive"
 		android:text="模块未激活"
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:textColor="#FFFF0000"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/tv_statistics"
+		android:textAppearance="?android:attr/textAppearanceSmall"/>
 
 	<ScrollView
 		android:layout_width="match_parent"
