@@ -39,26 +39,26 @@ public class MainActivity extends Activity
 
   Config.shouldReloadConfig = true;
 
-  cb_immediateEffect = findViewById(R.id.cb_immediateEffect);
-  cb_recordLog = findViewById(R.id.cb_recordLog);
-  cb_enableForest = findViewById(R.id.cb_enableForest);
-  cb_enableFarm = findViewById(R.id.cb_enableFarm);
-  cb_collectEnergy = findViewById(R.id.cb_collectEnergy);
-  cb_helpFriendCollect = findViewById(R.id.cb_helpFriendCollect);
-  cb_onTimeCollect = findViewById(R.id.cb_onTimeCollect);
-  cb_receiveForestTaskAward = findViewById(R.id.cb_receiveForestTaskAward);
-  cb_rewardFriend = findViewById(R.id.cb_rewardFriend);
-  cb_sendBackAnimal = findViewById(R.id.cb_sendBackAnimal);
-  cb_receiveFarmToolReward = findViewById(R.id.cb_receiveFarmToolReward);
-  cb_useNewEggTool = findViewById(R.id.cb_useNewEggTool);
-  cb_harvestProduce = findViewById(R.id.cb_harvestProduce);
-  cb_donation = findViewById(R.id.cb_donation);
-  cb_answerQuestion = findViewById(R.id.cb_answerQuestion);
-  cb_receiveFarmTaskAward = findViewById(R.id.cb_receiveFarmTaskAward);
-  cb_feedAnimal = findViewById(R.id.cb_feedAnimal);
-  cb_useAccelerateTool = findViewById(R.id.cb_useAccelerateTool);
-  cb_notifyFriend = findViewById(R.id.cb_notifyFriend);
-  cb_receivePoint = findViewById(R.id.cb_receivePoint);
+  cb_immediateEffect = (CheckBox) findViewById(R.id.cb_immediateEffect);
+  cb_recordLog = (CheckBox) findViewById(R.id.cb_recordLog);
+  cb_enableForest = (CheckBox) findViewById(R.id.cb_enableForest);
+  cb_enableFarm = (CheckBox) findViewById(R.id.cb_enableFarm);
+  cb_collectEnergy = (CheckBox) findViewById(R.id.cb_collectEnergy);
+  cb_helpFriendCollect = (CheckBox) findViewById(R.id.cb_helpFriendCollect);
+  cb_onTimeCollect = (CheckBox) findViewById(R.id.cb_onTimeCollect);
+  cb_receiveForestTaskAward = (CheckBox) findViewById(R.id.cb_receiveForestTaskAward);
+  cb_rewardFriend = (CheckBox) findViewById(R.id.cb_rewardFriend);
+  cb_sendBackAnimal = (CheckBox) findViewById(R.id.cb_sendBackAnimal);
+  cb_receiveFarmToolReward = (CheckBox) findViewById(R.id.cb_receiveFarmToolReward);
+  cb_useNewEggTool = (CheckBox) findViewById(R.id.cb_useNewEggTool);
+  cb_harvestProduce = (CheckBox) findViewById(R.id.cb_harvestProduce);
+  cb_donation = (CheckBox) findViewById(R.id.cb_donation);
+  cb_answerQuestion = (CheckBox) findViewById(R.id.cb_answerQuestion);
+  cb_receiveFarmTaskAward = (CheckBox) findViewById(R.id.cb_receiveFarmTaskAward);
+  cb_feedAnimal = (CheckBox) findViewById(R.id.cb_feedAnimal);
+  cb_useAccelerateTool = (CheckBox) findViewById(R.id.cb_useAccelerateTool);
+  cb_notifyFriend = (CheckBox) findViewById(R.id.cb_notifyFriend);
+  cb_receivePoint = (CheckBox) findViewById(R.id.cb_receivePoint);
  }
 
  @Override
@@ -143,7 +143,6 @@ public class MainActivity extends Activity
 
    case R.id.cb_onTimeCollect:
     Config.setOnTimeCollect(cb.isChecked());
-    Toast.makeText(this, "需要重启支付宝生效", 1).show();
     break;
 
    case R.id.btn_timeInterval:
@@ -270,7 +269,7 @@ public class MainActivity extends Activity
  private void setModuleActive(boolean b)
  {
   b = b || isExpModuleActive(this);
-  TextView tv_unactive = findViewById(R.id.tv_unactive);
+  TextView tv_unactive = (TextView) findViewById(R.id.tv_unactive);
   tv_unactive.setVisibility(b ? View.GONE : View.VISIBLE);
  }
 

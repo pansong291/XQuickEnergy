@@ -31,7 +31,7 @@ public class AntForest
  public enum ThreadStatus
  { START, END }
  private static int threadCount = 0;
- private static boolean forestEnd = false;
+// private static boolean forestEnd = false;
  private static boolean hasMore = true;
  private static boolean checkingIds = false;
  private static long serverTime = -1;
@@ -62,26 +62,18 @@ public class AntForest
     @Override
     public void run()
     {
-     forestEnd = false;
+//     forestEnd = false;
+     updateThreadCount(ThreadStatus.START, loader);
      Log.showToastAndRecordLog("森林功能开始…", "");
      Log.resetDialog();
      try
      {
       checkUnknownId(loader);
-      if(Config.collectEnergy())
+      if(Config.enableForest() && Config.collectEnergy())
       {
        Log.showDialogAndRecordLog("开始收取能量…", "");
        queryEnergyRanking(loader, "1");
-       JSONObject jo = new JSONObject(resp);
-       if(jo.getString("resultCode").equals("SUCCESS"))
-       {
-        jo = jo.getJSONObject("userEnergy");
-        selfId = jo.getString("userId");
-        canCollectSelfEnergy(loader, resp);
-       }else
-       {
-        Log.showDialogAndRecordLog(jo.getString("resultDesc"), resp);
-       }
+       canCollectSelfEnergy(loader, resp);
       }
 
       for(String userId: Config.getWaterFriendList())
@@ -95,8 +87,9 @@ public class AntForest
       Log.i(TAG, "start err:");
       Log.printStackTrace(TAG, t);
      }
-     if(forestEnd) onForestEnd(loader);
-     else forestEnd = true;
+//     if(forestEnd) onForestEnd(loader);
+//     else forestEnd = true;
+     updateThreadCount(ThreadStatus.END, loader);
     }
    }.setData(loader, resp)).start();
 
@@ -119,9 +112,9 @@ public class AntForest
     @Override
     public void run()
     {
+     updateThreadCount(ThreadStatus.START, loader);
      try
      {
-      updateThreadCount(ThreadStatus.START, loader);
       String s = rpcCall_queryEnergyRanking(loader, startPoint);
       JSONObject jo = new JSONObject(s);
       if(jo.getString("resultCode").equals("SUCCESS"))
@@ -134,12 +127,7 @@ public class AntForest
        {
         jo = jaFriendRanking.getJSONObject(i);
         long canCollectLaterTime = jo.getLong("canCollectLaterTime");
-        if(canCollectLaterTime > 0 && canCollectLaterTime > serverTime)
-         if(laterTime < 0 || canCollectLaterTime < laterTime)
-         {
-          laterTime = canCollectLaterTime;
-          Log.i(TAG, laterTime - serverTime + "ms 后能量成熟");
-         }
+        setLaterTime(canCollectLaterTime);
         boolean optBoolean = jo.getBoolean("canCollectEnergy")
          || jo.getBoolean("canHelpCollect");
         String userId = jo.getString("userId");
@@ -175,19 +163,23 @@ public class AntForest
    {
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     jo = jo.getJSONObject("userEnergy");
-    String userId = selfId;
+    selfId = jo.getString("userId");
     String userName = jo.getString("displayName");
-    Config.putIdMap(userId, userName);
+    Config.putIdMap(selfId, userName);
     for(int i = 0; i < jaBubbles.length(); i++)
     {
      jo = jaBubbles.getJSONObject(i);
      long bubbleId = jo.getLong("id");
-     if("AVAILABLE".equals(jo.getString("collectStatus")))
+     String collectStatus = jo.getString("collectStatus");
+     if("AVAILABLE".equals(collectStatus))
      {
-      if(Config.dontCollect(userId))
-       Log.showDialogAndRecordLog("不偷取【" + userName + "】", ", userId=" + userId);
+      if(Config.dontCollect(selfId))
+       Log.showDialogAndRecordLog("不偷取【" + userName + "】", ", userId=" + selfId);
       else
-       collectEnergy(loader, userId, bubbleId, userName);
+       collectEnergy(loader, selfId, bubbleId, userName);
+     }else if("WAITING".equals(collectStatus))
+     {
+      setLaterTime(jo.getLong("produceTime"));
      }
     }
    }else
@@ -219,12 +211,16 @@ public class AntForest
     {
      jo = jaBubbles.getJSONObject(i);
      long bubbleId = jo.getLong("id");
-     if("AVAILABLE".equals(jo.getString("collectStatus")))
+     String collectStatus = jo.getString("collectStatus");
+     if("AVAILABLE".equals(collectStatus))
      {
       if(Config.dontCollect(userId))
        Log.showDialogAndRecordLog("不偷取【" + userName + "】", ", userId=" + userId);
       else
        collected += collectEnergy(loader, userId, bubbleId, userName);
+     }else if("WAITING".equals(collectStatus))
+     {
+      setLaterTime(jo.getLong("produceTime"));
      }
      if(jo.getBoolean("canHelpCollect"))
      {
@@ -601,6 +597,16 @@ public class AntForest
   return null;
  }
 
+ private static void setLaterTime(long time)
+ {
+  if(time > serverTime && serverTime > 0
+     && (laterTime < 0 || time < laterTime))
+  {
+   laterTime = time;
+   Log.i(TAG, laterTime - serverTime + "ms 后能量成熟");
+  }
+ }
+
  private static synchronized void updateThreadCount(ThreadStatus ts, ClassLoader loader)
  {
   switch(ts)
@@ -620,9 +626,9 @@ public class AntForest
         helpCollectedEnergy == 0 && onceHelpCollected == 0)
      {
       Log.showDialogOrToastAndRecordLog("暂时没有可收取的能量", "");
-      if(forestEnd || AntForestNotification.isStart())
-       onForestEnd(loader);
-      else forestEnd = true;
+//      if(forestEnd || AntForestNotification.isStart())
+      onForestEnd(loader);
+//      else forestEnd = true;
      }else if(onceHelpCollected != 0)
      {
       helpCollectedEnergy += onceHelpCollected;
@@ -635,9 +641,9 @@ public class AntForest
       totalCollected += collectedEnergy;
       totalHelpCollected += helpCollectedEnergy;
       Config.saveIdMap();
-      if(forestEnd || AntForestNotification.isStart())
-       onForestEnd(loader);
-      else forestEnd = true;
+//      if(forestEnd || AntForestNotification.isStart())
+      onForestEnd(loader);
+//      else forestEnd = true;
       collectedEnergy = 0;
       helpCollectedEnergy = 0;
      }
@@ -649,18 +655,33 @@ public class AntForest
  private static void onForestEnd(ClassLoader loader)
  {
   Log.showToastAndRecordLog("森林功能结束", "");
-  if(RpcCall.loginActivity != null && Config.onTimeCollect())
+  if(RpcCall.loginActivity != null && Config.enableForest()
+     && Config.collectEnergy() && Config.onTimeCollect())
   {
    String str = "  收：" + totalCollected + "，帮：" + totalHelpCollected;
+   if(laterTime > 0)
+   {
+    str += "，下个：";
+    long second = (laterTime - serverTime) / 1000;
+    long minute = second / 60;
+    second %= 60;
+    long hour = minute / 60;
+    minute %= 60;
+    if(hour > 0) str +=  hour + "时";
+    if(minute > 0) str += minute + "分";
+    str += second + "秒";
+   }
    Log.recordLog(str, "");
-   AntForestNotification.setContentText(Log.getFormatDate() + str);
+   AntForestNotification.setContentText(Log.getFormatDate().split(" ")[1] + str);
   }
   long delay = laterTime + offsetTime - System.currentTimeMillis();
 //  if(delay < 0)
 //  {
 //   delay = Config.TimeInterval();
 //  }
-  if(Config.onTimeCollect() && delay > 0 && delay < Config.timeInterval())
+  if(Config.enableForest() && Config.collectEnergy()
+     && Config.onTimeCollect() && delay > 0
+     && delay < Config.timeInterval())
   {
    laterTime = -1;
    if(nextTime < System.currentTimeMillis())
@@ -685,8 +706,6 @@ public class AntForest
       @Override
       public void run()
       {
-       //rpcCall_queryNextAction(loader, "");
-       //queryEnergyRanking(loader, "1");
        checkEnergyRanking(loader);
        hasNextTask = false;
       }
@@ -702,6 +721,8 @@ public class AntForest
 
  public static void checkEnergyRanking(ClassLoader loader)
  {
+  if(!Config.enableForest() || !Config.collectEnergy() || !Config.onTimeCollect())
+   return;
   Log.recordLog("定时执行开始", "");
   new Thread(
    new Runnable(){
@@ -716,8 +737,9 @@ public class AntForest
     @Override
     public void run()
     {
-     rpcCall_queryNextAction(loader, Config.getSelfId());
+     String s = rpcCall_queryNextAction(loader, Config.getSelfId());
      queryEnergyRanking(loader, "1");
+     canCollectSelfEnergy(loader, s);
     }
    }.setData(loader)).start();
  }

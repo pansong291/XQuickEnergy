@@ -92,7 +92,7 @@ public class XposedHook implements IXposedHookLoadPackage
       PowerManager pm = (PowerManager) activity.getSystemService(activity.POWER_SERVICE);
       wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, activity.getClass().getName());
       wakeLock.acquire();
-      if(Config.onTimeCollect() && timer == null)
+      if(timer == null)
       {
        AntForestNotification.start(activity);
        timer = new Timer(true);
@@ -125,6 +125,8 @@ public class XposedHook implements IXposedHookLoadPackage
       }
       if(timer != null)
       {
+       AntForestNotification.setContentText("主界面被销毁");
+       Log.recordLog("主界面被销毁", "");
        timer.cancel();
        timer = null;
       }
