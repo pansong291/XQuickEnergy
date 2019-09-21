@@ -2,9 +2,9 @@ package pansong291.xposed.quickenergy;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.icu.text.SimpleDateFormat;
 import android.widget.Toast;
 import de.robv.android.xposed.XposedBridge;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log
