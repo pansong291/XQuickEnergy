@@ -778,6 +778,8 @@ public class AntFarm
    JSONObject jo;
    for(String userId: Config.getFeedFriendAnimal())
    {
+    if(userId.equals(farmId2UserId(ownerFarmId)))
+     continue;
     s = rpcCall_enterFarm(loader, "", userId);
     jo = new JSONObject(s);
     memo = jo.getString("memo");
