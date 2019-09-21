@@ -49,6 +49,7 @@ public class Config
  jn_useNewEggTool = "useNewEggTool", jn_harvestProduce = "harvestProduce", jn_donation = "donation",
  jn_answerQuestion = "answerQuestion", jn_receiveFarmTaskAward = "receiveFarmTaskAward", jn_feedAnimal = "feedAnimal",
  jn_useAccelerateTool = "useAccelerateTool", jn_feedFriendAnimalList = "feedFriendAnimalList", jn_notifyFriend = "notifyFriend",
+ jn_dontNotifyFriendList = "dontNotifyFriendList",
  /* member */
  jn_receivePoint = "receivePoint";
 
@@ -91,6 +92,7 @@ public class Config
  private boolean useAccelerateTool;
  private List<String> feedFriendAnimalList;
  private boolean notifyFriend;
+ private List<String> dontNotifyFriendList;
 
  /* member */
  private boolean receivePoint;
@@ -414,7 +416,7 @@ public class Config
   return getConfig().useAccelerateTool;
  }
 
- public static List<String> getFeedFriendAnimal()
+ public static List<String> getFeedFriendAnimalList()
  {
   return getConfig().feedFriendAnimalList;
  }
@@ -438,6 +440,16 @@ public class Config
  public static boolean notifyFriend()
  {
   return getConfig().notifyFriend;
+ }
+
+ public static List<String> getDontNotifyFriendList()
+ {
+  return getConfig().dontNotifyFriendList;
+ }
+
+ public static boolean dontNotifyFriend(String id)
+ {
+  return getConfig().dontNotifyFriendList.contains(id);
  }
 
  /* member */
@@ -617,6 +629,7 @@ public class Config
   c.useAccelerateTool = true;
   if(c.feedFriendAnimalList == null) c.feedFriendAnimalList = new ArrayList<>();
   c.notifyFriend = true;
+  if(c.dontNotifyFriendList == null) c.dontNotifyFriendList = new ArrayList<>();
 
   c.receivePoint = true;
   return c;
@@ -854,6 +867,18 @@ public class Config
     config.notifyFriend = true;
    Log.i(TAG, jn_notifyFriend + ":" + config.notifyFriend);
 
+   config.dontNotifyFriendList = new ArrayList<>();
+   Log.i(TAG, jn_dontNotifyFriendList + ":[");
+   if(jo.has(jn_dontNotifyFriendList))
+   {
+    ja = jo.getJSONArray(jn_dontNotifyFriendList);
+    for(int i = 0; i < ja.length(); i++)
+    {
+     config.dontNotifyFriendList.add(ja.getString(i));
+     Log.i(TAG, "  " + config.dontNotifyFriendList.get(i) + ",");
+    }
+   }
+
    /* member */
    if(jo.has(jn_receivePoint))
     config.receivePoint = jo.getBoolean(jn_receivePoint);
@@ -976,6 +1001,13 @@ public class Config
    jo.put(jn_feedFriendAnimalList, ja);
 
    jo.put(jn_notifyFriend, config.notifyFriend);
+
+   ja = new JSONArray();
+   for(String s: config.dontNotifyFriendList)
+   {
+    ja.put(s);
+   }
+   jo.put(jn_dontNotifyFriendList, ja);
 
    /* member */
    jo.put(jn_receivePoint, config.receivePoint);

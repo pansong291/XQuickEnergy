@@ -213,8 +213,12 @@ public class MainActivity extends Activity
     Config.setNotifyFriend(cb.isChecked());
     break;
 
+   case R.id.btn_dontNotifyFriendList:
+    ListDialog.show(this, btn.getText(), Config.getDontNotifyFriendList());
+    break;
+
    case R.id.btn_feedFriendAnimalList:
-    ListDialog.show(this, btn.getText(), Config.getFeedFriendAnimal());
+    ListDialog.show(this, btn.getText(), Config.getFeedFriendAnimalList());
     break;
 
    case R.id.cb_receivePoint:

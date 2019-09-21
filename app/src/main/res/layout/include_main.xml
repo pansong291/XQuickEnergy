@@ -325,6 +325,18 @@
 			android:minHeight="50dp"
 			android:id="@+id/cb_useAccelerateTool"/>
 
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="帮喂鸡的好友列表"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_feedFriendAnimalList"
+			android:paddingLeft="8dp"/>
+
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -337,12 +349,12 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="帮喂鸡的好友列表"
+			android:text="不通知赶鸡的好友列表"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
 			android:background="@drawable/button"
-			android:id="@+id/btn_feedFriendAnimalList"
+			android:id="@+id/btn_dontNotifyFriendList"
 			android:paddingLeft="8dp"/>
 
 	</LinearLayout>

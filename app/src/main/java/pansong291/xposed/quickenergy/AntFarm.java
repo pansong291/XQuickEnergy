@@ -776,7 +776,7 @@ public class AntFarm
    Log.showDialogAndRecordLog("开始帮好友喂鸡…", "");
    String s, memo;
    JSONObject jo;
-   for(String userId: Config.getFeedFriendAnimal())
+   for(String userId: Config.getFeedFriendAnimalList())
    {
     if(userId.equals(farmId2UserId(ownerFarmId)))
      continue;
@@ -874,6 +874,8 @@ public class AntFarm
      {
       jo = jaRankingList.getJSONObject(i);
       String userId = jo.getString("userId");
+      if(Config.dontNotifyFriend(userId))
+       continue;
       boolean starve = jo.has("actionType") &&  jo.getString("actionType").equals("starve_action");
       if(jo.getBoolean("stealingAnimal") && !starve)
       {
