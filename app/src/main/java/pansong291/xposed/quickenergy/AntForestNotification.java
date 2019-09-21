@@ -22,7 +22,7 @@ public class AntForestNotification
  private AntForestNotification()
  {}
 
- public static boolean isAntForestNotificationStart()
+ public static boolean isStart()
  {
   return isStart;
  }
@@ -32,7 +32,7 @@ public class AntForestNotification
   if(mNotification == null)
   {
    Intent it = new Intent(Intent.ACTION_VIEW);
-   it.setData(Uri.parse("alipays://platformapi/startapp?appId=60000002"));
+   it.setData(Uri.parse("alipays://platformapi/startapp?appId="));
    PendingIntent pi = PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_UPDATE_CURRENT);
 
    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -51,7 +51,7 @@ public class AntForestNotification
    mNotification = builder
     .setSmallIcon(android.R.drawable.sym_def_app_icon)
     .setContentTitle("XQuickEnergy")
-    .setContentText("点此启动蚂蚁森林")
+    .setContentText("点此启动支付宝")
     .setAutoCancel(true)
     .setContentIntent(pi)
     .build();

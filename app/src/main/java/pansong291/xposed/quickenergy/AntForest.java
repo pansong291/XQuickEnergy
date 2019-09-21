@@ -601,7 +601,7 @@ public class AntForest
   return null;
  }
 
- private static void updateThreadCount(ThreadStatus ts, ClassLoader loader)
+ private static synchronized void updateThreadCount(ThreadStatus ts, ClassLoader loader)
  {
   switch(ts)
   {
@@ -620,7 +620,8 @@ public class AntForest
         helpCollectedEnergy == 0 && onceHelpCollected == 0)
      {
       Log.showDialogOrToastAndRecordLog("暂时没有可收取的能量", "");
-      if(forestEnd) onForestEnd(loader);
+      if(forestEnd || AntForestNotification.isStart())
+       onForestEnd(loader);
       else forestEnd = true;
      }else if(onceHelpCollected != 0)
      {
@@ -634,7 +635,8 @@ public class AntForest
       totalCollected += collectedEnergy;
       totalHelpCollected += helpCollectedEnergy;
       Config.saveIdMap();
-      if(forestEnd) onForestEnd(loader);
+      if(forestEnd || AntForestNotification.isStart())
+       onForestEnd(loader);
       else forestEnd = true;
       collectedEnergy = 0;
       helpCollectedEnergy = 0;
