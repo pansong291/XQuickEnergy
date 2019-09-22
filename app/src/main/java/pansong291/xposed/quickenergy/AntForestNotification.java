@@ -14,7 +14,7 @@ public class AntForestNotification
 {
  public static final int ANTFOREST_NOTIFICATION_ID = 46;
  private static NotificationManager mNotifyManager;
- public static final String CHANNEL_ID = "CHANNELID0";
+ public static final String CHANNEL_ID = "pansong291.xposed.quickenergy.ANTFOREST_NOTIFY_CHANNEL";
  private static Notification mNotification;
  private static Notification.Builder builder;
  private static boolean isStart = false;
@@ -37,7 +37,7 @@ public class AntForestNotification
 
    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
    {
-    NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "ChannelName", NotificationManager.IMPORTANCE_DEFAULT);
+    NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "XQuickEnergy能量提醒", NotificationManager.IMPORTANCE_DEFAULT);
     mNotifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     if(mNotifyManager != null)
     {
@@ -52,7 +52,7 @@ public class AntForestNotification
     .setSmallIcon(android.R.drawable.sym_def_app_icon)
     .setContentTitle("XQuickEnergy")
     .setContentText("点此启动支付宝")
-    .setAutoCancel(true)
+    .setAutoCancel(false)
     .setContentIntent(pi)
     .build();
   }
