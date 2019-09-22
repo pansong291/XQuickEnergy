@@ -75,8 +75,15 @@ public class EditDialog
          long l = Long.parseLong(edt.getText().toString());
          if(l >= 0)
          {
+          if(l < 10_000)
+          {
+           Toast.makeText(context, "间隔时间太短", 0).show();
+           break;
+          }else if(l < 60_000)
+           Toast.makeText(context, "该项不影响秒偷，请尽量以分钟起步", 0).show();
+          else
+           Toast.makeText(context, "需要重启支付宝生效", 0).show();
           Config.setTimeInterval(l);
-          Toast.makeText(context, "需要重启支付宝生效", 1).show();
          }
         }catch(Throwable t)
         {}

@@ -6,16 +6,10 @@ public class Statistics
 {
  public enum TimeType
  { YEAR, MONTH, DAY }
- 
+
  public enum DataType
- { COLLECTED, HELPED, WATERED }
- 
- private static final String TAG = Statistics.class.getCanonicalName();
- private static final String
- jn_year = "year", jn_month = "month", jn_day = "day",
- jn_collected = "collected", jn_helped = "helped", jn_watered = "watered";
- 
- private static Statistics statistics;
+ { TIME, COLLECTED, HELPED, WATERED }
+
  private class TimeStatistics
  {
   int time;
@@ -23,80 +17,61 @@ public class Statistics
 
   TimeStatistics(int i)
   {
+   reset(i);
+  }
+
+  public void reset(int i)
+  {
    time = i;
    collected = 0;
    helped = 0;
    watered = 0;
   }
  }
+
+ private static final String TAG = Statistics.class.getCanonicalName();
+ private static final String
+ jn_year = "year", jn_month = "month", jn_day = "day",
+ jn_collected = "collected", jn_helped = "helped", jn_watered = "watered";
+
  private TimeStatistics year;
  private TimeStatistics month;
  private TimeStatistics day;
- 
+ private static Statistics statistics;
+
  public static void addData(DataType dt, int i)
  {
   String[] dateStr = Log.getFormatDate().split("-");
   int ye = Integer.parseInt(dateStr[0]);
   int mo = Integer.parseInt(dateStr[1]);
   int da = Integer.parseInt(dateStr[2]);
+
+  if(ye > getStatistics().year.time)
+  {
+   getStatistics().year.reset(ye);
+   getStatistics().month.reset(mo);
+   getStatistics().day.reset(da);
+  }else if(mo > getStatistics().month.time)
+  {
+   getStatistics().month.reset(mo);
+   getStatistics().day.reset(da);
+  }else if(da > getStatistics().day.time)
+  {
+   getStatistics().day.reset(da);
+  }
   switch(dt)
   {
    case COLLECTED:
-    if(da > getStatistics().day.time)
-    {
-     getStatistics().day.time = da;
-     getStatistics().day.collected = 0;
-     if(mo > getStatistics().month.time)
-     {
-      getStatistics().month.time = mo;
-      getStatistics().month.collected = 0;
-      if(ye > getStatistics().year.time)
-      {
-       getStatistics().year.time = ye;
-       getStatistics().year.collected = 0;
-      }
-     }
-    }
     getStatistics().day.collected += i;
     getStatistics().month.collected += i;
     getStatistics().year.collected += i;
     break;
    case HELPED:
-    if(da > getStatistics().day.time)
-    {
-     getStatistics().day.time = da;
-     getStatistics().day.helped = 0;
-     if(mo > getStatistics().month.time)
-     {
-      getStatistics().month.time = mo;
-      getStatistics().month.helped = 0;
-      if(ye > getStatistics().year.time)
-      {
-       getStatistics().year.time = ye;
-       getStatistics().year.helped = 0;
-      }
-     }
-    }
     getStatistics().day.helped += i;
     getStatistics().month.helped += i;
     getStatistics().year.helped += i;
     break;
    case WATERED:
-    if(da > getStatistics().day.time)
-    {
-     getStatistics().day.time = da;
-     getStatistics().day.watered = 0;
-     if(mo > getStatistics().month.time)
-     {
-      getStatistics().month.time = mo;
-      getStatistics().month.watered = 0;
-      if(ye > getStatistics().year.time)
-      {
-       getStatistics().year.time = ye;
-       getStatistics().year.watered = 0;
-      }
-     }
-    }
     getStatistics().day.watered += i;
     getStatistics().month.watered += i;
     getStatistics().year.watered += i;
@@ -121,9 +96,12 @@ public class Statistics
     ts = getStatistics().day;
     break;
   }
-  if(dt != null)
+  if(ts != null)
    switch(dt)
    {
+    case TIME:
+     data = ts.time;
+    break;
     case COLLECTED:
      data = ts.collected;
      break;
@@ -140,15 +118,15 @@ public class Statistics
  public static String getText()
  {
   statistics = null;
-  StringBuilder sb = new StringBuilder("年：收");
+  StringBuilder sb = new StringBuilder(getData(TimeType.YEAR, DataType.TIME) + "年：收");
   sb.append(getData(TimeType.YEAR, DataType.COLLECTED));
   sb.append("，  帮" + getData(TimeType.YEAR, DataType.HELPED));
   sb.append("，  浇" + getData(TimeType.YEAR, DataType.WATERED));
-  sb.append("\n月：收");
+  sb.append("\n" + getData(TimeType.MONTH, DataType.TIME) + "月：收");
   sb.append(getData(TimeType.MONTH, DataType.COLLECTED));
   sb.append("，  帮" + getData(TimeType.MONTH, DataType.HELPED));
   sb.append("，  浇" + getData(TimeType.MONTH, DataType.WATERED));
-  sb.append("\n日：收");
+  sb.append("\n" + getData(TimeType.DAY, DataType.TIME) + "日：收");
   sb.append(getData(TimeType.DAY, DataType.COLLECTED));
   sb.append("，  帮" + getData(TimeType.DAY, DataType.HELPED));
   sb.append("，  浇" + getData(TimeType.DAY, DataType.WATERED));
@@ -179,7 +157,7 @@ public class Statistics
    statis.day = statis.new TimeStatistics(Integer.parseInt(date[2]));
   return statis;
  }
- 
+
  private static Statistics json2Statistics(String json)
  {
   Statistics statis = null;
@@ -191,21 +169,33 @@ public class Statistics
 
    joo = jo.getJSONObject(jn_year);
    statis.year = statis.new TimeStatistics(joo.getInt(jn_year));
+   Log.i(TAG, jn_year + ":" + statis.year.time);
    statis.year.collected = joo.getInt(jn_collected);
+   Log.i(TAG, "  " + jn_collected + ":" + statis.year.collected);
    statis.year.helped = joo.getInt(jn_helped);
+   Log.i(TAG, "  " + jn_helped + ":" + statis.year.helped);
    statis.year.watered = joo.getInt(jn_watered);
+   Log.i(TAG, "  " + jn_watered + ":" + statis.year.watered);
 
    joo = jo.getJSONObject(jn_month);
    statis.month = statis.new TimeStatistics(joo.getInt(jn_month));
+   Log.i(TAG, jn_month + ":" + statis.month.time);
    statis.month.collected = joo.getInt(jn_collected);
+   Log.i(TAG, "  " + jn_collected + ":" + statis.month.collected);
    statis.month.helped = joo.getInt(jn_helped);
+   Log.i(TAG, "  " + jn_helped + ":" + statis.month.helped);
    statis.month.watered = joo.getInt(jn_watered);
+   Log.i(TAG, "  " + jn_watered + ":" + statis.month.watered);
 
    joo = jo.getJSONObject(jn_day);
    statis.day = statis.new TimeStatistics(joo.getInt(jn_day));
+   Log.i(TAG, jn_day + ":" + statis.day.time);
    statis.day.collected = joo.getInt(jn_collected);
+   Log.i(TAG, "  " + jn_collected + ":" + statis.day.collected);
    statis.day.helped = joo.getInt(jn_helped);
+   Log.i(TAG, "  " + jn_helped + ":" + statis.day.helped);
    statis.day.watered = joo.getInt(jn_watered);
+   Log.i(TAG, "  " + jn_watered + ":" + statis.day.watered);
 
   }catch(Throwable t)
   {
@@ -225,7 +215,7 @@ public class Statistics
   }
   return statis;
  }
- 
+
  public static String statistics2Json(Statistics statis)
  {
   JSONObject jo = new JSONObject();
@@ -259,5 +249,5 @@ public class Statistics
   }
   return Config.formatJson(jo);
  }
- 
+
 }

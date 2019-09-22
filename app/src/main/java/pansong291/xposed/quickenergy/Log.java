@@ -110,7 +110,7 @@ public class Log
  {
   if(log) Log.i(TAG, str + str2);
   if(!Config.recordLog()) return false;
-  return FileUtils.append2LogFile(str + str2);
+  return FileUtils.append2LogFile(str);
  }
 
  public static void resetDialog()
