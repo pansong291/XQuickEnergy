@@ -90,7 +90,14 @@ public class Log
      {
       public void run()
       {
-       Toast.makeText(activity, str, 1).show();
+       try
+       {
+        Toast.makeText(activity, str, 1).show();
+       }catch(Throwable t)
+       {
+        Log.i(TAG, "showToast err:");
+        Log.printStackTrace(TAG, t);
+       }
       }
      });
    }catch(Throwable t)
@@ -132,22 +139,29 @@ public class Log
      {
       public void run()
       {
-       if(sb == null)
-        sb = new StringBuffer();
-       if(dlg == null)
-        dlg = createNewDialog();
-       if(!dlg.isShowing())
-        try
-        {
-         dlg.show();
-        }catch(Throwable t)
-        {
-         Log.i(TAG, "Dialog show error");
+       try
+       {
+        if(sb == null)
+         sb = new StringBuffer();
+        if(dlg == null)
          dlg = createNewDialog();
-         dlg.show();
-        }
-       sb.append(str).append('\n');
-       dlg.setMessage(sb.toString());
+        if(!dlg.isShowing())
+         try
+         {
+          dlg.show();
+         }catch(Throwable t)
+         {
+          Log.i(TAG, "Dialog show error");
+          dlg = createNewDialog();
+          dlg.show();
+         }
+        sb.append(str).append('\n');
+        dlg.setMessage(sb.toString());
+       }catch(Throwable t)
+       {
+        Log.i(TAG, "showDialog err:");
+        Log.printStackTrace(TAG, t);
+       }
       }
      });
    }catch(Throwable t)
@@ -178,10 +192,10 @@ public class Log
  {
   return getFormatDateTime().split(" ")[0];
  }
- 
+
  public static String getFormatTime()
  {
   return getFormatDateTime().split(" ")[1];
  }
- 
+
 }
