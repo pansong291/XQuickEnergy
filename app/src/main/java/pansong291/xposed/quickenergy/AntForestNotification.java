@@ -29,39 +29,13 @@ public class AntForestNotification
 
  public static void start(Context context)
  {
-  if(mNotification == null)
-  {
-   Intent it = new Intent(Intent.ACTION_VIEW);
-   it.setData(Uri.parse("alipays://platformapi/startapp?appId="));
-   PendingIntent pi = PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_UPDATE_CURRENT);
-
-   if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-   {
-    NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "XQuickEnergy能量提醒", NotificationManager.IMPORTANCE_DEFAULT);
-    mNotifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    if(mNotifyManager != null)
-    {
-     mNotifyManager.createNotificationChannel(notificationChannel);
-    }
-    builder = new Notification.Builder(context, CHANNEL_ID);
-   }else
-   {
-    builder = new Notification.Builder(context);
-   }
-   mNotification = builder
-    .setSmallIcon(android.R.drawable.sym_def_app_icon)
-    .setContentTitle("XQuickEnergy")
-    .setContentText("点此启动支付宝")
-    .setAutoCancel(false)
-    .setContentIntent(pi)
-    .build();
-  }
+  initNotification(context);
   if(!isStart)
   {
    if(context instanceof Service)
     ((Service)context).startForeground(ANTFOREST_NOTIFICATION_ID, mNotification);
    else
-    mNotifyManager.notify(ANTFOREST_NOTIFICATION_ID, mNotification);
+    getNotificationManager(context).notify(ANTFOREST_NOTIFICATION_ID, mNotification);
    isStart = true;
   }
  }
@@ -71,7 +45,7 @@ public class AntForestNotification
   if(isStart)
   {
    mNotification = builder.setContentText(cs).build();
-   mNotifyManager.notify(ANTFOREST_NOTIFICATION_ID, mNotification);
+   getNotificationManager(null).notify(ANTFOREST_NOTIFICATION_ID, mNotification);
   }
  }
 
@@ -82,9 +56,47 @@ public class AntForestNotification
    if(context instanceof Service)
     ((Service)context).stopForeground(remove);
    else
-    mNotifyManager.cancel(ANTFOREST_NOTIFICATION_ID);
+    getNotificationManager(null).cancel(ANTFOREST_NOTIFICATION_ID);
    isStart = false;
   }
+ }
+
+ private static void initNotification(Context context)
+ {
+  if(mNotification == null)
+  {
+   Intent it = new Intent(Intent.ACTION_VIEW);
+   it.setData(Uri.parse("alipays://platformapi/startapp?appId="));
+   PendingIntent pi = PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_UPDATE_CURRENT);
+
+   if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+   {
+    NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "XQuickEnergy能量提醒", NotificationManager.IMPORTANCE_LOW);
+    notificationChannel.enableLights(false);
+    notificationChannel.enableVibration(false);
+    notificationChannel.setShowBadge(false);
+    getNotificationManager(context).createNotificationChannel(notificationChannel);
+    builder = new Notification.Builder(context, CHANNEL_ID);
+   }else
+   {
+    builder = new Notification.Builder(context)
+     .setPriority(Notification.PRIORITY_LOW);
+   }
+   mNotification = builder
+    .setSmallIcon(android.R.drawable.sym_def_app_icon)
+    .setContentTitle("XQuickEnergy")
+    .setContentText("点此启动支付宝")
+    .setAutoCancel(false)
+    .setContentIntent(pi)
+    .build();
+  }
+ }
+
+ private static NotificationManager getNotificationManager(Context context)
+ {
+  if(mNotifyManager == null)
+   mNotifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+  return mNotifyManager;
  }
 
 }

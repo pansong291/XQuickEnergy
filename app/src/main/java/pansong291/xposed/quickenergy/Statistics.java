@@ -210,7 +210,7 @@ public class Statistics
   String formated = statistics2Json(statis);
   if(!formated.equals(json))
   {
-   Log.i(TAG, "Reformat statistics.json");
+   Log.i(TAG, "重新格式化 statistics.json");
    FileUtils.write2File(formated, FileUtils.getStatisticsFile());
   }
   return statis;

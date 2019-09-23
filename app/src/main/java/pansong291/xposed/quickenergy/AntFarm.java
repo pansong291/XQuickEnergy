@@ -244,7 +244,7 @@ public class AntFarm
         Log.showDialogAndRecordLog("饲料剩余〔" + foodStock + "克〕", "");
       }catch(Throwable t)
       {
-       Log.i(TAG, "run err:");
+       Log.i(TAG, "AntFarm.start.run err:");
        Log.printStackTrace(TAG, t);
       }
       Config.saveIdMap();

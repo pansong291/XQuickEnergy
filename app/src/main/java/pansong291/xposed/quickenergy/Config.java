@@ -556,11 +556,11 @@ public class Config
    for(int i = 0; i < ids.length; i++)
    {
     ids[i] = idList.get(i);
-    Log.i(TAG, "unknown id: " + ids[i]);
+    Log.i(TAG, "未知id: " + ids[i]);
    }
    return ids;
   }
-  Log.i(TAG, "There is no unknown ids.");
+  Log.i(TAG, "没有未知id");
   return null;
  }
 
@@ -899,7 +899,7 @@ public class Config
   String formated = config2Json(config);
   if(!formated.equals(json))
   {
-   Log.i(TAG, "Reformat config.json");
+   Log.i(TAG, "重新格式化 config.json");
    FileUtils.write2File(formated, FileUtils.getConfigFile());
   }
   return config;
