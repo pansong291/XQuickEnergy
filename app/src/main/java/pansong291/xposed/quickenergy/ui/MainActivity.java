@@ -15,17 +15,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-import pansong291.xposed.quickenergy.Config;
 import pansong291.xposed.quickenergy.R;
-import pansong291.xposed.quickenergy.RpcCall;
-import pansong291.xposed.quickenergy.Statistics;
+import pansong291.xposed.quickenergy.hook.RpcCall;
+import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.Statistics;
 
 public class MainActivity extends Activity
 {
  TextView tv_statistics;
- CheckBox cb_immediateEffect, cb_recordLog, cb_enableForest,
- cb_enableFarm, cb_collectEnergy, cb_helpFriendCollect,
- cb_onTimeCollect, cb_receiveForestTaskAward, cb_rewardFriend,
+ CheckBox cb_immediateEffect, cb_recordLog,
+ cb_collectEnergy, cb_helpFriendCollect,
+ cb_receiveForestTaskAward, cb_enableFarm, cb_rewardFriend,
  cb_sendBackAnimal, cb_receiveFarmToolReward, cb_useNewEggTool,
  cb_harvestProduce, cb_donation, cb_answerQuestion,
  cb_receiveFarmTaskAward, cb_feedAnimal, cb_useAccelerateTool,
@@ -44,12 +44,10 @@ public class MainActivity extends Activity
   tv_statistics = (TextView) findViewById(R.id.tv_statistics);
   cb_immediateEffect = (CheckBox) findViewById(R.id.cb_immediateEffect);
   cb_recordLog = (CheckBox) findViewById(R.id.cb_recordLog);
-  cb_enableForest = (CheckBox) findViewById(R.id.cb_enableForest);
-  cb_enableFarm = (CheckBox) findViewById(R.id.cb_enableFarm);
   cb_collectEnergy = (CheckBox) findViewById(R.id.cb_collectEnergy);
   cb_helpFriendCollect = (CheckBox) findViewById(R.id.cb_helpFriendCollect);
-  cb_onTimeCollect = (CheckBox) findViewById(R.id.cb_onTimeCollect);
   cb_receiveForestTaskAward = (CheckBox) findViewById(R.id.cb_receiveForestTaskAward);
+  cb_enableFarm = (CheckBox) findViewById(R.id.cb_enableFarm);
   cb_rewardFriend = (CheckBox) findViewById(R.id.cb_rewardFriend);
   cb_sendBackAnimal = (CheckBox) findViewById(R.id.cb_sendBackAnimal);
   cb_receiveFarmToolReward = (CheckBox) findViewById(R.id.cb_receiveFarmToolReward);
@@ -71,11 +69,9 @@ public class MainActivity extends Activity
   tv_statistics.setText(Statistics.getText());
   cb_immediateEffect.setChecked(Config.immediateEffect());
   cb_recordLog.setChecked(Config.recordLog());
-  cb_enableForest.setChecked(Config.enableForest());
   cb_enableFarm.setChecked(Config.enableFarm());
   cb_collectEnergy.setChecked(Config.collectEnergy());
   cb_helpFriendCollect.setChecked(Config.helpFriendCollect());
-  cb_onTimeCollect.setChecked(Config.onTimeCollect());
   cb_receiveForestTaskAward.setChecked(Config.receiveForestTaskAward());
   cb_rewardFriend.setChecked(Config.rewardFriend());
   cb_sendBackAnimal.setChecked(Config.sendBackAnimal());
@@ -101,36 +97,40 @@ public class MainActivity extends Activity
     Config.setImmediateEffect(cb.isChecked());
     break;
 
-   case R.id.btn_showMode:
-    ChoiceDialog.showShowMode(this, btn.getText());
-    break;
-
    case R.id.cb_recordLog:
     Config.setRecordLog(cb.isChecked());
-    break;
-
-   case R.id.cb_enableForest:
-    Config.setEnableForest(cb.isChecked());
-    break;
-
-   case R.id.cb_enableFarm:
-    Config.setEnableFarm(cb.isChecked());
     break;
 
    case R.id.cb_collectEnergy:
     Config.setCollectEnergy(cb.isChecked());
     break;
 
+   case R.id.btn_timeInterval:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.TIME_INTERVAL);
+    break;
+
+   case R.id.btn_advanceTime:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.ADVANCE_TIME);
+    break;
+
+   case R.id.btn_collectInterval:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.COLLECT_INTERVAL);
+    break;
+
+   case R.id.btn_collectTimeout:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.COLLECT_TIMEOUT);
+    break;
+
    case R.id.btn_returnWater30:
-    EditDialog.showReturnWaterDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_30);
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_30);
     break;
 
    case R.id.btn_returnWater20:
-    EditDialog.showReturnWaterDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_20);
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_20);
     break;
 
    case R.id.btn_returnWater10:
-    EditDialog.showReturnWaterDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_10);
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.RETURN_WATER_10);
     break;
 
    case R.id.cb_helpFriendCollect:
@@ -145,20 +145,16 @@ public class MainActivity extends Activity
     ListDialog.show(this, btn.getText(), Config.getDontHelpCollectList());
     break;
 
-   case R.id.cb_onTimeCollect:
-    Config.setOnTimeCollect(cb.isChecked());
-    break;
-
-   case R.id.btn_timeInterval:
-    EditDialog.showTimeIntervalDialog(this, btn.getText());
-    break;
-
    case R.id.cb_receiveForestTaskAward:
     Config.setReceiveForestTaskAward(cb.isChecked());
     break;
 
    case R.id.btn_waterFriendList:
     ListDialog.show(this, btn.getText(), Config.getWaterFriendList());
+    break;
+
+   case R.id.cb_enableFarm:
+    Config.setEnableFarm(cb.isChecked());
     break;
 
    case R.id.cb_rewardFriend:
@@ -173,8 +169,8 @@ public class MainActivity extends Activity
     ChoiceDialog.showSendType(this, btn.getText());
     break;
 
-   case R.id.btn_sendTypeExcludeList:
-    ListDialog.show(this, btn.getText(), Config.getSendTypeExcludeList());
+   case R.id.btn_dontSendFriendList:
+    ListDialog.show(this, btn.getText(), Config.getDontSendFriendList());
     break;
 
    case R.id.btn_recallAnimalType:

@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import java.util.List;
-import pansong291.xposed.quickenergy.Config;
+import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.R;
 
 public class ListDialog
@@ -67,6 +67,7 @@ public class ListDialog
   btn_find_next.setOnClickListener(onBtnClickListener);
   edt_find = v.findViewById(R.id.edt_find);
   lv_list = v.findViewById(R.id.lv_list);
+  edt_find.setHint("名字或账号（含星号）");
   ListAdapter la = ListAdapter.get(c);
   la.setAlipayUserList(AlipayUser.getAlipayUserList());
   lv_list.setAdapter(la);

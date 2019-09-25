@@ -1,4 +1,4 @@
-package pansong291.xposed.quickenergy;
+package pansong291.xposed.quickenergy.hook;
 
 public class ClassMember
 {

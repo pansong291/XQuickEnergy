@@ -6,33 +6,20 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
-import pansong291.xposed.quickenergy.Config;
+import pansong291.xposed.quickenergy.util.Config;
 
 public class EditDialog
 {
  private static AlertDialog editDialog;
  private static EditText edt;
  public enum EditMode
- { TIME_INTERVAL, RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10 }
+ { TIME_INTERVAL, ADVANCE_TIME, COLLECT_INTERVAL, COLLECT_TIMEOUT,
+   RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10 }
  private static EditMode mode;
 
- public static void showReturnWaterDialog(Context c, CharSequence title, EditMode em)
+ public static void showEditDialog(Context c, CharSequence title, EditMode em)
  {
   mode = em;
-  try
-  {
-   getEditDialog(c, title).show();
-  }catch(Throwable t)
-  {
-   editDialog = null;
-   getEditDialog(c, title).show();
-  }
-  editDialog.setTitle(title);
- }
-
- public static void showTimeIntervalDialog(Context c, CharSequence title)
- {
-  mode = EditMode.TIME_INTERVAL;
   try
   {
    getEditDialog(c, title).show();
@@ -67,64 +54,52 @@ public class EditDialog
      @Override
      public void onClick(DialogInterface p1, int p2)
      {
-      switch(mode)
+      try
       {
-       case TIME_INTERVAL:
-        try
-        {
-         long l = Long.parseLong(edt.getText().toString());
-         if(l >= 0)
+       int i = Integer.parseInt(edt.getText().toString());
+       switch(mode)
+       {
+        case TIME_INTERVAL:
+         if(i > 0)
          {
-          if(l < 10_000)
-          {
-           Toast.makeText(context, "间隔时间太短", 0).show();
-           break;
-          }else if(l < 60_000)
-           Toast.makeText(context, "该项不影响秒偷，请尽量以分钟起步", 0).show();
-          else
-           Toast.makeText(context, "需要重启支付宝生效", 0).show();
-          Config.setTimeInterval(l);
+          Toast.makeText(context, "需要重启支付宝生效", 0).show();
+          Config.setTimeInterval(i * 60_000);
          }
-        }catch(Throwable t)
-        {}
-        break;
+         break;
 
-       case RETURN_WATER_30:
-        try
-        {
-         int i = Integer.parseInt(edt.getText().toString());
+        case ADVANCE_TIME:
+         if(i > 0)
+          Config.setAdvanceTime(i);
+         break;
+
+        case COLLECT_INTERVAL:
+         if(i > 0)
+          Config.setCollectInterval(i);
+         break;
+
+        case COLLECT_TIMEOUT:
+         if(i > 0)
+          Config.setCollectTimeout(i * 1_000);
+         break;
+
+        case RETURN_WATER_30:
          if(i >= 0)
-         {
           Config.setReturnWater30(i);
-         }
-        }catch(Throwable t)
-        {}
-        break;
+         break;
 
-       case RETURN_WATER_20:
-        try
-        {
-         int i = Integer.parseInt(edt.getText().toString());
+        case RETURN_WATER_20:
+
          if(i >= 0)
-         {
           Config.setReturnWater20(i);
-         }
-        }catch(Throwable t)
-        {}
-        break;
+         break;
 
-       case RETURN_WATER_10:
-        try
-        {
-         int i = Integer.parseInt(edt.getText().toString());
+        case RETURN_WATER_10:
          if(i >= 0)
-         {
           Config.setReturnWater10(i);
-         }
-        }catch(Throwable t)
-        {}
-        break;
-      }
+         break;
+       }
+      }catch(Throwable t)
+      {}
      }
     }.setData(c))
     .create();
@@ -133,9 +108,21 @@ public class EditDialog
   switch(mode)
   {
    case TIME_INTERVAL:
-    str = String.valueOf(Config.timeInterval());
+    str = String.valueOf(Config.timeInterval() / 60_000);
     break;
 
+   case ADVANCE_TIME:
+    str = String.valueOf(Config.advanceTime());
+    break;
+
+   case COLLECT_INTERVAL:
+    str = String.valueOf(Config.collectInterval());
+    break;
+
+   case COLLECT_TIMEOUT:
+    str = String.valueOf(Config.collectTimeout() / 1_000);
+    break;
+    
    case RETURN_WATER_30:
     str = String.valueOf(Config.returnWater30());
     break;

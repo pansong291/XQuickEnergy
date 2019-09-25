@@ -5,45 +5,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import pansong291.xposed.quickenergy.AntFarm.SendType;
-import pansong291.xposed.quickenergy.Config;
-import pansong291.xposed.quickenergy.Config.RecallAnimalType;
-import pansong291.xposed.quickenergy.Config.ShowMode;
+import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.Config.RecallAnimalType;
 
 public class ChoiceDialog
 {
- private static AlertDialog showModeDialog,
+ private static AlertDialog
  sendTypeDialog, recallAnimalTypeDialog;
-
- public static void showShowMode(Context c, CharSequence title)
- {
-  try
-  {
-   getShowModeDialog(c, title).show();
-  }catch(Throwable t)
-  {
-   showModeDialog = null;
-   getShowModeDialog(c, title).show();
-  }
- }
-
- private static AlertDialog getShowModeDialog(Context c, CharSequence title)
- {
-  if(showModeDialog == null)
-   showModeDialog = new AlertDialog.Builder(c)
-    .setTitle(title)
-    .setSingleChoiceItems(ShowMode.nickNames, Config.showMode().ordinal(),
-    new OnClickListener()
-    {
-     @Override
-     public void onClick(DialogInterface p1, int p2)
-     {
-      Config.setShowMode(p2);
-     }
-    })
-    .setPositiveButton("确定", null)
-    .create();
-  return showModeDialog;
- }
 
  public static void showSendType(Context c, CharSequence title)
  {
@@ -62,7 +30,7 @@ public class ChoiceDialog
   if(sendTypeDialog == null)
    sendTypeDialog = new AlertDialog.Builder(c)
     .setTitle(title)
-    .setSingleChoiceItems(SendType.nickNames, Config.sendType(null).ordinal(),
+    .setSingleChoiceItems(SendType.nickNames, Config.sendType().ordinal(),
     new OnClickListener()
     {
      @Override

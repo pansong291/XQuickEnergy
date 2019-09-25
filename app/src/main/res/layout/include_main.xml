@@ -27,18 +27,6 @@
 			android:minHeight="50dp"
 			android:id="@+id/cb_immediateEffect"/>
 
-		<Button
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="?android:attr/buttonBarButtonStyle"
-			android:text="展示模式"
-			android:onClick="onClick"
-			android:minHeight="50dp"
-			android:gravity="left|center_vertical"
-			android:background="@drawable/button"
-			android:id="@+id/btn_showMode"
-			android:paddingLeft="8dp"/>
-
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -46,22 +34,6 @@
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_recordLog"/>
-
-		<CheckBox
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="启用森林功能"
-			android:onClick="onClick"
-			android:minHeight="50dp"
-			android:id="@+id/cb_enableForest"/>
-
-		<CheckBox
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="启用庄园功能"
-			android:onClick="onClick"
-			android:minHeight="50dp"
-			android:id="@+id/cb_enableFarm"/>
 
 	</LinearLayout>
 
@@ -85,6 +57,54 @@
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_collectEnergy"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="检测间隔（分钟）"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_timeInterval"
+			android:paddingLeft="8dp"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="提前时间（毫秒）"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_advanceTime"
+			android:paddingLeft="8dp"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="收取间隔（毫秒）"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_collectInterval"
+			android:paddingLeft="8dp"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="收取超时（秒）"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_collectTimeout"
+			android:paddingLeft="8dp"/>
 
 		<Button
 			android:layout_width="match_parent"
@@ -157,26 +177,6 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="定时收取"
-			android:onClick="onClick"
-			android:minHeight="50dp"
-			android:id="@+id/cb_onTimeCollect"/>
-
-		<Button
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="?android:attr/buttonBarButtonStyle"
-			android:text="最大检测间隔（毫秒）"
-			android:onClick="onClick"
-			android:minHeight="50dp"
-			android:gravity="left|center_vertical"
-			android:background="@drawable/button"
-			android:id="@+id/btn_timeInterval"
-			android:paddingLeft="8dp"/>
-
-		<CheckBox
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
 			android:text="领取森林任务奖励"
 			android:onClick="onClick"
 			android:minHeight="50dp"
@@ -212,6 +212,14 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:text="启用庄园功能"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:id="@+id/cb_enableFarm"/>
+
+		<CheckBox
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
 			android:text="打赏好友"
 			android:onClick="onClick"
 			android:minHeight="50dp"
@@ -241,12 +249,12 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="赶鸡方式的排除列表"
+			android:text="不赶鸡的好友列表"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
 			android:background="@drawable/button"
-			android:id="@+id/btn_sendTypeExcludeList"
+			android:id="@+id/btn_dontSendFriendList"
 			android:paddingLeft="8dp"/>
 
 		<Button

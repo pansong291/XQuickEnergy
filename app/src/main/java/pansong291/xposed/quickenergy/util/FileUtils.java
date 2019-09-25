@@ -1,4 +1,4 @@
-package pansong291.xposed.quickenergy;
+package pansong291.xposed.quickenergy.util;
 
 import android.os.Environment;
 import java.io.Closeable;

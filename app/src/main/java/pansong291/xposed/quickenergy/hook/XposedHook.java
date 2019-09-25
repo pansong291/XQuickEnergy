@@ -1,4 +1,4 @@
-package pansong291.xposed.quickenergy;
+package pansong291.xposed.quickenergy.hook;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -13,8 +13,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import pansong291.xposed.quickenergy.AntFarm;
+import pansong291.xposed.quickenergy.AntForest;
 import pansong291.xposed.quickenergy.AntForestNotification;
+import pansong291.xposed.quickenergy.AntMember;
+import pansong291.xposed.quickenergy.hook.AntFarmRpcCall;
+import pansong291.xposed.quickenergy.hook.ClassMember;
 import pansong291.xposed.quickenergy.ui.MainActivity;
+import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.Log;
 
 public class XposedHook implements IXposedHookLoadPackage
 {
@@ -25,7 +32,7 @@ public class XposedHook implements IXposedHookLoadPackage
  @Override
  public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
  {
-  if(getClass().getPackage().getName().equals(lpparam.packageName))
+  if("pansong291.xposed.quickenergy".equals(lpparam.packageName))
   {
    XposedHelpers.findAndHookMethod(MainActivity.class.getName(), lpparam.classLoader, "setModuleActive", boolean.class, new XC_MethodHook()
     {
@@ -79,60 +86,82 @@ public class XposedHook implements IXposedHookLoadPackage
 
  private void hookLoginActivity(final ClassLoader loader)
  {
-  XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onCreate, Bundle.class, new XC_MethodHook()
-   {
-    @Override
-    protected void afterHookedMethod(MethodHookParam param) throws Throwable
+  try
+  {
+   XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onCreate, Bundle.class, new XC_MethodHook()
     {
-     if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
-        .equals(param.thisObject.getClass().getCanonicalName()))
+     @Override
+     protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
-      Activity activity = (Activity) param.thisObject;
-      RpcCall.loginActivity = activity;
-      PowerManager pm = (PowerManager) activity.getSystemService(activity.POWER_SERVICE);
-      wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, activity.getClass().getName());
-      wakeLock.acquire();
-      if(timer == null)
+      if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
+         .equals(param.thisObject.getClass().getCanonicalName()))
       {
-       AntForestNotification.start(activity);
-       timer = new Timer(true);
-       timer.scheduleAtFixedRate(new TimerTask()
-        {
-         @Override
-         public void run()
+       Activity activity = (Activity) param.thisObject;
+       RpcCall.loginActivity = activity;
+       Log.i(TAG, "onCreate loginActivity=" + activity);
+       PowerManager pm = (PowerManager) activity.getSystemService(activity.POWER_SERVICE);
+       wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, activity.getClass().getName());
+       wakeLock.acquire();
+       if(timer == null && Config.collectEnergy() && Config.enableFarm())
+       {
+        AntForestNotification.start(activity);
+        timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask()
          {
-          AntForest.checkEnergyRanking(loader);
-         }
-        }, 0, Config.timeInterval());
+          @Override
+          public void run()
+          {
+           AntForest.checkEnergyRanking(loader);
+           AntFarm.start(loader);
+           AntMember.receivePoint(loader);
+          }
+         }, 0, Config.timeInterval());
+        Log.i(TAG, "timer start. interval=" + Config.timeInterval());
+       }
       }
      }
-    }
-   });
+    });
+   Log.i(TAG, "hook " + ClassMember.onCreate + " successfully");
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "hook " + ClassMember.onCreate + " err:");
+   Log.printStackTrace(TAG, t);
+  }
 
-  XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onDestroy, new XC_MethodHook()
-   {
-    @Override
-    protected void afterHookedMethod(MethodHookParam param) throws Throwable
+  try
+  {
+   XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onDestroy, new XC_MethodHook()
     {
-     if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
-        .equals(param.thisObject.getClass().getCanonicalName()))
+     @Override
+     protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
-      Activity activity = (Activity) param.thisObject;
-      if(wakeLock != null)
+      if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
+         .equals(param.thisObject.getClass().getCanonicalName()))
       {
-       wakeLock.release();
-       wakeLock = null;
-      }
-      if(timer != null)
-      {
-       AntForestNotification.setContentText("主界面被销毁");
-       Log.recordLog("主界面被销毁", "");
-       timer.cancel();
-       timer = null;
+       Activity activity = (Activity) param.thisObject;
+       Log.i(TAG, "onDestroy loginActivity=" + activity);
+       if(wakeLock != null)
+       {
+        wakeLock.release();
+        wakeLock = null;
+       }
+       if(timer != null)
+       {
+        AntForestNotification.setContentText("支付宝主界面被销毁");
+        Log.recordLog("支付宝主界面被销毁", "");
+        Log.i(TAG, "timer cancel");
+        timer.cancel();
+        timer = null;
+       }
       }
      }
-    }
-   });
+    });
+   Log.i(TAG, "hook " + ClassMember.onDestroy + " successfully");
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "hook " + ClassMember.onDestroy + " err:");
+   Log.printStackTrace(TAG, t);
+  }
  }
 
  private void hookRpcCall(final ClassLoader loader)
@@ -266,25 +295,25 @@ public class XposedHook implements IXposedHookLoadPackage
    String response = RpcCall.getResponse(resp);
    Log.i(TAG, "response: " + response);
 
-   AntForest.saveUserIdAndName(args0, response);
+//   AntForest.saveUserIdAndName(args0, response);
 
-   if(Config.enableForest())
-    AntForest.start(loader, args0, args1, response);
+//   if(Config.enableForest())
+//    AntForest.start(loader, args0, args1, response);
 
-   if(Config.enableFarm())
-    AntFarm.start(loader, args0, args1, response);
+//   if(Config.enableFarm())
+//    AntFarm.start(loader, args0, args1, response);
 
-   if(AntFarm.isEnterFriendFarm(response))
-   {
-    JSONObject jo = new JSONArray(args1).getJSONObject(0);
-    String userId = jo.getString("userId");
-    if(userId == null || userId.isEmpty())
-     userId = AntFarm.farmId2UserId(jo.getString("farmId"));
-    Log.recordLog("进入〔" + Config.getNameById(userId) + "〕的蚂蚁庄园", "");
-   }
+//   if(AntFarm.isEnterFriendFarm(response))
+//   {
+//    JSONObject jo = new JSONArray(args1).getJSONObject(0);
+//    String userId = jo.getString("userId");
+//    if(userId == null || userId.isEmpty())
+//     userId = AntFarmRpcCall.farmId2UserId(jo.getString("farmId"));
+//    Log.recordLog("进入〔" + Config.getNameById(userId) + "〕的蚂蚁庄园", "");
+//   }
 
-   if(Config.receivePoint())
-    AntMember.receivePoint(loader, args0, args1, response);
+//   if(Config.receivePoint())
+//    AntMember.receivePoint(loader, args0, args1, response);
   }
  }
 

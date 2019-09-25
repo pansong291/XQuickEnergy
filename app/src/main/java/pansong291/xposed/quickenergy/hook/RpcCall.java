@@ -1,8 +1,8 @@
-package pansong291.xposed.quickenergy;
+package pansong291.xposed.quickenergy.hook;
 
 import android.app.Activity;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import pansong291.xposed.quickenergy.util.Log;
 
 public class RpcCall
 {

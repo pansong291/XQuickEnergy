@@ -1,4 +1,4 @@
-package pansong291.xposed.quickenergy;
+package pansong291.xposed.quickenergy.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,17 +11,6 @@ import pansong291.xposed.quickenergy.AntFarm.SendType;
 
 public class Config
 {
- public enum ShowMode
- {
-  DIALOG, TOAST, NONE;
-  public static final CharSequence[] nickNames =
-  {"对话框", "toast气泡", "无"};
-  public CharSequence nickName()
-  {
-   return nickNames[ordinal()];
-  }
- }
-
  public enum RecallAnimalType
  {
   ALWAYS, WHEN_THIEF, WHEN_HUNGRY, NEVER;
@@ -34,18 +23,19 @@ public class Config
  }
 
  private static final String TAG = Config.class.getCanonicalName();
- private static final String
+ public static final String
  /* application */
- jn_immediateEffect = "immediateEffect", jn_showMode = "showMode", jn_recordLog = "recordLog",
- jn_enableForest = "enableForest", jn_enableFarm = "enableFarm",
+ jn_immediateEffect = "immediateEffect", jn_recordLog = "recordLog",
  /* forest */
  jn_collectEnergy = "collectEnergy", jn_ReturnWater30 = "returnWater30", jn_ReturnWater20 = "returnWater20",
  jn_ReturnWater10 = "returnWater10", jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList",
  jn_dontHelpCollectList = "dontHelpCollectList", jn_onTimeCollect = "onTimeCollect", jn_timeInterval = "timeInterval",
+ jn_advanceTime = "advanceTime", jn_collectInterval = "collectInterval", jn_collectTimeout = "collectTimeout",
  jn_receiveForestTaskAward = "receiveForestTaskAward", jn_waterFriendList = "waterFriendList",
  /* farm */
+ jn_enableFarm = "enableFarm",
  jn_rewardFriend = "rewardFriend", jn_sendBackAnimal = "sendBackAnimal", jn_sendType = "sendType",
- jn_sendTypeExcludeList = "sendTypeExcludeList", jn_recallAnimalType = "recallAnimalType", jn_receiveFarmToolReward = "receiveFarmToolReward",
+ jn_dontSendFriendList = "dontSendFriendList", jn_recallAnimalType = "recallAnimalType", jn_receiveFarmToolReward = "receiveFarmToolReward",
  jn_useNewEggTool = "useNewEggTool", jn_harvestProduce = "harvestProduce", jn_donation = "donation",
  jn_answerQuestion = "answerQuestion", jn_receiveFarmTaskAward = "receiveFarmTaskAward", jn_feedAnimal = "feedAnimal",
  jn_useAccelerateTool = "useAccelerateTool", jn_feedFriendAnimalList = "feedFriendAnimalList", jn_notifyFriend = "notifyFriend",
@@ -58,21 +48,22 @@ public class Config
 
  /* application */
  private boolean immediateEffect;
- private ShowMode showMode;
  private boolean recordLog;
  private boolean enableForest;
  private boolean enableFarm;
 
  /* forest */
  private boolean collectEnergy;
+ private int timeInterval;
+ private int advanceTime;
+ private int collectInterval;
+ private int collectTimeout;
  private int returnWater30;
  private int returnWater20;
  private int returnWater10;
  private boolean helpFriendCollect;
  private List<String> dontCollectList;
  private List<String> dontHelpCollectList;
- private boolean onTimeCollect;
- private long timeInterval;
  private boolean receiveForestTaskAward;
  private List<String> waterFriendList;
 
@@ -80,7 +71,7 @@ public class Config
  private boolean rewardFriend;
  private boolean sendBackAnimal;
  private SendType sendType;
- private List<String> sendTypeExcludeList;
+ private List<String> dontSendFriendList;
  private RecallAnimalType recallAnimalType;
  private boolean receiveFarmToolReward;
  private boolean useNewEggTool;
@@ -114,17 +105,6 @@ public class Config
  public static boolean immediateEffect()
  {
   return getConfig().immediateEffect;
- }
-
- public static void setShowMode(int i)
- {
-  getConfig().showMode = ShowMode.values()[i];
-  hasConfigChanged = true;
- }
-
- public static ShowMode showMode()
- {
-  return getConfig().showMode;
  }
 
  public static void setRecordLog(boolean b)
@@ -170,6 +150,50 @@ public class Config
  public static boolean collectEnergy()
  {
   return getConfig().collectEnergy;
+ }
+
+ public static void setTimeInterval(int i)
+ {
+  getConfig().timeInterval = i;
+  hasConfigChanged = true;
+ }
+
+ public static int timeInterval()
+ {
+  return getConfig().timeInterval;
+ }
+
+ public static void setAdvanceTime(int i)
+ {
+  getConfig().advanceTime = i;
+  hasConfigChanged = true;
+ }
+
+ public static int advanceTime()
+ {
+  return getConfig().advanceTime;
+ }
+
+ public static void setCollectInterval(int i)
+ {
+  getConfig().collectInterval = i;
+  hasConfigChanged = true;
+ }
+
+ public static int collectInterval()
+ {
+  return getConfig().collectInterval;
+ }
+
+ public static void setCollectTimeout(int i)
+ {
+  getConfig().collectTimeout = i;
+  hasConfigChanged = true;
+ }
+
+ public static int collectTimeout()
+ {
+  return getConfig().collectTimeout;
  }
 
  public static void setReturnWater30(int i)
@@ -221,41 +245,9 @@ public class Config
   return getConfig().dontCollectList;
  }
 
- public static boolean dontCollect(String id)
- {
-  return getConfig().dontCollectList.contains(id);
- }
-
  public static List<String> getDontHelpCollectList()
  {
   return getConfig().dontHelpCollectList;
- }
-
- public static boolean dontHelpCollect(String id)
- {
-  return getConfig().dontHelpCollectList.contains(id);
- }
-
- public static void setOnTimeCollect(boolean b)
- {
-  getConfig().onTimeCollect = b;
-  hasConfigChanged = true;
- }
-
- public static boolean onTimeCollect()
- {
-  return getConfig().onTimeCollect;
- }
-
- public static void setTimeInterval(long l)
- {
-  getConfig().timeInterval = l;
-  hasConfigChanged = true;
- }
-
- public static long timeInterval()
- {
-  return getConfig().timeInterval;
  }
 
  public static void setReceiveForestTaskAward(boolean b)
@@ -297,24 +289,20 @@ public class Config
   return getConfig().sendBackAnimal;
  }
 
- public static List<String> getSendTypeExcludeList()
- {
-  return getConfig().sendTypeExcludeList;
- }
-
  public static void setSendType(int i)
  {
   getConfig().sendType = SendType.values()[i];
   hasConfigChanged = true;
  }
 
- public static SendType sendType(String id)
+ public static SendType sendType()
  {
-  if(getConfig().sendTypeExcludeList.contains(id))
-  {
-   return getConfig().sendType.another();
-  }
   return getConfig().sendType;
+ }
+
+ public static List<String> getDontSendFriendList()
+ {
+  return getConfig().dontSendFriendList;
  }
 
  public static void setRecallAnimalType(int i)
@@ -421,16 +409,6 @@ public class Config
   return getConfig().feedFriendAnimalList;
  }
 
- public static boolean feedFriendAnimal()
- {
-  return getConfig().feedFriendAnimalList.size() > 0;
- }
-
- public static boolean feedFriendAnimal(String id)
- {
-  return getConfig().feedFriendAnimalList.contains(id);
- }
-
  public static void setNotifyFriend(boolean b)
  {
   getConfig().notifyFriend = b;
@@ -445,11 +423,6 @@ public class Config
  public static List<String> getDontNotifyFriendList()
  {
   return getConfig().dontNotifyFriendList;
- }
-
- public static boolean dontNotifyFriend(String id)
- {
-  return getConfig().dontNotifyFriendList.contains(id);
  }
 
  /* member */
@@ -560,7 +533,6 @@ public class Config
    }
    return ids;
   }
-  Log.i(TAG, "没有未知id");
   return null;
  }
 
@@ -597,27 +569,28 @@ public class Config
   c.reInit = true;
 
   c.immediateEffect = true;
-  c.showMode = ShowMode.DIALOG;
   c.recordLog = true;
   c.enableForest = true;
   c.enableFarm = true;
 
   c.collectEnergy = true;
+  c.timeInterval = 120_000;
+  c.advanceTime = 500;
+  c.collectInterval = 100;
+  c.collectTimeout = 2_000;
   c.returnWater30 = 0;
   c.returnWater20 = 0;
   c.returnWater10 = 0;
   c.helpFriendCollect = true;
   if(c.dontCollectList == null) c.dontCollectList = new ArrayList<>();
   if(c.dontHelpCollectList == null) c.dontHelpCollectList = new ArrayList<>();
-  c.onTimeCollect = true;
-  c.timeInterval = 120_000;
   c.receiveForestTaskAward = true;
   if(c.waterFriendList == null) c.waterFriendList = new ArrayList<>();
 
   c.rewardFriend = true;
   c.sendBackAnimal = true;
   c.sendType = SendType.HIT;
-  if(c.sendTypeExcludeList == null) c.sendTypeExcludeList = new ArrayList<>();
+  if(c.dontSendFriendList == null) c.dontSendFriendList = new ArrayList<>();
   c.recallAnimalType = RecallAnimalType.ALWAYS;
   c.receiveFarmToolReward = true;
   c.useNewEggTool = true;
@@ -655,29 +628,11 @@ public class Config
     config.immediateEffect = true;
    Log.i(TAG, jn_immediateEffect + ":" + config.immediateEffect);
 
-   if(jo.has(jn_showMode))
-    config.showMode = ShowMode.valueOf(jo.getString(jn_showMode));
-   else
-    config.showMode = ShowMode.DIALOG;
-   Log.i(TAG, jn_showMode + ":" + config.showMode.name());
-
    if(jo.has(jn_recordLog))
     config.recordLog = jo.getBoolean(jn_recordLog);
    else
     config.recordLog = true;
    Log.i(TAG, jn_recordLog + ":" + config.recordLog);
-
-   if(jo.has(jn_enableForest))
-    config.enableForest = jo.getBoolean(jn_enableForest);
-   else
-    config.enableForest = true;
-   Log.i(TAG, jn_enableForest + ":" + config.enableForest);
-
-   if(jo.has(jn_enableFarm))
-    config.enableFarm = jo.getBoolean(jn_enableFarm);
-   else
-    config.enableFarm = true;
-   Log.i(TAG, jn_enableFarm + ":" + config.enableFarm);
 
    /* forest */
    if(jo.has(jn_collectEnergy))
@@ -685,6 +640,30 @@ public class Config
    else
     config.collectEnergy = true;
    Log.i(TAG, jn_collectEnergy + ":" + config.collectEnergy);
+
+   if(jo.has(jn_timeInterval))
+    config.timeInterval = jo.getInt(jn_timeInterval);
+   else
+    config.timeInterval = 120_000;
+   Log.i(TAG, jn_timeInterval + ":" + config.timeInterval);
+
+   if(jo.has(jn_advanceTime))
+    config.advanceTime = jo.getInt(jn_advanceTime);
+   else
+    config.advanceTime = 500;
+   Log.i(TAG, jn_advanceTime + ":" + config.advanceTime);
+
+   if(jo.has(jn_collectInterval))
+    config.collectInterval = jo.getInt(jn_collectInterval);
+   else
+    config.collectInterval = 100;
+   Log.i(TAG, jn_collectInterval + ":" + config.collectInterval);
+
+   if(jo.has(jn_collectTimeout))
+    config.collectTimeout = jo.getInt(jn_collectTimeout);
+   else
+    config.collectTimeout = 2_000;
+   Log.i(TAG, jn_collectTimeout + ":" + config.collectTimeout);
 
    if(jo.has(jn_ReturnWater30))
     config.returnWater30 = jo.getInt(jn_ReturnWater30);
@@ -734,18 +713,6 @@ public class Config
     }
    }
 
-   if(jo.has(jn_onTimeCollect))
-    config.onTimeCollect = jo.getBoolean(jn_onTimeCollect);
-   else
-    config.onTimeCollect = true;
-   Log.i(TAG, jn_onTimeCollect + ":" + config.onTimeCollect);
-
-   if(jo.has(jn_timeInterval))
-    config.timeInterval = jo.getLong(jn_timeInterval);
-   else
-    config.timeInterval = 120_000;
-   Log.i(TAG, jn_timeInterval + ":" + config.timeInterval);
-
    if(jo.has(jn_receiveForestTaskAward))
     config.receiveForestTaskAward = jo.getBoolean(jn_receiveForestTaskAward);
    else
@@ -765,6 +732,12 @@ public class Config
    }
 
    /* farm */
+   if(jo.has(jn_enableFarm))
+    config.enableFarm = jo.getBoolean(jn_enableFarm);
+   else
+    config.enableFarm = true;
+   Log.i(TAG, jn_enableFarm + ":" + config.enableFarm);
+
    if(jo.has(jn_rewardFriend))
     config.rewardFriend = jo.getBoolean(jn_rewardFriend);
    else
@@ -783,15 +756,15 @@ public class Config
     config.sendType = SendType.HIT;
    Log.i(TAG, jn_sendType + ":" + config.sendType.name());
 
-   config.sendTypeExcludeList = new ArrayList<>();
-   Log.i(TAG, jn_sendTypeExcludeList + ":[");
-   if(jo.has(jn_sendTypeExcludeList))
+   config.dontSendFriendList = new ArrayList<>();
+   Log.i(TAG, jn_dontSendFriendList + ":[");
+   if(jo.has(jn_dontSendFriendList))
    {
-    ja = jo.getJSONArray(jn_sendTypeExcludeList);
+    ja = jo.getJSONArray(jn_dontSendFriendList);
     for(int i = 0; i < ja.length(); i++)
     {
-     config.sendTypeExcludeList.add(ja.getString(i));
-     Log.i(TAG, "  " + config.sendTypeExcludeList.get(i) + ",");
+     config.dontSendFriendList.add(ja.getString(i));
+     Log.i(TAG, "  " + config.dontSendFriendList.get(i) + ",");
     }
    }
 
@@ -914,16 +887,18 @@ public class Config
 
    jo.put(jn_immediateEffect, config.immediateEffect);
 
-   jo.put(jn_showMode, config.showMode.name());
-
    jo.put(jn_recordLog, config.recordLog);
-
-   jo.put(jn_enableForest, config.enableForest);
-
-   jo.put(jn_enableFarm, config.enableFarm);
 
    /* forest */
    jo.put(jn_collectEnergy, config.collectEnergy);
+
+   jo.put(jn_timeInterval, config.timeInterval);
+
+   jo.put(jn_advanceTime, config.advanceTime);
+
+   jo.put(jn_collectInterval, config.collectInterval);
+
+   jo.put(jn_collectTimeout, config.collectTimeout);
 
    jo.put(jn_ReturnWater30, config.returnWater30);
 
@@ -947,10 +922,6 @@ public class Config
    }
    jo.put(jn_dontHelpCollectList, ja);
 
-   jo.put(jn_onTimeCollect, config.onTimeCollect);
-
-   jo.put(jn_timeInterval, config.timeInterval);
-
    jo.put(jn_receiveForestTaskAward, config.receiveForestTaskAward);
 
    ja = new JSONArray();
@@ -961,6 +932,8 @@ public class Config
    jo.put(jn_waterFriendList, ja);
 
    /* farm */
+   jo.put(jn_enableFarm, config.enableFarm);
+
    jo.put(jn_rewardFriend, config.rewardFriend);
 
    jo.put(jn_sendBackAnimal, config.sendBackAnimal);
@@ -968,11 +941,11 @@ public class Config
    jo.put(jn_sendType, config.sendType.name());
 
    ja = new JSONArray();
-   for(String s: config.sendTypeExcludeList)
+   for(String s: config.dontSendFriendList)
    {
     ja.put(s);
    }
-   jo.put(jn_sendTypeExcludeList, ja);
+   jo.put(jn_dontSendFriendList, ja);
 
    jo.put(jn_recallAnimalType, config.recallAnimalType);
 

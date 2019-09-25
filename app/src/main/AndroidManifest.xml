@@ -16,7 +16,7 @@
 
         <meta-data
             android:name="xposeddescription"
-            android:value="蚂蚁森林快速收取能量\n（适配支付宝 10.1.68.7434）"/>
+            android:value="蚂蚁森林快速收取能量"/>
 
         <meta-data
             android:name="xposedminversion"

@@ -1,4 +1,4 @@
-package pansong291.xposed.quickenergy;
+package pansong291.xposed.quickenergy.util;
 
 import org.json.JSONObject;
 
@@ -32,11 +32,26 @@ public class Statistics
  private static final String TAG = Statistics.class.getCanonicalName();
  private static final String
  jn_year = "year", jn_month = "month", jn_day = "day",
- jn_collected = "collected", jn_helped = "helped", jn_watered = "watered";
+ jn_collected = "collected", jn_helped = "helped", jn_watered = "watered",
+ jn_questionHint = "questionHint";
 
  private TimeStatistics year;
  private TimeStatistics month;
  private TimeStatistics day;
+
+ // forest
+ private int receiveForestTaskAward = 0;
+ private int waterFriendList = 0;
+
+ // farm
+ private int receiveFarmToolReward = 0;
+ private int useNewEggTool = 0;
+ private int answerQuestion = 0;
+ private String questionHint;
+
+ // member
+ private int receivePoint = 0;
+
  private static Statistics statistics;
 
  public static void addData(DataType dt, int i)
@@ -77,7 +92,7 @@ public class Statistics
     getStatistics().year.watered += i;
     break;
   }
-  FileUtils.write2File(statistics2Json(getStatistics()), FileUtils.getStatisticsFile());
+  save();
  }
 
  public static int getData(TimeType tt, DataType dt)
@@ -101,7 +116,7 @@ public class Statistics
    {
     case TIME:
      data = ts.time;
-    break;
+     break;
     case COLLECTED:
      data = ts.collected;
      break;
@@ -130,7 +145,77 @@ public class Statistics
   sb.append(getData(TimeType.DAY, DataType.COLLECTED));
   sb.append("，  帮" + getData(TimeType.DAY, DataType.HELPED));
   sb.append("，  浇" + getData(TimeType.DAY, DataType.WATERED));
+  if(getStatistics().questionHint != null && !getStatistics().questionHint.isEmpty())
+  {
+   sb.append("\n今日答题提示：" + getStatistics().questionHint);
+  }
   return sb.toString();
+ }
+
+ public static boolean isReceiveForestTaskAwardToday()
+ {
+  return getStatistics().receiveForestTaskAward >= getStatistics().day.time;
+ }
+
+ public static void receiveForestTaskAwardToday()
+ {
+  getStatistics().receiveForestTaskAward = getStatistics().day.time;
+ }
+
+ public static boolean isWaterFriendListToday()
+ {
+  return getStatistics().waterFriendList >= getStatistics().day.time;
+ }
+
+ public static void waterFriendListToday()
+ {
+  getStatistics().waterFriendList = getStatistics().day.time;
+ }
+
+ public static boolean isReceiveFarmToolRewardToday()
+ {
+  return getStatistics().receiveFarmToolReward >= getStatistics().day.time;
+ }
+
+ public static void receiveFarmToolRewardToday()
+ {
+  getStatistics().receiveFarmToolReward = getStatistics().day.time;
+ }
+
+ public static boolean isUseNewEggToolToday()
+ {
+  return getStatistics().useNewEggTool >= getStatistics().day.time;
+ }
+
+ public static void useNewEggToolToday()
+ {
+  getStatistics().useNewEggTool = getStatistics().day.time;
+ }
+
+ public static boolean isAnswerQuestionToday()
+ {
+  return getStatistics().answerQuestion >= getStatistics().day.time;
+ }
+
+ public static void answerQuestionToday()
+ {
+  getStatistics().answerQuestion = getStatistics().day.time;
+ }
+
+ public static void setQuestionHint(String s)
+ {
+  getStatistics().questionHint = s;
+  save();
+ }
+
+ public static boolean isReceivePointToday()
+ {
+  return getStatistics().receivePoint >= getStatistics().day.time;
+ }
+
+ public static void receivePointToday()
+ {
+  getStatistics().receivePoint = getStatistics().day.time;
  }
 
  private static Statistics getStatistics()
@@ -197,6 +282,34 @@ public class Statistics
    statis.day.watered = joo.getInt(jn_watered);
    Log.i(TAG, "  " + jn_watered + ":" + statis.day.watered);
 
+   if(jo.has(Config.jn_receiveForestTaskAward))
+    statis.receiveForestTaskAward = jo.getInt(Config.jn_receiveForestTaskAward);
+   Log.i(TAG, Config.jn_receiveForestTaskAward + ":" + statis.receiveForestTaskAward);
+
+   if(jo.has(Config.jn_waterFriendList))
+    statis.waterFriendList = jo.getInt(Config.jn_waterFriendList);
+   Log.i(TAG, Config.jn_waterFriendList + ":" + statis.waterFriendList);
+
+   if(jo.has(Config.jn_receiveFarmToolReward))
+    statis.receiveFarmToolReward = jo.getInt(Config.jn_receiveFarmToolReward);
+   Log.i(TAG, Config.jn_receiveFarmToolReward + ":" + statis.receiveFarmToolReward);
+
+   if(jo.has(Config.jn_useNewEggTool))
+    statis.useNewEggTool = jo.getInt(Config.jn_useNewEggTool);
+   Log.i(TAG, Config.jn_useNewEggTool + ":" + statis.useNewEggTool);
+
+   if(jo.has(Config.jn_answerQuestion))
+    statis.answerQuestion = jo.getInt(Config.jn_answerQuestion);
+   Log.i(TAG, Config.jn_answerQuestion + ":" + statis.answerQuestion);
+
+   if(jo.has(jn_questionHint))
+    statis.questionHint = jo.getString(jn_questionHint);
+   Log.i(TAG, jn_questionHint + ":" + statis.questionHint);
+
+   if(jo.has(Config.jn_receivePoint))
+    statis.receivePoint = jo.getInt(Config.jn_receivePoint);
+   Log.i(TAG, Config.jn_receivePoint + ":" + statis.receivePoint);
+
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);
@@ -216,7 +329,7 @@ public class Statistics
   return statis;
  }
 
- public static String statistics2Json(Statistics statis)
+ private static String statistics2Json(Statistics statis)
  {
   JSONObject jo = new JSONObject();
   try
@@ -243,11 +356,24 @@ public class Statistics
    joo.put(jn_watered, statis.day.watered);
    jo.put(jn_day, joo);
 
+   jo.put(Config.jn_receiveForestTaskAward, statis.receiveForestTaskAward);
+   jo.put(Config.jn_waterFriendList, statis.waterFriendList);
+   jo.put(Config.jn_receiveFarmToolReward, statis.receiveFarmToolReward);
+   jo.put(Config.jn_useNewEggTool, statis.useNewEggTool);
+   jo.put(Config.jn_answerQuestion, statis.answerQuestion);
+   if(statis.questionHint != null)
+    jo.put(jn_questionHint, statis.questionHint);
+   jo.put(Config.jn_receivePoint, statis.receivePoint);
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);
   }
   return Config.formatJson(jo);
+ }
+
+ private static boolean save()
+ {
+  return FileUtils.write2File(statistics2Json(getStatistics()), FileUtils.getStatisticsFile());
  }
 
 }
