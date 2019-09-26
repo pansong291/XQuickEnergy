@@ -453,6 +453,7 @@ public class Config
 
  public static void putIdMap(String key, String value)
  {
+  if(key == null || key.isEmpty()) return;
   if(getIdMap().containsKey(key))
   {
    if(!getIdMap().get(key).equals(value))
@@ -503,6 +504,7 @@ public class Config
 
  public static String getNameById(String id)
  {
+  if(id == null || id.isEmpty()) return id;
   if(getIdMap().containsKey(id))
   {
    String n = getIdMap().get(id).toString();
