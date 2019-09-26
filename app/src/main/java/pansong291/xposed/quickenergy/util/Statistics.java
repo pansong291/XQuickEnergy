@@ -193,6 +193,8 @@ public class Statistics
 
  public static boolean isReceivePointToday()
  {
+  int hour = Integer.parseInt(Log.getFormatDateTime().split(":")[1]);
+  if(hour < Config.receivePointTime()) return true;
   return getStatistics().receivePoint >= getStatistics().day.time;
  }
 

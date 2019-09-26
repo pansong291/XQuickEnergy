@@ -388,6 +388,18 @@
 			android:minHeight="50dp"
 			android:id="@+id/cb_receivePoint"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="积分领取时（24小时制）"
+            android:onClick="onClick"
+            android:minHeight="50dp"
+            android:gravity="left|center_vertical"
+            android:background="@drawable/button"
+            android:id="@+id/btn_receivePointTime"
+            android:paddingLeft="8dp"/>
+
 	</LinearLayout>
 
 	<LinearLayout

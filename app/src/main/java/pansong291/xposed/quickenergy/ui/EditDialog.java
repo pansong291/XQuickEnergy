@@ -14,7 +14,7 @@ public class EditDialog
  private static EditText edt;
  public enum EditMode
  { TIME_INTERVAL, ADVANCE_TIME, COLLECT_INTERVAL, COLLECT_TIMEOUT,
-   RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10 }
+  RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10, RECEIVE_POINT_TIME }
  private static EditMode mode;
 
  public static void showEditDialog(Context c, CharSequence title, EditMode em)
@@ -97,6 +97,11 @@ public class EditDialog
          if(i >= 0)
           Config.setReturnWater10(i);
          break;
+
+        case RECEIVE_POINT_TIME:
+         if(i >= 0 && i < 24)
+          Config.setReceivePointTime(i);
+         break;
        }
       }catch(Throwable t)
       {}
@@ -122,7 +127,7 @@ public class EditDialog
    case COLLECT_TIMEOUT:
     str = String.valueOf(Config.collectTimeout() / 1_000);
     break;
-    
+
    case RETURN_WATER_30:
     str = String.valueOf(Config.returnWater30());
     break;
@@ -133,6 +138,10 @@ public class EditDialog
 
    case RETURN_WATER_10:
     str = String.valueOf(Config.returnWater10());
+    break;
+
+   case RECEIVE_POINT_TIME:
+    str = String.valueOf(Config.receivePointTime());
     break;
   }
   edt.setText(str);

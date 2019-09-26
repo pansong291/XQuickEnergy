@@ -41,7 +41,7 @@ public class Config
  jn_useAccelerateTool = "useAccelerateTool", jn_feedFriendAnimalList = "feedFriendAnimalList", jn_notifyFriend = "notifyFriend",
  jn_dontNotifyFriendList = "dontNotifyFriendList",
  /* member */
- jn_receivePoint = "receivePoint";
+ jn_receivePoint = "receivePoint", jn_receivePointTime = "receivePointTime";
 
  public static boolean shouldReloadConfig;
  public static boolean hasConfigChanged;
@@ -87,6 +87,7 @@ public class Config
 
  /* member */
  private boolean receivePoint;
+ private int receivePointTime;
 
  /* other */
  private boolean reInit;
@@ -437,6 +438,17 @@ public class Config
   return getConfig().receivePoint;
  }
 
+ public static void setReceivePointTime(int i)
+ {
+  getConfig().receivePointTime = i;
+  hasConfigChanged = true;
+ }
+
+ public static int receivePointTime()
+ {
+  return getConfig().receivePointTime;
+ }
+
  /* other */
  private static Config getConfig()
  {
@@ -607,6 +619,7 @@ public class Config
   if(c.dontNotifyFriendList == null) c.dontNotifyFriendList = new ArrayList<>();
 
   c.receivePoint = true;
+  c.receivePointTime = 23;
   return c;
  }
 
@@ -861,6 +874,12 @@ public class Config
     config.receivePoint = true;
    Log.i(TAG, jn_receivePoint + ":" + config.receivePoint);
 
+   if(jo.has(jn_receivePointTime))
+    config.receivePointTime = jo.getInt(jn_receivePointTime);
+   else
+    config.receivePointTime = 23;
+   Log.i(TAG, jn_receivePointTime + ":" + config.receivePointTime);
+
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);
@@ -985,6 +1004,8 @@ public class Config
 
    /* member */
    jo.put(jn_receivePoint, config.receivePoint);
+
+   jo.put(jn_receivePointTime, config.receivePointTime);
 
   }catch(Throwable t)
   {

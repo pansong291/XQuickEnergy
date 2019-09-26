@@ -225,6 +225,10 @@ public class MainActivity extends Activity
     Config.setReceivePoint(cb.isChecked());
     break;
 
+   case R.id.btn_receivePointTime:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.RECEIVE_POINT_TIME);
+    break;
+
    case R.id.btn_help:
     Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/pansong291/XQuickEnergy/wiki"));
     startActivity(it);
