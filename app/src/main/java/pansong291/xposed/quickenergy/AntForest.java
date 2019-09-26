@@ -33,10 +33,6 @@ public class AntForest
   }
  }
 
- public enum ThreadStatus
- { START, END }
- private static int threadCount = 0;
- private static boolean hasMore = true;
  private static boolean checkingIds = false;
  private static long serverTime = -1;
  private static long offsetTime = -1;
@@ -44,58 +40,45 @@ public class AntForest
 
  private static void queryEnergyRanking(ClassLoader loader, String startPoint)
  {
-  new Thread()
+  boolean hasMore = false;
+  try
   {
-   ClassLoader loader;
-   String startPoint;
-
-   public Thread setData(ClassLoader cl, String sp)
+   String s;
+   JSONObject jo;
+   do
    {
-    loader = cl;startPoint = sp;
-    return this;
-   }
-
-   @Override
-   public void run()
-   {
-    updateThreadCount(ThreadStatus.START, loader);
-    try
+    s = AntForestRpcCall.rpcCall_queryEnergyRanking(loader, startPoint);
+    jo = new JSONObject(s);
+    if(jo.getString("resultCode").equals("SUCCESS"))
     {
-     String s = AntForestRpcCall.rpcCall_queryEnergyRanking(loader, startPoint);
-     JSONObject jo = new JSONObject(s);
-     if(jo.getString("resultCode").equals("SUCCESS"))
+     hasMore = jo.getBoolean("hasMore");
+     startPoint = jo.getString("nextStartPoint");
+     JSONArray jaFriendRanking = jo.getJSONArray("friendRanking");
+     for(int i = 0; i < jaFriendRanking.length(); i++)
      {
-      hasMore = jo.getBoolean("hasMore");
-      if(hasMore)
-       queryEnergyRanking(loader, jo.getString("nextStartPoint"));
-      JSONArray jaFriendRanking = jo.getJSONArray("friendRanking");
-      for(int i = 0; i < jaFriendRanking.length(); i++)
+      jo = jaFriendRanking.getJSONObject(i);
+      boolean optBoolean = jo.getBoolean("canCollectEnergy")
+       || jo.getBoolean("canHelpCollect") || jo.getLong("canCollectLaterTime") > 0;
+      String userId = jo.getString("userId");
+      if(optBoolean && !userId.equals(selfId))
       {
-       jo = jaFriendRanking.getJSONObject(i);
-       boolean optBoolean = jo.getBoolean("canCollectEnergy")
-        || jo.getBoolean("canHelpCollect") || jo.getLong("canCollectLaterTime") > 0;
-       String userId = jo.getString("userId");
-       if(optBoolean && !userId.equals(selfId))
-       {
-        canCollectEnergy(loader, userId);
-       }else
-       {
-        Config.getNameById(userId);
-       }
+       canCollectEnergy(loader, userId);
+      }else
+      {
+       Config.getNameById(userId);
       }
-     }else
-     {
-      Log.recordLog(jo.getString("resultDesc"), s);
      }
-    }catch(Throwable t)
+    }else
     {
-     Log.i(TAG, "queryEnergyRanking err:");
-     Log.printStackTrace(TAG, t);
-     hasMore = false;
+     Log.recordLog(jo.getString("resultDesc"), s);
     }
-    updateThreadCount(ThreadStatus.END, loader);
-   }
-  }.setData(loader, startPoint).start();
+   }while(hasMore);
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "queryEnergyRanking err:");
+   Log.printStackTrace(TAG, t);
+  }
+  onForestEnd(loader);
  }
 
  private static void canCollectSelfEnergy(ClassLoader loader, String resp)
@@ -483,36 +466,15 @@ public class AntForest
   }
  }
 
- private static synchronized void updateThreadCount(ThreadStatus ts, ClassLoader loader)
- {
-  switch(ts)
-  {
-   case START:
-    threadCount++;
-    Log.i(TAG, "新线程开始" + threadCount);
-    break;
-
-   case END:
-    threadCount--;
-    Log.i(TAG, "线程结束" + threadCount);
-    if(!hasMore && threadCount == 0)
-    {
-     hasMore = true;
-     Log.recordLog(
-      "收【" + collectedEnergy + "克】，帮【"
-      + helpCollectedEnergy + "克】，"
-      + collectTaskCount + "个蹲点任务", "");
-     Config.saveIdMap();
-     collectedEnergy = 0;
-     helpCollectedEnergy = 0;
-     onForestEnd(loader);
-    }
-    break;
-  }
- }
-
  private static void onForestEnd(ClassLoader loader)
  {
+  Log.recordLog(
+   "收【" + collectedEnergy + "克】，帮【"
+   + helpCollectedEnergy + "克】，"
+   + collectTaskCount + "个蹲点任务", "");
+  Config.saveIdMap();
+  collectedEnergy = 0;
+  helpCollectedEnergy = 0;
   if(Config.collectEnergy())
   {
    if(RpcCall.loginActivity != null)

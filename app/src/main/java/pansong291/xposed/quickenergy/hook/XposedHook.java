@@ -22,6 +22,7 @@ import pansong291.xposed.quickenergy.hook.ClassMember;
 import pansong291.xposed.quickenergy.ui.MainActivity;
 import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.util.Log;
+import pansong291.xposed.quickenergy.util.Statistics;
 
 public class XposedHook implements IXposedHookLoadPackage
 {
@@ -111,6 +112,7 @@ public class XposedHook implements IXposedHookLoadPackage
           @Override
           public void run()
           {
+           Statistics.resetToday();
            AntForest.checkEnergyRanking(loader);
            AntFarm.start(loader);
            AntMember.receivePoint(loader);

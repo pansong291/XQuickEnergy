@@ -56,24 +56,7 @@ public class Statistics
 
  public static void addData(DataType dt, int i)
  {
-  String[] dateStr = Log.getFormatDate().split("-");
-  int ye = Integer.parseInt(dateStr[0]);
-  int mo = Integer.parseInt(dateStr[1]);
-  int da = Integer.parseInt(dateStr[2]);
-
-  if(ye > getStatistics().year.time)
-  {
-   getStatistics().year.reset(ye);
-   getStatistics().month.reset(mo);
-   getStatistics().day.reset(da);
-  }else if(mo > getStatistics().month.time)
-  {
-   getStatistics().month.reset(mo);
-   getStatistics().day.reset(da);
-  }else if(da > getStatistics().day.time)
-  {
-   getStatistics().day.reset(da);
-  }
+  resetToday();
   switch(dt)
   {
    case COLLECTED:
@@ -228,6 +211,28 @@ public class Statistics
    statistics = json2Statistics(statJson);
   }
   return statistics;
+ }
+
+ public static void resetToday()
+ {
+  String[] dateStr = Log.getFormatDate().split("-");
+  int ye = Integer.parseInt(dateStr[0]);
+  int mo = Integer.parseInt(dateStr[1]);
+  int da = Integer.parseInt(dateStr[2]);
+
+  if(ye > getStatistics().year.time)
+  {
+   getStatistics().year.reset(ye);
+   getStatistics().month.reset(mo);
+   getStatistics().day.reset(da);
+  }else if(mo > getStatistics().month.time)
+  {
+   getStatistics().month.reset(mo);
+   getStatistics().day.reset(da);
+  }else if(da > getStatistics().day.time)
+  {
+   getStatistics().day.reset(da);
+  }
  }
 
  private static Statistics defInit()
