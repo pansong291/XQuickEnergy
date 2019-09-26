@@ -1,5 +1,6 @@
 package pansong291.xposed.quickenergy;
 
+import android.os.Handler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
@@ -8,8 +9,8 @@ import pansong291.xposed.quickenergy.hook.AntForestRpcCall;
 import pansong291.xposed.quickenergy.hook.RpcCall;
 import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.util.Log;
-import pansong291.xposed.quickenergy.util.Statistics;
 import pansong291.xposed.quickenergy.util.RandomUtils;
+import pansong291.xposed.quickenergy.util.Statistics;
 
 public class AntForest
 {
@@ -34,6 +35,7 @@ public class AntForest
  }
 
  private static boolean checkingIds = false;
+ private static Handler handler;
  private static long serverTime = -1;
  private static long offsetTime = -1;
  private static long laterTime = -1;
@@ -455,7 +457,7 @@ public class AntForest
   }
  }
 
- private static synchronized void setLaterTime(long time)
+ private static void setLaterTime(long time)
  {
   Log.i(TAG, "能量成熟时间：" + time);
   if(time > serverTime && serverTime > 0
@@ -585,12 +587,13 @@ public class AntForest
  {
   BubbleTimerTask btt = new BubbleTimerTask(loader, userName, userId, bizNo, bubbleId, produceTime);
   long delay = btt.getDelayTime();
-  btt.start();
+  if(handler == null) handler = new Handler();
+  handler.postDelayed(btt, delay);
   collectTaskCount++;
   Log.recordLog(delay / 1000 + "秒后尝试收取能量", "");
  }
 
- public static class BubbleTimerTask extends Thread
+ public static class BubbleTimerTask implements Runnable
  {
   ClassLoader loader;
   String userName;
@@ -621,7 +624,6 @@ public class AntForest
   {
    try
    {
-    sleep(sleep);
     Log.recordLog("蹲点收取开始", "");
     collectTaskCount--;
     long time = System.currentTimeMillis();
@@ -630,7 +632,7 @@ public class AntForest
     {
      collected = collectEnergy(loader, userId, bubbleId, userName, bizNo);
      if(collected > 0) break;
-     sleep(Config.collectInterval());
+     Thread.sleep(Config.collectInterval());
     }
    }catch(Throwable t)
    {

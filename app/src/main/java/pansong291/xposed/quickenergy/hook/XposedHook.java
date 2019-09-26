@@ -2,6 +2,7 @@ package pansong291.xposed.quickenergy.hook;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -9,15 +10,10 @@ import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm;
 import pansong291.xposed.quickenergy.AntForest;
 import pansong291.xposed.quickenergy.AntForestNotification;
 import pansong291.xposed.quickenergy.AntMember;
-import pansong291.xposed.quickenergy.hook.AntFarmRpcCall;
 import pansong291.xposed.quickenergy.hook.ClassMember;
 import pansong291.xposed.quickenergy.ui.MainActivity;
 import pansong291.xposed.quickenergy.util.Config;
@@ -28,7 +24,8 @@ public class XposedHook implements IXposedHookLoadPackage
 {
  private static final String TAG = XposedHook.class.getCanonicalName();
  private static PowerManager.WakeLock wakeLock;
- private static Timer timer;
+ private static Handler handler;
+ private static Runnable runnable;
 
  @Override
  public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
@@ -103,22 +100,25 @@ public class XposedHook implements IXposedHookLoadPackage
        PowerManager pm = (PowerManager) activity.getSystemService(activity.POWER_SERVICE);
        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, activity.getClass().getName());
        wakeLock.acquire();
-       if(timer == null && Config.collectEnergy() && Config.enableFarm())
+       if(handler == null) handler = new Handler();
+       if(runnable == null) runnable = new Runnable()
+        {
+         @Override
+         public void run()
+         {
+          Statistics.resetToday();
+          AntForest.checkEnergyRanking(loader);
+          AntFarm.start(loader);
+          AntMember.receivePoint(loader);
+          if(Config.collectEnergy() || Config.enableFarm())
+           handler.postDelayed(this, Config.timeInterval());
+         }
+        };
+       if(Config.collectEnergy() || Config.enableFarm())
        {
         AntForestNotification.start(activity);
-        timer = new Timer(true);
-        timer.scheduleAtFixedRate(new TimerTask()
-         {
-          @Override
-          public void run()
-          {
-           Statistics.resetToday();
-           AntForest.checkEnergyRanking(loader);
-           AntFarm.start(loader);
-           AntMember.receivePoint(loader);
-          }
-         }, 0, Config.timeInterval());
-        Log.i(TAG, "timer start. interval=" + Config.timeInterval());
+        handler.post(runnable);
+        Log.i(TAG, "task start. interval=" + Config.timeInterval());
        }
       }
      }
@@ -147,14 +147,8 @@ public class XposedHook implements IXposedHookLoadPackage
         wakeLock.release();
         wakeLock = null;
        }
-       if(timer != null)
-       {
-        AntForestNotification.setContentText("支付宝主界面被销毁");
-        Log.recordLog("支付宝主界面被销毁", "");
-        Log.i(TAG, "timer cancel");
-        timer.cancel();
-        timer = null;
-       }
+       AntForestNotification.setContentText("支付宝主界面被销毁");
+       Log.recordLog("支付宝主界面被销毁", "");
       }
      }
     });

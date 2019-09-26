@@ -61,10 +61,7 @@ public class EditDialog
        {
         case TIME_INTERVAL:
          if(i > 0)
-         {
-          Toast.makeText(context, "需要重启支付宝生效", 0).show();
           Config.setTimeInterval(i * 60_000);
-         }
          break;
 
         case ADVANCE_TIME:
