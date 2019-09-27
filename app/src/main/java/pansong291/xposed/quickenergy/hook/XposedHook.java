@@ -1,7 +1,7 @@
 package pansong291.xposed.quickenergy.hook;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.app.Service;
 import android.os.Handler;
 import android.os.PowerManager;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -46,7 +46,7 @@ public class XposedHook implements IXposedHookLoadPackage
   {
    Log.i(TAG, lpparam.packageName);
    //hookSecurity(lpparam);
-   hookLoginActivity(lpparam.classLoader);
+   hookLauncherService(lpparam.classLoader);
    hookRpcCall(lpparam.classLoader);
   }
  }
@@ -82,44 +82,47 @@ public class XposedHook implements IXposedHookLoadPackage
   }
  }
 
- private void hookLoginActivity(final ClassLoader loader)
+ private void hookLauncherService(final ClassLoader loader)
  {
   try
   {
-   XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onCreate, Bundle.class, new XC_MethodHook()
+   XposedHelpers.findAndHookMethod(ClassMember.com_alipay_android_launcher_service_LauncherService, loader, ClassMember.onCreate, new XC_MethodHook()
     {
      @Override
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
-      if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
-         .equals(param.thisObject.getClass().getCanonicalName()))
-      {
-       Activity activity = (Activity) param.thisObject;
-       RpcCall.loginActivity = activity;
-       Log.i(TAG, "onCreate loginActivity=" + activity);
-       PowerManager pm = (PowerManager) activity.getSystemService(activity.POWER_SERVICE);
-       wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, activity.getClass().getName());
-       wakeLock.acquire();
-       if(handler == null) handler = new Handler();
-       if(runnable == null) runnable = new Runnable()
-        {
-         @Override
-         public void run()
-         {
-          Statistics.resetToday();
-          AntForest.checkEnergyRanking(loader);
-          AntFarm.start(loader);
-          AntMember.receivePoint(loader);
-          if(Config.collectEnergy() || Config.enableFarm())
-           handler.postDelayed(this, Config.timeInterval());
-         }
-        };
-       if(Config.collectEnergy() || Config.enableFarm())
+      Service service = (Service) param.thisObject;
+      PowerManager pm = (PowerManager) service.getSystemService(service.POWER_SERVICE);
+      wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, service.getClass().getName());
+      wakeLock.acquire();
+      if(handler == null) handler = new Handler();
+      if(runnable == null) runnable = new Runnable()
        {
-        AntForestNotification.start(activity);
-        handler.post(runnable);
-        Log.i(TAG, "task start. interval=" + Config.timeInterval());
-       }
+        Service service;
+
+        public Runnable setData(Service s)
+        {
+         service = s;
+         return this;
+        }
+
+        @Override
+        public void run()
+        {
+         Statistics.resetToday();
+         AntForest.checkEnergyRanking(loader);
+         AntFarm.start(loader);
+         AntMember.receivePoint(loader);
+         if(Config.collectEnergy() || Config.enableFarm())
+          handler.postDelayed(this, Config.timeInterval());
+         else AntForestNotification.stop(service, false);
+        }
+       }.setData(service);
+      if(Config.collectEnergy() || Config.enableFarm())
+      {
+       AntForestNotification.start(service);
+       handler.post(runnable);
+       Log.i(TAG, "task start. interval=" + Config.timeInterval());
       }
      }
     });
@@ -132,24 +135,21 @@ public class XposedHook implements IXposedHookLoadPackage
 
   try
   {
-   XposedHelpers.findAndHookMethod(Activity.class, ClassMember.onDestroy, new XC_MethodHook()
+   XposedHelpers.findAndHookMethod(ClassMember.com_alipay_android_launcher_service_LauncherService, loader, ClassMember.onDestroy, new XC_MethodHook()
     {
      @Override
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
-      if(ClassMember.com_eg_android_AlipayGphone_AlipayLogin
-         .equals(param.thisObject.getClass().getCanonicalName()))
+      if(wakeLock != null)
       {
-       Activity activity = (Activity) param.thisObject;
-       Log.i(TAG, "onDestroy loginActivity=" + activity);
-       if(wakeLock != null)
-       {
-        wakeLock.release();
-        wakeLock = null;
-       }
-       AntForestNotification.setContentText("支付宝主界面被销毁");
-       Log.recordLog("支付宝主界面被销毁", "");
+       wakeLock.release();
+       wakeLock = null;
       }
+      Service service = (Service) param.thisObject;
+      AntForestNotification.setContentText("支付宝前台服务被销毁");
+      Log.recordLog("支付宝前台服务被销毁", "");
+      handler.removeCallbacks(runnable);
+      AntForestNotification.stop(service, false);
      }
     });
    Log.i(TAG, "hook " + ClassMember.onDestroy + " successfully");

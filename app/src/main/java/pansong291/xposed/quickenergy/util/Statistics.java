@@ -143,6 +143,7 @@ public class Statistics
  public static void receiveForestTaskAwardToday()
  {
   getStatistics().receiveForestTaskAward = getStatistics().day.time;
+  save();
  }
 
  public static boolean isWaterFriendListToday()
@@ -153,6 +154,7 @@ public class Statistics
  public static void waterFriendListToday()
  {
   getStatistics().waterFriendList = getStatistics().day.time;
+  save();
  }
 
  public static boolean isReceiveFarmToolRewardToday()
@@ -163,6 +165,7 @@ public class Statistics
  public static void receiveFarmToolRewardToday()
  {
   getStatistics().receiveFarmToolReward = getStatistics().day.time;
+  save();
  }
 
  public static boolean isUseNewEggToolToday()
@@ -173,6 +176,7 @@ public class Statistics
  public static void useNewEggToolToday()
  {
   getStatistics().useNewEggTool = getStatistics().day.time;
+  save();
  }
 
  public static boolean isAnswerQuestionToday()
@@ -183,6 +187,7 @@ public class Statistics
  public static void answerQuestionToday()
  {
   getStatistics().answerQuestion = getStatistics().day.time;
+  save();
  }
 
  public static void setQuestionHint(String s)
@@ -193,7 +198,7 @@ public class Statistics
 
  public static boolean isReceivePointToday()
  {
-  int hour = Integer.parseInt(Log.getFormatDateTime().split(":")[1]);
+  int hour = Integer.parseInt(Log.getFormatTime().split(":")[0]);
   if(hour < Config.receivePointTime()) return true;
   return getStatistics().receivePoint >= getStatistics().day.time;
  }

@@ -5,6 +5,7 @@ public class ClassMember
  public static final String
  com_eg_android_AlipayGphone = "com.eg.android.AlipayGphone",
  com_eg_android_AlipayGphone_AlipayLogin = "com.eg.android.AlipayGphone.AlipayLogin",
+ com_alipay_android_launcher_service_LauncherService = "com.alipay.android.launcher.service.LauncherService",
  com_alipay_mobile_nebulaappproxy_api_rpc_H5AppRpcUpdate = "com.alipay.mobile.nebulaappproxy.api.rpc.H5AppRpcUpdate",
  matchVersion = "matchVersion",
  a = "a", h = "h",

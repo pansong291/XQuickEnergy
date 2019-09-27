@@ -1,6 +1,5 @@
 package pansong291.xposed.quickenergy;
 
-import android.os.Handler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
@@ -35,7 +34,6 @@ public class AntForest
  }
 
  private static boolean checkingIds = false;
- private static Handler handler;
  private static long serverTime = -1;
  private static long offsetTime = -1;
  private static long laterTime = -1;
@@ -280,7 +278,7 @@ public class AntForest
      returnFriendWater(loader, userId, userName, bizNo, returnCount);
    }else
    {
-    Log.recordLog(userName + jo.getString("resultDesc"), s);
+    Log.recordLog("【" + userName + "】" + jo.getString("resultDesc"), s);
    }
   }catch(Throwable t)
   {
@@ -317,7 +315,7 @@ public class AntForest
     }
    }else
    {
-    Log.recordLog(userName + jo.getString("resultDesc"), s);
+    Log.recordLog("【" + userName + "】" + jo.getString("resultDesc"), s);
    }
   }catch(Throwable t)
   {
@@ -479,25 +477,22 @@ public class AntForest
   helpCollectedEnergy = 0;
   if(Config.collectEnergy())
   {
-   if(RpcCall.loginActivity != null)
+   StringBuilder sb = new StringBuilder();
+   sb.append("  收：" + totalCollected + "，帮：" + totalHelpCollected);
+   if(laterTime > 0)
    {
-    StringBuilder sb = new StringBuilder();
-    sb.append("  收：" + totalCollected + "，帮：" + totalHelpCollected);
-    if(laterTime > 0)
-    {
-     sb.append("，下个：");
-     long second = (laterTime - serverTime) / 1000;
-     long minute = second / 60;
-     second %= 60;
-     long hour = minute / 60;
-     minute %= 60;
-     if(hour > 0) sb.append(hour + "时");
-     if(minute > 0) sb.append(minute + "分");
-     sb.append(second + "秒");
-    }
-    Log.recordLog(sb.toString(), "");
-    AntForestNotification.setContentText(Log.getFormatTime() + sb.toString());
+    sb.append("，下个：");
+    long second = (laterTime - serverTime) / 1000;
+    long minute = second / 60;
+    second %= 60;
+    long hour = minute / 60;
+    minute %= 60;
+    if(hour > 0) sb.append(hour + "时");
+    if(minute > 0) sb.append(minute + "分");
+    sb.append(second + "秒");
    }
+   Log.recordLog(sb.toString(), "");
+   AntForestNotification.setContentText(Log.getFormatTime() + sb.toString());
   }
   laterTime = -1;
   checkUnknownId(loader);
@@ -522,8 +517,10 @@ public class AntForest
    public void run()
    {
     String s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
-    queryEnergyRanking(loader, "1");
+    if(s == null)
+     s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
     canCollectSelfEnergy(loader, s);
+    queryEnergyRanking(loader, "1");
    }
   }.setData(loader).start();
  }
@@ -587,13 +584,12 @@ public class AntForest
  {
   BubbleTimerTask btt = new BubbleTimerTask(loader, userName, userId, bizNo, bubbleId, produceTime);
   long delay = btt.getDelayTime();
-  if(handler == null) handler = new Handler();
-  handler.postDelayed(btt, delay);
+  btt.start();
   collectTaskCount++;
   Log.recordLog(delay / 1000 + "秒后尝试收取能量", "");
  }
 
- public static class BubbleTimerTask implements Runnable
+ public static class BubbleTimerTask extends Thread
  {
   ClassLoader loader;
   String userName;
@@ -616,6 +612,7 @@ public class AntForest
   public long getDelayTime()
   {
    sleep = produceTime + offsetTime - System.currentTimeMillis() - Config.advanceTime();
+   if(sleep < 0) sleep = 0;
    return  sleep;
   }
 
@@ -624,7 +621,8 @@ public class AntForest
   {
    try
    {
-    Log.recordLog("蹲点收取开始", "");
+    Thread.sleep(sleep);
+    Log.recordLog("【" + userName + "】蹲点收取开始" + collectTaskCount, "");
     collectTaskCount--;
     long time = System.currentTimeMillis();
     int collected = 0;
