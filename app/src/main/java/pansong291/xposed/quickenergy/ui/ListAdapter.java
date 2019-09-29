@@ -43,23 +43,47 @@ public class ListAdapter extends BaseAdapter
   selects = l;
  }
 
- public int find(CharSequence cs)
+ public int findLast(CharSequence cs)
  {
   if(!cs.equals(findWord))
   {
    findIndex = -1;
+   findWord = cs;
   }
-  findWord = cs;
-  int i = findIndex + 1;
-  if(i == list.size()) i = 0;
-  for(;i < list.size(); i++)
+  int i = findIndex;
+  if(i < 0) i = list.size(); 
+  for(;;)
   {
+   i = (i + list.size() - 1) % list.size();
    if(list.get(i).name.contains(cs))
    {
     findIndex = i;
     break;
    }
-   if(findIndex >= 0 && i == list.size() - 1) i = -1;
+   if(findIndex < 0 && i == 0)
+    break;
+  }
+  notifyDataSetChanged();
+  return findIndex;
+ }
+
+ public int findNext(CharSequence cs)
+ {
+  if(!cs.equals(findWord))
+  {
+   findIndex = -1;
+   findWord = cs;
+  }
+  for(int i = findIndex;;)
+  {
+   i = (i + 1) % list.size();
+   if(list.get(i).name.contains(cs))
+   {
+    findIndex = i;
+    break;
+   }
+   if(findIndex < 0 && i == list.size() - 1)
+    break;
   }
   notifyDataSetChanged();
   return findIndex;

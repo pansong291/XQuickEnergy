@@ -44,6 +44,11 @@
                     android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+        
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:resizeableActivity="true"/>
+            
     </application>
 
 </manifest>

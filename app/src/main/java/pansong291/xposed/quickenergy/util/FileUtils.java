@@ -13,7 +13,10 @@ public class FileUtils
  private static File configFile;
  private static File friendIdMapFile;
  private static File statisticsFile;
- private static File logFile;
+ private static File forestLogFile;
+ private static File farmLogFile;
+ private static File otherLogFile;
+ private static File simpleLogFile;
  private static File runtimeLogFile;
 
  public static File getDirectoryPath()
@@ -69,15 +72,66 @@ public class FileUtils
   return statisticsFile;
  }
 
- public static File getLogFile()
+ public static File getForestLogFile()
  {
-  if(logFile == null)
+  if(forestLogFile == null)
   {
-   logFile = new File(getDirectoryPath(), "energy.log");
-   if(logFile.exists() && logFile.isDirectory())
-    logFile.delete();
+   forestLogFile = new File(getDirectoryPath(), "forest.log");
+   if(forestLogFile.exists() && forestLogFile.isDirectory())
+    forestLogFile.delete();
+   if(!forestLogFile.exists())
+    try
+    {
+     forestLogFile.createNewFile();
+    }catch(Throwable t)
+    {}
   }
-  return logFile;
+  return forestLogFile;
+ }
+
+ public static File getFarmLogFile()
+ {
+  if(farmLogFile == null)
+  {
+   farmLogFile = new File(getDirectoryPath(), "farm.log");
+   if(farmLogFile.exists() && farmLogFile.isDirectory())
+    farmLogFile.delete();
+   if(!farmLogFile.exists())
+    try
+    {
+     farmLogFile.createNewFile();
+    }catch(Throwable t)
+    {}
+  }
+  return farmLogFile;
+ }
+
+ public static File getOtherLogFile()
+ {
+  if(otherLogFile == null)
+  {
+   otherLogFile = new File(getDirectoryPath(), "other.log");
+   if(otherLogFile.exists() && otherLogFile.isDirectory())
+    otherLogFile.delete();
+   if(!otherLogFile.exists())
+    try
+    {
+     otherLogFile.createNewFile();
+    }catch(Throwable t)
+    {}
+  }
+  return otherLogFile;
+ }
+
+ public static File getSimpleLogFile()
+ {
+  if(simpleLogFile == null)
+  {
+   simpleLogFile = new File(getDirectoryPath(), "simple.log");
+   if(simpleLogFile.exists() && simpleLogFile.isDirectory())
+    simpleLogFile.delete();
+  }
+  return simpleLogFile;
  }
 
  public static File getRuntimeLogFile()
@@ -117,9 +171,9 @@ public class FileUtils
   return result.toString();
  }
 
- public static boolean append2LogFile(String s)
+ public static boolean append2SimpleLogFile(String s)
  {
-  return append2File(Log.getFormatDateTime() + "  " + s + "\n", getLogFile());
+  return append2File(Log.getFormatDateTime() + "  " + s + "\n", getSimpleLogFile());
  }
 
  public static boolean append2RuntimeLogFile(String s)

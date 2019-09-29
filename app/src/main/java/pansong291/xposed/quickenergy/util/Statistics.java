@@ -1,6 +1,8 @@
 package pansong291.xposed.quickenergy.util;
 
 import org.json.JSONObject;
+import java.util.ArrayList;
+import org.json.JSONArray;
 
 public class Statistics
 {
@@ -29,6 +31,13 @@ public class Statistics
   }
  }
 
+ private class FeedFriendTask
+ {
+  String userId;
+  int today;
+  int feedCount;
+ }
+
  private static final String TAG = Statistics.class.getCanonicalName();
  private static final String
  jn_year = "year", jn_month = "month", jn_day = "day",
@@ -48,6 +57,7 @@ public class Statistics
  private int useNewEggTool = 0;
  private int answerQuestion = 0;
  private String questionHint;
+ private ArrayList<FeedFriendTask> feedFriendTaskList;
 
  // member
  private int receivePoint = 0;
@@ -56,23 +66,24 @@ public class Statistics
 
  public static void addData(DataType dt, int i)
  {
+  Statistics stat = getStatistics();
   resetToday();
   switch(dt)
   {
    case COLLECTED:
-    getStatistics().day.collected += i;
-    getStatistics().month.collected += i;
-    getStatistics().year.collected += i;
+    stat.day.collected += i;
+    stat.month.collected += i;
+    stat.year.collected += i;
     break;
    case HELPED:
-    getStatistics().day.helped += i;
-    getStatistics().month.helped += i;
-    getStatistics().year.helped += i;
+    stat.day.helped += i;
+    stat.month.helped += i;
+    stat.year.helped += i;
     break;
    case WATERED:
-    getStatistics().day.watered += i;
-    getStatistics().month.watered += i;
-    getStatistics().year.watered += i;
+    stat.day.watered += i;
+    stat.month.watered += i;
+    stat.year.watered += i;
     break;
   }
   save();
@@ -80,18 +91,19 @@ public class Statistics
 
  public static int getData(TimeType tt, DataType dt)
  {
+  Statistics stat = getStatistics();
   int data = 0;
   TimeStatistics ts = null;
   switch(tt)
   {
    case YEAR:
-    ts = getStatistics().year;
+    ts = stat.year;
     break;
    case MONTH:
-    ts = getStatistics().month;
+    ts = stat.month;
     break;
    case DAY:
-    ts = getStatistics().day;
+    ts = stat.day;
     break;
   }
   if(ts != null)
@@ -116,6 +128,7 @@ public class Statistics
  public static String getText()
  {
   statistics = null;
+  Statistics stat = getStatistics();
   StringBuilder sb = new StringBuilder(getData(TimeType.YEAR, DataType.TIME) + "年：收");
   sb.append(getData(TimeType.YEAR, DataType.COLLECTED));
   sb.append("，  帮" + getData(TimeType.YEAR, DataType.HELPED));
@@ -128,65 +141,75 @@ public class Statistics
   sb.append(getData(TimeType.DAY, DataType.COLLECTED));
   sb.append("，  帮" + getData(TimeType.DAY, DataType.HELPED));
   sb.append("，  浇" + getData(TimeType.DAY, DataType.WATERED));
-  if(getStatistics().questionHint != null && !getStatistics().questionHint.isEmpty())
+  if(stat.questionHint != null && !stat.questionHint.isEmpty())
   {
-   sb.append("\n今日答题提示：" + getStatistics().questionHint);
+   sb.append("\n今日答题提示：" + stat.questionHint);
   }
   return sb.toString();
  }
 
- public static boolean isReceiveForestTaskAwardToday()
+ public static boolean canReceiveForestTaskAwardToday()
  {
-  return getStatistics().receiveForestTaskAward >= getStatistics().day.time;
+  Statistics stat = getStatistics();
+  return stat.receiveForestTaskAward < stat.day.time;
  }
 
  public static void receiveForestTaskAwardToday()
  {
-  getStatistics().receiveForestTaskAward = getStatistics().day.time;
+  Statistics stat = getStatistics();
+  stat.receiveForestTaskAward = stat.day.time;
   save();
  }
 
- public static boolean isWaterFriendListToday()
+ public static boolean canWaterFriendListToday()
  {
-  return getStatistics().waterFriendList >= getStatistics().day.time;
+  Statistics stat = getStatistics();
+  return stat.waterFriendList < stat.day.time;
  }
 
  public static void waterFriendListToday()
  {
-  getStatistics().waterFriendList = getStatistics().day.time;
+  Statistics stat = getStatistics();
+  stat.waterFriendList = stat.day.time;
   save();
  }
 
- public static boolean isReceiveFarmToolRewardToday()
+ public static boolean canReceiveFarmToolRewardToday()
  {
-  return getStatistics().receiveFarmToolReward >= getStatistics().day.time;
+  Statistics stat = getStatistics();
+  return stat.receiveFarmToolReward < stat.day.time;
  }
 
  public static void receiveFarmToolRewardToday()
  {
-  getStatistics().receiveFarmToolReward = getStatistics().day.time;
+  Statistics stat = getStatistics();
+  stat.receiveFarmToolReward = stat.day.time;
   save();
  }
 
- public static boolean isUseNewEggToolToday()
+ public static boolean canUseNewEggToolToday()
  {
-  return getStatistics().useNewEggTool >= getStatistics().day.time;
+  Statistics stat = getStatistics();
+  return stat.useNewEggTool < stat.day.time;
  }
 
  public static void useNewEggToolToday()
  {
-  getStatistics().useNewEggTool = getStatistics().day.time;
+  Statistics stat = getStatistics();
+  stat.useNewEggTool = stat.day.time;
   save();
  }
 
- public static boolean isAnswerQuestionToday()
+ public static boolean canAnswerQuestionToday()
  {
-  return getStatistics().answerQuestion >= getStatistics().day.time;
+  Statistics stat = getStatistics();
+  return stat.answerQuestion < stat.day.time;
  }
 
  public static void answerQuestionToday()
  {
-  getStatistics().answerQuestion = getStatistics().day.time;
+  Statistics stat = getStatistics();
+  stat.answerQuestion = stat.day.time;
   save();
  }
 
@@ -196,16 +219,57 @@ public class Statistics
   save();
  }
 
- public static boolean isReceivePointToday()
+ public static boolean canFeedFriendToday(String id, int count)
  {
+  Statistics stat = getStatistics();
+  int index = -1;
+  for(int i = 0; i < stat.feedFriendTaskList.size(); i++)
+   if(stat.feedFriendTaskList.get(i).userId.equals(id))
+   {
+    index = i;
+    break;
+   }
+  if(index < 0) return true;
+  FeedFriendTask fft = stat.feedFriendTaskList.get(index);
+  if(fft.today < stat.day.time)
+  {
+   return true;
+  }
+  return fft.feedCount < count;
+ }
+
+ public static void feedFriendToday(String id)
+ {
+  Statistics stat = getStatistics();
+  FeedFriendTask fft;
+  int index = stat.feedFriendTaskList.indexOf(id);
+  if(index < 0)
+  {
+   fft = stat.new FeedFriendTask();
+   fft.userId = id;
+   fft.feedCount = 1;
+   stat.feedFriendTaskList.add(fft);
+  }else
+  {
+   fft = stat.feedFriendTaskList.get(index);
+   fft.feedCount++;
+  }
+  fft.today = stat.day.time;
+  save();
+ }
+
+ public static boolean canReceivePointToday()
+ {
+  Statistics stat = getStatistics();
   int hour = Integer.parseInt(Log.getFormatTime().split(":")[0]);
-  if(hour < Config.receivePointTime()) return true;
-  return getStatistics().receivePoint >= getStatistics().day.time;
+  if(hour < Config.receivePointTime()) return false;
+  return stat.receivePoint < stat.day.time;
  }
 
  public static void receivePointToday()
  {
-  getStatistics().receivePoint = getStatistics().day.time;
+  Statistics stat = getStatistics();
+  stat.receivePoint = stat.day.time;
  }
 
  private static Statistics getStatistics()
@@ -222,105 +286,123 @@ public class Statistics
 
  public static void resetToday()
  {
+  Statistics stat = getStatistics();
   String[] dateStr = Log.getFormatDate().split("-");
   int ye = Integer.parseInt(dateStr[0]);
   int mo = Integer.parseInt(dateStr[1]);
   int da = Integer.parseInt(dateStr[2]);
 
-  if(ye > getStatistics().year.time)
+  if(ye > stat.year.time)
   {
-   getStatistics().year.reset(ye);
-   getStatistics().month.reset(mo);
-   getStatistics().day.reset(da);
-  }else if(mo > getStatistics().month.time)
+   stat.year.reset(ye);
+   stat.month.reset(mo);
+   stat.day.reset(da);
+  }else if(mo > stat.month.time)
   {
-   getStatistics().month.reset(mo);
-   getStatistics().day.reset(da);
-  }else if(da > getStatistics().day.time)
+   stat.month.reset(mo);
+   stat.day.reset(da);
+  }else if(da > stat.day.time)
   {
-   getStatistics().day.reset(da);
+   stat.day.reset(da);
   }
  }
 
  private static Statistics defInit()
  {
-  Statistics statis = new Statistics();
+  Statistics stat = new Statistics();
   String[] date = Log.getFormatDate().split("-");
-  if(statis.year == null)
-   statis.year = statis.new TimeStatistics(Integer.parseInt(date[0]));
-  if(statis.month == null)
-   statis.month = statis.new TimeStatistics(Integer.parseInt(date[1]));
-  if(statis.day == null)
-   statis.day = statis.new TimeStatistics(Integer.parseInt(date[2]));
-  return statis;
+  if(stat.year == null)
+   stat.year = stat.new TimeStatistics(Integer.parseInt(date[0]));
+  if(stat.month == null)
+   stat.month = stat.new TimeStatistics(Integer.parseInt(date[1]));
+  if(stat.day == null)
+   stat.day = stat.new TimeStatistics(Integer.parseInt(date[2]));
+  return stat;
  }
 
  private static Statistics json2Statistics(String json)
  {
-  Statistics statis = null;
+  Statistics stat = null;
   try
   {
    JSONObject jo = new JSONObject(json);
    JSONObject joo = null;
-   statis = new Statistics();
+   stat = new Statistics();
 
    joo = jo.getJSONObject(jn_year);
-   statis.year = statis.new TimeStatistics(joo.getInt(jn_year));
-   Log.i(TAG, jn_year + ":" + statis.year.time);
-   statis.year.collected = joo.getInt(jn_collected);
-   Log.i(TAG, "  " + jn_collected + ":" + statis.year.collected);
-   statis.year.helped = joo.getInt(jn_helped);
-   Log.i(TAG, "  " + jn_helped + ":" + statis.year.helped);
-   statis.year.watered = joo.getInt(jn_watered);
-   Log.i(TAG, "  " + jn_watered + ":" + statis.year.watered);
+   stat.year = stat.new TimeStatistics(joo.getInt(jn_year));
+   Log.i(TAG, jn_year + ":" + stat.year.time);
+   stat.year.collected = joo.getInt(jn_collected);
+   Log.i(TAG, "  " + jn_collected + ":" + stat.year.collected);
+   stat.year.helped = joo.getInt(jn_helped);
+   Log.i(TAG, "  " + jn_helped + ":" + stat.year.helped);
+   stat.year.watered = joo.getInt(jn_watered);
+   Log.i(TAG, "  " + jn_watered + ":" + stat.year.watered);
 
    joo = jo.getJSONObject(jn_month);
-   statis.month = statis.new TimeStatistics(joo.getInt(jn_month));
-   Log.i(TAG, jn_month + ":" + statis.month.time);
-   statis.month.collected = joo.getInt(jn_collected);
-   Log.i(TAG, "  " + jn_collected + ":" + statis.month.collected);
-   statis.month.helped = joo.getInt(jn_helped);
-   Log.i(TAG, "  " + jn_helped + ":" + statis.month.helped);
-   statis.month.watered = joo.getInt(jn_watered);
-   Log.i(TAG, "  " + jn_watered + ":" + statis.month.watered);
+   stat.month = stat.new TimeStatistics(joo.getInt(jn_month));
+   Log.i(TAG, jn_month + ":" + stat.month.time);
+   stat.month.collected = joo.getInt(jn_collected);
+   Log.i(TAG, "  " + jn_collected + ":" + stat.month.collected);
+   stat.month.helped = joo.getInt(jn_helped);
+   Log.i(TAG, "  " + jn_helped + ":" + stat.month.helped);
+   stat.month.watered = joo.getInt(jn_watered);
+   Log.i(TAG, "  " + jn_watered + ":" + stat.month.watered);
 
    joo = jo.getJSONObject(jn_day);
-   statis.day = statis.new TimeStatistics(joo.getInt(jn_day));
-   Log.i(TAG, jn_day + ":" + statis.day.time);
-   statis.day.collected = joo.getInt(jn_collected);
-   Log.i(TAG, "  " + jn_collected + ":" + statis.day.collected);
-   statis.day.helped = joo.getInt(jn_helped);
-   Log.i(TAG, "  " + jn_helped + ":" + statis.day.helped);
-   statis.day.watered = joo.getInt(jn_watered);
-   Log.i(TAG, "  " + jn_watered + ":" + statis.day.watered);
+   stat.day = stat.new TimeStatistics(joo.getInt(jn_day));
+   Log.i(TAG, jn_day + ":" + stat.day.time);
+   stat.day.collected = joo.getInt(jn_collected);
+   Log.i(TAG, "  " + jn_collected + ":" + stat.day.collected);
+   stat.day.helped = joo.getInt(jn_helped);
+   Log.i(TAG, "  " + jn_helped + ":" + stat.day.helped);
+   stat.day.watered = joo.getInt(jn_watered);
+   Log.i(TAG, "  " + jn_watered + ":" + stat.day.watered);
 
    if(jo.has(Config.jn_receiveForestTaskAward))
-    statis.receiveForestTaskAward = jo.getInt(Config.jn_receiveForestTaskAward);
-   Log.i(TAG, Config.jn_receiveForestTaskAward + ":" + statis.receiveForestTaskAward);
+    stat.receiveForestTaskAward = jo.getInt(Config.jn_receiveForestTaskAward);
+   Log.i(TAG, Config.jn_receiveForestTaskAward + ":" + stat.receiveForestTaskAward);
 
    if(jo.has(Config.jn_waterFriendList))
-    statis.waterFriendList = jo.getInt(Config.jn_waterFriendList);
-   Log.i(TAG, Config.jn_waterFriendList + ":" + statis.waterFriendList);
+    stat.waterFriendList = jo.getInt(Config.jn_waterFriendList);
+   Log.i(TAG, Config.jn_waterFriendList + ":" + stat.waterFriendList);
 
    if(jo.has(Config.jn_receiveFarmToolReward))
-    statis.receiveFarmToolReward = jo.getInt(Config.jn_receiveFarmToolReward);
-   Log.i(TAG, Config.jn_receiveFarmToolReward + ":" + statis.receiveFarmToolReward);
+    stat.receiveFarmToolReward = jo.getInt(Config.jn_receiveFarmToolReward);
+   Log.i(TAG, Config.jn_receiveFarmToolReward + ":" + stat.receiveFarmToolReward);
 
    if(jo.has(Config.jn_useNewEggTool))
-    statis.useNewEggTool = jo.getInt(Config.jn_useNewEggTool);
-   Log.i(TAG, Config.jn_useNewEggTool + ":" + statis.useNewEggTool);
+    stat.useNewEggTool = jo.getInt(Config.jn_useNewEggTool);
+   Log.i(TAG, Config.jn_useNewEggTool + ":" + stat.useNewEggTool);
 
    if(jo.has(Config.jn_answerQuestion))
-    statis.answerQuestion = jo.getInt(Config.jn_answerQuestion);
-   Log.i(TAG, Config.jn_answerQuestion + ":" + statis.answerQuestion);
+    stat.answerQuestion = jo.getInt(Config.jn_answerQuestion);
+   Log.i(TAG, Config.jn_answerQuestion + ":" + stat.answerQuestion);
 
    if(jo.has(jn_questionHint))
-    statis.questionHint = jo.getString(jn_questionHint);
-   Log.i(TAG, jn_questionHint + ":" + statis.questionHint);
+    stat.questionHint = jo.getString(jn_questionHint);
+   Log.i(TAG, jn_questionHint + ":" + stat.questionHint);
+
+   stat.feedFriendTaskList = new ArrayList<>();
+   Log.i(TAG, Config.jn_feedFriendAnimalList + ":[");
+   if(jo.has(Config.jn_feedFriendAnimalList))
+   {
+    JSONArray ja = jo.getJSONArray(Config.jn_feedFriendAnimalList);
+    for(int i = 0; i < ja.length(); i++)
+    {
+     JSONArray jaa = ja.getJSONArray(i);
+     FeedFriendTask fft = stat.new FeedFriendTask();
+     fft.userId = jaa.getString(0);
+     fft.today = jaa.getInt(1);
+     fft.feedCount = jaa.getInt(2);
+     stat.feedFriendTaskList.add(fft);
+     Log.i(TAG, "  " + fft.userId + "," + fft.today + "," + fft.feedCount + ",");
+    }
+   }
 
    if(jo.has(Config.jn_receivePoint))
-    statis.receivePoint = jo.getInt(Config.jn_receivePoint);
-   Log.i(TAG, Config.jn_receivePoint + ":" + statis.receivePoint);
+    stat.receivePoint = jo.getInt(Config.jn_receivePoint);
+   Log.i(TAG, Config.jn_receivePoint + ":" + stat.receivePoint);
 
   }catch(Throwable t)
   {
@@ -330,52 +412,65 @@ public class Statistics
     Log.showToastIgnoreConfig("统计文件格式有误，已重置统计文件并备份原文件", "");
     FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getStatisticsFile()));
    }
-   statis = defInit();
+   stat = defInit();
   }
-  String formated = statistics2Json(statis);
+  String formated = statistics2Json(stat);
   if(!formated.equals(json))
   {
    Log.i(TAG, "重新格式化 statistics.json");
    FileUtils.write2File(formated, FileUtils.getStatisticsFile());
   }
-  return statis;
+  return stat;
  }
 
- private static String statistics2Json(Statistics statis)
+ private static String statistics2Json(Statistics stat)
  {
   JSONObject jo = new JSONObject();
   try
   {
-   if(statis == null) statis = Statistics.defInit();
+   if(stat == null) stat = Statistics.defInit();
    JSONObject joo = new JSONObject();
-   joo.put(jn_year, statis.year.time);
-   joo.put(jn_collected, statis.year.collected);
-   joo.put(jn_helped, statis.year.helped);
-   joo.put(jn_watered, statis.year.watered);
+   joo.put(jn_year, stat.year.time);
+   joo.put(jn_collected, stat.year.collected);
+   joo.put(jn_helped, stat.year.helped);
+   joo.put(jn_watered, stat.year.watered);
    jo.put(jn_year, joo);
 
    joo = new JSONObject();
-   joo.put(jn_month, statis.month.time);
-   joo.put(jn_collected, statis.month.collected);
-   joo.put(jn_helped, statis.month.helped);
-   joo.put(jn_watered, statis.month.watered);
+   joo.put(jn_month, stat.month.time);
+   joo.put(jn_collected, stat.month.collected);
+   joo.put(jn_helped, stat.month.helped);
+   joo.put(jn_watered, stat.month.watered);
    jo.put(jn_month, joo);
 
    joo = new JSONObject();
-   joo.put(jn_day, statis.day.time);
-   joo.put(jn_collected, statis.day.collected);
-   joo.put(jn_helped, statis.day.helped);
-   joo.put(jn_watered, statis.day.watered);
+   joo.put(jn_day, stat.day.time);
+   joo.put(jn_collected, stat.day.collected);
+   joo.put(jn_helped, stat.day.helped);
+   joo.put(jn_watered, stat.day.watered);
    jo.put(jn_day, joo);
 
-   jo.put(Config.jn_receiveForestTaskAward, statis.receiveForestTaskAward);
-   jo.put(Config.jn_waterFriendList, statis.waterFriendList);
-   jo.put(Config.jn_receiveFarmToolReward, statis.receiveFarmToolReward);
-   jo.put(Config.jn_useNewEggTool, statis.useNewEggTool);
-   jo.put(Config.jn_answerQuestion, statis.answerQuestion);
-   if(statis.questionHint != null)
-    jo.put(jn_questionHint, statis.questionHint);
-   jo.put(Config.jn_receivePoint, statis.receivePoint);
+   jo.put(Config.jn_receiveForestTaskAward, stat.receiveForestTaskAward);
+   jo.put(Config.jn_waterFriendList, stat.waterFriendList);
+   jo.put(Config.jn_receiveFarmToolReward, stat.receiveFarmToolReward);
+   jo.put(Config.jn_useNewEggTool, stat.useNewEggTool);
+   jo.put(Config.jn_answerQuestion, stat.answerQuestion);
+   if(stat.questionHint != null)
+    jo.put(jn_questionHint, stat.questionHint);
+
+   JSONArray ja = new JSONArray();
+   for(int i = 0; i < stat.feedFriendTaskList.size(); i++)
+   {
+    FeedFriendTask fft = stat.feedFriendTaskList.get(i);
+    JSONArray jaa = new JSONArray();
+    jaa.put(fft.userId);
+    jaa.put(fft.today);
+    jaa.put(fft.feedCount);
+    ja.put(jaa);
+   }
+   jo.put(Config.jn_feedFriendAnimalList, ja);
+
+   jo.put(Config.jn_receivePoint, stat.receivePoint);
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);

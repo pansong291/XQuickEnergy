@@ -68,6 +68,22 @@ public class Log
   }
  }
 
+ public static boolean forest(String s)
+ {
+  recordLog(s, "");
+  return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getForestLogFile());
+ }
+
+ public static boolean farm(String s)
+ {
+  return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getFarmLogFile());
+ }
+
+ public static boolean other(String s)
+ {
+  return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getOtherLogFile());
+ }
+
  public static boolean recordLog(String str, String str2)
  {
   return recordLog(str, str2, true);
@@ -77,7 +93,7 @@ public class Log
  {
   if(log) Log.i(TAG, str + str2);
   if(!Config.recordLog()) return false;
-  return FileUtils.append2LogFile(str);
+  return FileUtils.append2SimpleLogFile(str);
  }
 
  public static String getFormatDateTime()

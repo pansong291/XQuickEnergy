@@ -66,6 +66,7 @@ public class Config
  private List<String> dontHelpCollectList;
  private boolean receiveForestTaskAward;
  private List<String> waterFriendList;
+ private List<Integer> waterCountList;
 
  /* farm */
  private boolean rewardFriend;
@@ -82,6 +83,7 @@ public class Config
  private boolean feedAnimal;
  private boolean useAccelerateTool;
  private List<String> feedFriendAnimalList;
+ private List<Integer> feedFriendCountList;
  private boolean notifyFriend;
  private List<String> dontNotifyFriendList;
 
@@ -267,6 +269,11 @@ public class Config
   return getConfig().waterFriendList;
  }
 
+ public static List<Integer> getWaterCountList()
+ {
+  return getConfig().waterCountList;
+ }
+
  /* farm */
  public static void setRewardFriend(boolean b)
  {
@@ -408,6 +415,11 @@ public class Config
  public static List<String> getFeedFriendAnimalList()
  {
   return getConfig().feedFriendAnimalList;
+ }
+
+ public static List<Integer> getFeedFriendCountList()
+ {
+  return getConfig().feedFriendCountList;
  }
 
  public static void setNotifyFriend(boolean b)
@@ -600,6 +612,7 @@ public class Config
   if(c.dontHelpCollectList == null) c.dontHelpCollectList = new ArrayList<>();
   c.receiveForestTaskAward = true;
   if(c.waterFriendList == null) c.waterFriendList = new ArrayList<>();
+  if(c.waterCountList == null) c.waterCountList = new ArrayList<>();
 
   c.rewardFriend = true;
   c.sendBackAnimal = true;
@@ -615,6 +628,7 @@ public class Config
   c.feedAnimal = true;
   c.useAccelerateTool = true;
   if(c.feedFriendAnimalList == null) c.feedFriendAnimalList = new ArrayList<>();
+  if(c.feedFriendCountList == null) c.feedFriendCountList = new ArrayList<>();
   c.notifyFriend = true;
   if(c.dontNotifyFriendList == null) c.dontNotifyFriendList = new ArrayList<>();
 
@@ -634,7 +648,7 @@ public class Config
   try
   {
    JSONObject jo = new JSONObject(removeOutcomment(json));
-   JSONArray ja = null;
+   JSONArray ja = null, jaa = null;
    config = new Config();
 
    if(jo.has(jn_immediateEffect))
@@ -735,14 +749,26 @@ public class Config
    Log.i(TAG, jn_receiveForestTaskAward + ":" + config.receiveForestTaskAward);
 
    config.waterFriendList = new ArrayList<>();
+   config.waterCountList = new ArrayList<>();
    Log.i(TAG, jn_waterFriendList + ":[");
    if(jo.has(jn_waterFriendList))
    {
     ja = jo.getJSONArray(jn_waterFriendList);
     for(int i = 0; i < ja.length(); i++)
     {
-     config.waterFriendList.add(ja.getString(i));
-     Log.i(TAG, "  " + config.waterFriendList.get(i) + ",");
+     if(ja.get(i) instanceof JSONArray)
+     {
+      jaa = ja.getJSONArray(i);
+      config.waterFriendList.add(jaa.getString(0));
+      config.waterCountList.add(jaa.getInt(1));
+     }else
+     {
+      config.waterFriendList.add(ja.getString(i));
+      config.waterCountList.add(3);
+     }
+     Log.i(TAG, "  "
+           + config.waterFriendList.get(i) + ","
+           + config.waterCountList.get(i) + ",");
     }
    }
 
@@ -838,14 +864,26 @@ public class Config
    Log.i(TAG, jn_useAccelerateTool + ":" + config.useAccelerateTool);
 
    config.feedFriendAnimalList = new ArrayList<>();
+   config.feedFriendCountList = new ArrayList<>();
    Log.i(TAG, jn_feedFriendAnimalList + ":[");
    if(jo.has(jn_feedFriendAnimalList))
    {
     ja = jo.getJSONArray(jn_feedFriendAnimalList);
     for(int i = 0; i < ja.length(); i++)
     {
-     config.feedFriendAnimalList.add(ja.getString(i));
-     Log.i(TAG, "  " + config.feedFriendAnimalList.get(i) + ",");
+     if(ja.get(i) instanceof JSONArray)
+     {
+      jaa = ja.getJSONArray(i);
+      config.feedFriendAnimalList.add(jaa.getString(0));
+      config.feedFriendCountList.add(jaa.getInt(1));
+     }else
+     {
+      config.feedFriendAnimalList.add(ja.getString(i));
+      config.feedFriendCountList.add(1);
+     }
+     Log.i(TAG, "  "
+           + config.feedFriendAnimalList.get(i) + ","
+           + config.feedFriendCountList.get(i) + ",");
     }
    }
 
@@ -902,6 +940,7 @@ public class Config
  public static String config2Json(Config config)
  {
   JSONObject jo = new JSONObject();
+  JSONArray ja = null, jaa = null;
   try
   {
    if(config == null) config = Config.defInit();
@@ -929,7 +968,7 @@ public class Config
 
    jo.put(jn_helpFriendCollect, config.helpFriendCollect);
 
-   JSONArray ja = new JSONArray();
+   ja = new JSONArray();
    for(String s: config.dontCollectList)
    {
     ja.put(s);
@@ -946,9 +985,12 @@ public class Config
    jo.put(jn_receiveForestTaskAward, config.receiveForestTaskAward);
 
    ja = new JSONArray();
-   for(String s: config.waterFriendList)
+   for(int i = 0; i < config.waterFriendList.size(); i++)
    {
-    ja.put(s);
+    jaa = new JSONArray();
+    jaa.put(config.waterFriendList.get(i));
+    jaa.put(config.waterCountList.get(i));
+    ja.put(jaa);
    }
    jo.put(jn_waterFriendList, ja);
 
@@ -987,9 +1029,12 @@ public class Config
    jo.put(jn_useAccelerateTool, config.useAccelerateTool);
 
    ja = new JSONArray();
-   for(String s: config.feedFriendAnimalList)
+   for(int i = 0; i < config.feedFriendAnimalList.size(); i++)
    {
-    ja.put(s);
+    jaa = new JSONArray();
+    jaa.put(config.feedFriendAnimalList.get(i));
+    jaa.put(config.feedFriendCountList.get(i));
+    ja.put(jaa);
    }
    jo.put(jn_feedFriendAnimalList, ja);
 

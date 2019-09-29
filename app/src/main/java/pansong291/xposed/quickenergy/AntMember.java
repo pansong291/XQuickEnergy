@@ -13,7 +13,7 @@ public class AntMember
 
  public static void receivePoint(ClassLoader loader)
  {
-  if(Statistics.isReceivePointToday() || !Config.receivePoint())
+  if(!Statistics.canReceivePointToday() || !Config.receivePoint())
    return;
   new Thread()
   {
@@ -34,9 +34,9 @@ public class AntMember
      JSONObject jo = new JSONObject(s);
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
-      Log.recordLog(
-       "领取〔每日签到〕〔" + jo.getString("signinPoint") + "积分〕，已签到〔"
-       + jo.getString("signinSumDay") + "天〕", "");
+      Log.other(
+       "领取〔每日签到〕〔" + jo.getString("signinPoint") +
+       "积分〕，已签到〔" + jo.getString("signinSumDay") + "天〕");
      }else
      {
       Log.recordLog(jo.getString("resultDesc"), s);
@@ -72,7 +72,7 @@ public class AntMember
      jo = new JSONObject(s);
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
-      Log.recordLog("领取〔" + bizTitle + "〕〔" + pointAmount + "积分〕", "");
+      Log.other("领取〔" + bizTitle + "〕〔" + pointAmount + "积分〕");
      }else
      {
       Log.recordLog(jo.getString("resultDesc"), s);
