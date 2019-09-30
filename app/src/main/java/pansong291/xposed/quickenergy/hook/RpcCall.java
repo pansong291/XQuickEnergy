@@ -69,7 +69,6 @@ public class RpcCall
     }
   }
 
-  Log.i(TAG, "rpcCall params count: " + rpcCallMethod.getParameterTypes().length);
   switch(rpcCallMethod.getParameterTypes().length)
   {
    case 13:

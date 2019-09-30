@@ -244,13 +244,6 @@ public class AntFarm
 
  }
 
- private static boolean isEnterFarmAndHasNull(String args0)
- {
-  if(args0.equals("com.alipay.antfarm.enterFarm"))
-   return AntFarmRpcCall.cityAdCode == null || AntFarmRpcCall.districtAdCode == null || AntFarmRpcCall.version == null;
-  return false;
- }
-
  private static boolean isEnterOwnerFarm(String resp)
  {
   return resp.contains("\"relation\":\"OWNER\"");
@@ -397,7 +390,6 @@ public class AntFarm
         s = "胖揍〔" + user + "〕的小鸡，掉落了〔" + jo.getInt("hitLossFood") + "克〕饲料";
         if(jo.has("finalFoodStorage"))
          foodStock = jo.getInt("finalFoodStorage");
-        s += "\n剩余〔" + foodStock + "克〕饲料";
        }else
         s = "〔" + user + "〕的小鸡躲开了你的攻击";
       }else

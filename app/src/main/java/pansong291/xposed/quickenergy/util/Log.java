@@ -76,22 +76,19 @@ public class Log
 
  public static boolean farm(String s)
  {
+  recordLog(s, "");
   return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getFarmLogFile());
  }
 
  public static boolean other(String s)
  {
+  recordLog(s, "");
   return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getOtherLogFile());
  }
 
  public static boolean recordLog(String str, String str2)
  {
-  return recordLog(str, str2, true);
- }
-
- private static boolean recordLog(String str, String str2, boolean log)
- {
-  if(log) Log.i(TAG, str + str2);
+  Log.i(TAG, str + str2);
   if(!Config.recordLog()) return false;
   return FileUtils.append2SimpleLogFile(str);
  }

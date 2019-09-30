@@ -189,14 +189,9 @@ public class XposedHook implements IXposedHookLoadPackage
   {
    clazz = loader.loadClass(ClassMember.com_alipay_mobile_nebulaappproxy_api_rpc_H5AppRpcUpdate);
    Class<?> H5PageClazz = loader.loadClass(ClassMember.com_alipay_mobile_h5container_api_H5Page);
-   XposedHelpers.findAndHookMethod(clazz, ClassMember.matchVersion, H5PageClazz, Map.class, String.class, new XC_MethodHook()
-    {
-     @Override
-     protected void afterHookedMethod(MethodHookParam param) throws Throwable
-     {
-      param.setResult(false);
-     }
-    });
+   XposedHelpers.findAndHookMethod(
+    clazz, ClassMember.matchVersion, H5PageClazz, Map.class, String.class,
+    XC_MethodReplacement.returnConstant(false));
    Log.i(TAG, "hook " + ClassMember.matchVersion + " successfully");
   }catch(Throwable t)
   {

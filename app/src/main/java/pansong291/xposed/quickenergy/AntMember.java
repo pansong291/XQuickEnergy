@@ -35,13 +35,14 @@ public class AntMember
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
       Log.other(
-       "领取〔每日签到〕〔" + jo.getString("signinPoint") +
-       "积分〕，已签到〔" + jo.getString("signinSumDay") + "天〕");
+       "领取〈每日签到〉〈" + jo.getString("signinPoint") +
+       "积分〉，已签到〈" + jo.getString("signinSumDay") + "天〉");
      }else
      {
       Log.recordLog(jo.getString("resultDesc"), s);
      }
      queryPointCert(loader, 1, 8);
+     claimFamilyPoint(loader);
      Statistics.receivePointToday();
     }catch(Throwable t)
     {
@@ -72,27 +73,14 @@ public class AntMember
      jo = new JSONObject(s);
      if(jo.getString("resultCode").equals("SUCCESS"))
      {
-      Log.other("领取〔" + bizTitle + "〕〔" + pointAmount + "积分〕");
+      Log.other("领取〈" + bizTitle + "〉〈" + pointAmount + "积分〉");
      }else
      {
       Log.recordLog(jo.getString("resultDesc"), s);
      }
     }
     if(hasNextPage)
-    {
      queryPointCert(loader, page + 1, pageSize);
-    }else
-    {
-     s = AntMemberRpcCall.rpcCall_queryPoint(loader);
-     jo = new JSONObject(s);
-     if(jo.getString("resultCode").equals("SUCCESS"))
-     {
-      Log.recordLog("剩余〔" + jo.getString("pointAvailableAmount") + "积分〕", "");
-     }else
-     {
-      Log.recordLog(jo.getString("resultDesc"), s);
-     }
-    }
    }else
    {
     Log.recordLog(jo.getString("resultDesc"), s);
@@ -100,6 +88,52 @@ public class AntMember
   }catch(Throwable t)
   {
    Log.i(TAG, "queryPointCert err:");
+   Log.printStackTrace(TAG, t);
+  }
+ }
+
+ private static void claimFamilyPoint(ClassLoader loader)
+ {
+  try
+  {
+   String s = AntMemberRpcCall.rpcCall_familyHomepage(loader);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getBoolean("success"))
+   {
+    jo = jo.getJSONObject("data");
+    if(jo.getBoolean("success"))
+    {
+     jo = jo.getJSONObject("familyInfoView");
+     String familyId = jo.getString("familyId");
+     s = AntMemberRpcCall.rpcCall_queryFamilyPointCert(loader, familyId);
+     jo = new JSONObject(s);
+     if(jo.getBoolean("success"))
+     {
+      JSONArray ja = jo.getJSONArray("familyPointCertInfos");
+      for(int i = 0; i < ja.length(); i++)
+      {
+       jo = ja.getJSONObject(i);
+       String bizTitle = jo.getString("bizTitle");
+       long certId = jo.getLong("certId");
+       s = AntMemberRpcCall.rpcCall_claimFamilyPointCert(loader, certId, familyId);
+       jo = new JSONObject(s);
+       if(jo.getBoolean("success"))
+       {
+        Log.other("领取〈" + bizTitle + "〉〈" + jo.getInt("realPoint") + "家庭积分〉");
+       }else
+       {
+        Log.recordLog(jo.getString("resultDesc"), s);
+       }
+      }
+     }else
+     {
+      Log.recordLog(jo.getString("resultDesc"), s);
+     }
+    }
+   }
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "claimFamilyPoint err:");
    Log.printStackTrace(TAG, t);
   }
  }

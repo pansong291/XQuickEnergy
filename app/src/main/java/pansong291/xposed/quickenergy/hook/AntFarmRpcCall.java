@@ -6,7 +6,7 @@ public class AntFarmRpcCall
 {
  private static final String TAG = AntFarmRpcCall.class.getCanonicalName();
 
- public static String cityAdCode = "000000",
+ private static final String cityAdCode = "000000",
  districtAdCode = "000000", version = "1.0.1909070043.11";
 
  public static String rpcCall_enterFarm(ClassLoader loader, String farmId, String userId)

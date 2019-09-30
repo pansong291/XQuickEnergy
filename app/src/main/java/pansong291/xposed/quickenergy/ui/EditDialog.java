@@ -65,8 +65,7 @@ public class EditDialog
          break;
 
         case ADVANCE_TIME:
-         if(i > 0)
-          Config.setAdvanceTime(i);
+         Config.setAdvanceTime(i);
          break;
 
         case COLLECT_INTERVAL:

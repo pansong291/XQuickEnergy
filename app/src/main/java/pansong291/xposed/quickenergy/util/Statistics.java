@@ -34,8 +34,12 @@ public class Statistics
  private class FeedFriendTask
  {
   String userId;
-  int today;
-  int feedCount;
+  int today = 0;
+  int feedCount = 0;
+  public FeedFriendTask(String id)
+  {
+   userId = id;
+  }
  }
 
  private static final String TAG = Statistics.class.getCanonicalName();
@@ -242,19 +246,29 @@ public class Statistics
  {
   Statistics stat = getStatistics();
   FeedFriendTask fft;
-  int index = stat.feedFriendTaskList.indexOf(id);
+  int index = -1;
+  for(int i = 0; i < stat.feedFriendTaskList.size(); i++)
+   if(stat.feedFriendTaskList.get(i).userId.equals(id))
+   {
+    index = i;
+    break;
+   }
   if(index < 0)
   {
-   fft = stat.new FeedFriendTask();
-   fft.userId = id;
-   fft.feedCount = 1;
+   fft = stat.new FeedFriendTask(id);
    stat.feedFriendTaskList.add(fft);
   }else
   {
    fft = stat.feedFriendTaskList.get(index);
+  }
+  if(fft.today < stat.day.time)
+  {
+   fft.today = stat.day.time;
+   fft.feedCount = 1;
+  }else
+  {
    fft.feedCount++;
   }
-  fft.today = stat.day.time;
   save();
  }
 
@@ -270,6 +284,7 @@ public class Statistics
  {
   Statistics stat = getStatistics();
   stat.receivePoint = stat.day.time;
+  save();
  }
 
  private static Statistics getStatistics()
@@ -297,14 +312,29 @@ public class Statistics
    stat.year.reset(ye);
    stat.month.reset(mo);
    stat.day.reset(da);
+   monthClear();
   }else if(mo > stat.month.time)
   {
    stat.month.reset(mo);
    stat.day.reset(da);
+   monthClear();
   }else if(da > stat.day.time)
   {
    stat.day.reset(da);
   }
+ }
+
+ private static void monthClear()
+ {
+  Statistics stat = getStatistics();
+  stat.receiveForestTaskAward = 0;
+  stat.waterFriendList = 0;
+  stat.receiveFarmToolReward = 0;
+  stat.useNewEggTool = 0;
+  stat.answerQuestion = 0;
+  stat.feedFriendTaskList.clear();
+  stat.receivePoint = 0;
+  save();
  }
 
  private static Statistics defInit()
@@ -317,6 +347,8 @@ public class Statistics
    stat.month = stat.new TimeStatistics(Integer.parseInt(date[1]));
   if(stat.day == null)
    stat.day = stat.new TimeStatistics(Integer.parseInt(date[2]));
+  if(stat.feedFriendTaskList == null)
+   stat.feedFriendTaskList = new ArrayList<>();
   return stat;
  }
 
@@ -391,8 +423,7 @@ public class Statistics
     for(int i = 0; i < ja.length(); i++)
     {
      JSONArray jaa = ja.getJSONArray(i);
-     FeedFriendTask fft = stat.new FeedFriendTask();
-     fft.userId = jaa.getString(0);
+     FeedFriendTask fft = stat.new FeedFriendTask(jaa.getString(0));
      fft.today = jaa.getInt(1);
      fft.feedCount = jaa.getInt(2);
      stat.feedFriendTaskList.add(fft);
