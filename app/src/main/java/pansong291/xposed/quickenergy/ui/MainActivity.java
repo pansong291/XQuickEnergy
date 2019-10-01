@@ -52,20 +52,9 @@ public class MainActivity extends Activity
     data += FileUtils.getOtherLogFile().getAbsolutePath();
     break;
   }
-  try
-  {
-   Intent it = new Intent();
-   it.setClassName("com.android.htmlviewer", "com.android.htmlviewer.HTMLViewerActivity");
-   it.setData(Uri.parse(data));
-   startActivity(it);
-  }catch(Exception e)
-  {
-   Intent it = new Intent(Intent.ACTION_VIEW);
-   it.addCategory(Intent.CATEGORY_DEFAULT);  
-   it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-   it.setDataAndType(Uri.parse(data), "text/html");
-   startActivity(Intent.createChooser(it, "选择浏览器"));
-  }
+  Intent it = new Intent(this, HtmlViewerActivity.class);
+  it.setData(Uri.parse(data));
+  startActivity(it);
  }
 
  @Override
