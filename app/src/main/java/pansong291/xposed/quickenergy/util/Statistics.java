@@ -313,14 +313,17 @@ public class Statistics
    stat.month.reset(mo);
    stat.day.reset(da);
    monthClear();
+   dayClear();
   }else if(mo > stat.month.time)
   {
    stat.month.reset(mo);
    stat.day.reset(da);
    monthClear();
+   dayClear();
   }else if(da > stat.day.time)
   {
    stat.day.reset(da);
+   dayClear();
   }
  }
 
@@ -335,6 +338,13 @@ public class Statistics
   stat.feedFriendTaskList.clear();
   stat.receivePoint = 0;
   save();
+  FileUtils.getOtherLogFile().delete();
+ }
+
+ private static void dayClear()
+ {
+  FileUtils.getForestLogFile().delete();
+  FileUtils.getFarmLogFile().delete();
  }
 
  private static Statistics defInit()
