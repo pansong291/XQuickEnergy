@@ -218,7 +218,8 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_help:
-    Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/pansong291/XQuickEnergy/wiki"));
+    Intent it = new Intent(this, HtmlViewerActivity.class);
+    it.setData(Uri.parse("https://github.com/pansong291/XQuickEnergy/wiki"));
     startActivity(it);
     break;
 

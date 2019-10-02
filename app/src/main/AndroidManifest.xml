@@ -3,6 +3,7 @@
     package="pansong291.xposed.quickenergy">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:theme="@style/AppTheme"
