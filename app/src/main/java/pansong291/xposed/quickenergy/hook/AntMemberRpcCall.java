@@ -14,8 +14,7 @@ public class AntMemberRpcCall
   try
   {
    String args1 = "[{\"page\":" + page + ",\"pageSize\":" + pageSize + "}]";
-   Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.queryPointCert", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.queryPointCert", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryPointCert err:");
@@ -29,8 +28,7 @@ public class AntMemberRpcCall
   try
   {
    String args1 = "[{\"certId\":" + certId + "}]";
-   Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.receivePointByUser", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.receivePointByUser", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_receivePointByUser err:");
@@ -44,8 +42,7 @@ public class AntMemberRpcCall
   try
   {
    String args1 = "[{}]";
-   Object o = RpcCall.invoke(loader, "alipay.antmember.h5.queryPoint", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "alipay.antmember.h5.queryPoint", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryPoint err:");
@@ -59,8 +56,7 @@ public class AntMemberRpcCall
   try
   {
    String args1 = "[{}]";
-   Object o = RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.memberSignin", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "alipay.antmember.biz.rpc.member.h5.memberSignin", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_memberSignin err:");
@@ -76,8 +72,7 @@ public class AntMemberRpcCall
   {
    String args1 = "[{\"appVersion\": \"" + appVersion +
     "\",\"clientTraceId\": \"\",\"source\": \"JTHYJGW\"}]";
-   Object o = RpcCall.invoke(loader, "alipay.peerpayprod.family.homepage", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "alipay.peerpayprod.family.homepage", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_familyHomepage err:");
@@ -92,8 +87,7 @@ public class AntMemberRpcCall
   {
    String args1 = "[{\"familyId\":\"" + familyId +
     "\",\"limit\":20,\"needQueryOtherMemberCert\":false}]";
-   Object o = RpcCall.invoke(loader, "com.alipay.alipaymember.biz.rpc.family.h5.queryFamilyPointCert", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "com.alipay.alipaymember.biz.rpc.family.h5.queryFamilyPointCert", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryFamilyPointCert err:");
@@ -108,8 +102,7 @@ public class AntMemberRpcCall
   {
    String args1 = "[{\"certId\":" + certId + ",\"familyId\":\""
     + familyId + "\"}]";
-   Object o = RpcCall.invoke(loader, "com.alipay.alipaymember.biz.rpc.family.h5.claimFamilyPointCert", args1);
-   return RpcCall.getResponse(o);
+   return RpcCall.invoke(loader, "com.alipay.alipaymember.biz.rpc.family.h5.claimFamilyPointCert", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_claimFamilyPointCert err:");

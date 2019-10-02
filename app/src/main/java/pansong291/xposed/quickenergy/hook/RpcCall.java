@@ -11,7 +11,7 @@ public class RpcCall
  private static Method getResponseMethod;
  private static Object curH5PageImpl;
 
- public static Object invoke(ClassLoader loader, String args0, String args1) throws Exception
+ public static String invoke(ClassLoader loader, String args0, String args1) throws Exception
  {
   if(rpcCallMethod == null)
   {
@@ -49,24 +49,29 @@ public class RpcCall
     }
   }
 
-  Log.i(TAG, "argument: " + args0 + ", " + args1);
+  Object o = null;
   switch(rpcCallMethod.getParameterTypes().length)
   {
-   case 13:
-    return rpcCallMethod.invoke(
+   case 12:
+    o = rpcCallMethod.invoke(
+     null, args0, args1, "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
+    break;
+   default:
+    o = rpcCallMethod.invoke(
      null, args0, args1, "", true, null, null, false, curH5PageImpl, 0, "", false, -1, "");
   }
-  return rpcCallMethod.invoke(
-   null, args0, args1, "", true, null, null, false, curH5PageImpl, 0, "", false, -1);
+  String str = getResponse(o);
+  Log.i(TAG, "argument: " + args0 + ", " + args1);
+  Log.i(TAG, "response: " + str);
+  return str;
  }
 
  public static String getResponse(Object resp) throws Exception
  {
   if(getResponseMethod == null)
    getResponseMethod = resp.getClass().getMethod(ClassMember.getResponse);
-  String str = (String) getResponseMethod.invoke(resp);
-  Log.i(TAG, "response: " + str);
-  return str;
+
+  return (String) getResponseMethod.invoke(resp);
  }
 
 }
