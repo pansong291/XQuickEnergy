@@ -12,6 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import java.io.File;
+
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.util.FileUtils;
 import pansong291.xposed.quickenergy.util.Statistics;
@@ -39,21 +42,21 @@ public class MainActivity extends Activity
 
  public void onClick(View v)
  {
-  String data = "file://";
+  File file = null;
   switch(v.getId())
   {
    case R.id.btn_forest_log:
-    data += FileUtils.getForestLogFile().getAbsolutePath();
+    file = FileUtils.getForestLogFile();
     break;
    case R.id.btn_farm_log:
-    data += FileUtils.getFarmLogFile().getAbsolutePath();
+    file = FileUtils.getFarmLogFile();
     break;
    case R.id.btn_other_log:
-    data += FileUtils.getOtherLogFile().getAbsolutePath();
+    file = FileUtils.getOtherLogFile();
     break;
   }
   Intent it = new Intent(this, HtmlViewerActivity.class);
-  it.setData(Uri.parse(data));
+  it.setData(FileUtils.getURI(this, file));
   startActivity(it);
  }
 
