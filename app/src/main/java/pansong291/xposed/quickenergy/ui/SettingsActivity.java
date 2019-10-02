@@ -27,7 +27,6 @@ public class SettingsActivity extends Activity
  {
   super.onCreate(savedInstanceState);
   setContentView(R.layout.activity_settings);
-  RpcCall.h5Activity = this;
 
   Config.shouldReloadConfig = true;
 

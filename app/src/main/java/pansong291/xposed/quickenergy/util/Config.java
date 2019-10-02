@@ -651,71 +651,38 @@ public class Config
    JSONArray ja = null, jaa = null;
    config = new Config();
 
-   if(jo.has(jn_immediateEffect))
-    config.immediateEffect = jo.getBoolean(jn_immediateEffect);
-   else
-    config.immediateEffect = true;
+   config.immediateEffect = jo.optBoolean(jn_immediateEffect, true);
    Log.i(TAG, jn_immediateEffect + ":" + config.immediateEffect);
 
-   if(jo.has(jn_recordLog))
-    config.recordLog = jo.getBoolean(jn_recordLog);
-   else
-    config.recordLog = true;
+   config.recordLog = jo.optBoolean(jn_recordLog, true);
    Log.i(TAG, jn_recordLog + ":" + config.recordLog);
 
    /* forest */
-   if(jo.has(jn_collectEnergy))
-    config.collectEnergy = jo.getBoolean(jn_collectEnergy);
-   else
-    config.collectEnergy = true;
+   config.collectEnergy = jo.optBoolean(jn_collectEnergy, true);
    Log.i(TAG, jn_collectEnergy + ":" + config.collectEnergy);
 
-   if(jo.has(jn_timeInterval))
-    config.timeInterval = jo.getInt(jn_timeInterval);
-   else
-    config.timeInterval = 120_000;
+   config.timeInterval = jo.optInt(jn_timeInterval, 120_000);
    Log.i(TAG, jn_timeInterval + ":" + config.timeInterval);
 
-   if(jo.has(jn_advanceTime))
-    config.advanceTime = jo.getInt(jn_advanceTime);
-   else
-    config.advanceTime = 500;
+   config.advanceTime = jo.optInt(jn_advanceTime, 500);
    Log.i(TAG, jn_advanceTime + ":" + config.advanceTime);
 
-   if(jo.has(jn_collectInterval))
-    config.collectInterval = jo.getInt(jn_collectInterval);
-   else
-    config.collectInterval = 100;
+   config.collectInterval = jo.optInt(jn_collectInterval, 100);
    Log.i(TAG, jn_collectInterval + ":" + config.collectInterval);
 
-   if(jo.has(jn_collectTimeout))
-    config.collectTimeout = jo.getInt(jn_collectTimeout);
-   else
-    config.collectTimeout = 2_000;
+   config.collectTimeout = jo.optInt(jn_collectTimeout, 2_000);
    Log.i(TAG, jn_collectTimeout + ":" + config.collectTimeout);
 
-   if(jo.has(jn_ReturnWater30))
-    config.returnWater30 = jo.getInt(jn_ReturnWater30);
-   else
-    config.returnWater30 = 0;
+   config.returnWater30 = jo.optInt(jn_ReturnWater30);
    Log.i(TAG, jn_ReturnWater30 + ":" + config.returnWater30);
 
-   if(jo.has(jn_ReturnWater20))
-    config.returnWater20 = jo.getInt(jn_ReturnWater20);
-   else
-    config.returnWater20 = 0;
+   config.returnWater20 = jo.optInt(jn_ReturnWater20);
    Log.i(TAG, jn_ReturnWater20 + ":" + config.returnWater20);
 
-   if(jo.has(jn_ReturnWater10))
-    config.returnWater10 = jo.getInt(jn_ReturnWater10);
-   else
-    config.returnWater10 = 0;
+   config.returnWater10 = jo.optInt(jn_ReturnWater10);
    Log.i(TAG, jn_ReturnWater10 + ":" + config.returnWater10);
 
-   if(jo.has(jn_helpFriendCollect))
-    config.helpFriendCollect = jo.getBoolean(jn_helpFriendCollect);
-   else
-    config.helpFriendCollect = true;
+   config.helpFriendCollect = jo.optBoolean(jn_helpFriendCollect, true);
    Log.i(TAG, jn_helpFriendCollect + ":" + config.helpFriendCollect);
 
    config.dontCollectList = new ArrayList<>();
@@ -742,10 +709,7 @@ public class Config
     }
    }
 
-   if(jo.has(jn_receiveForestTaskAward))
-    config.receiveForestTaskAward = jo.getBoolean(jn_receiveForestTaskAward);
-   else
-    config.receiveForestTaskAward = true;
+   config.receiveForestTaskAward = jo.optBoolean(jn_receiveForestTaskAward, true);
    Log.i(TAG, jn_receiveForestTaskAward + ":" + config.receiveForestTaskAward);
 
    config.waterFriendList = new ArrayList<>();
@@ -773,28 +737,16 @@ public class Config
    }
 
    /* farm */
-   if(jo.has(jn_enableFarm))
-    config.enableFarm = jo.getBoolean(jn_enableFarm);
-   else
-    config.enableFarm = true;
+   config.enableFarm = jo.optBoolean(jn_enableFarm, true);
    Log.i(TAG, jn_enableFarm + ":" + config.enableFarm);
 
-   if(jo.has(jn_rewardFriend))
-    config.rewardFriend = jo.getBoolean(jn_rewardFriend);
-   else
-    config.rewardFriend = true;
+   config.rewardFriend = jo.optBoolean(jn_rewardFriend, true);
    Log.i(TAG, jn_rewardFriend + ":" + config.rewardFriend);
 
-   if(jo.has(jn_sendBackAnimal))
-    config.sendBackAnimal = jo.getBoolean(jn_sendBackAnimal);
-   else
-    config.sendBackAnimal = true;
+   config.sendBackAnimal = jo.optBoolean(jn_sendBackAnimal, true);
    Log.i(TAG, jn_sendBackAnimal + ":" + config.sendBackAnimal);
 
-   if(jo.has(jn_sendType))
-    config.sendType = SendType.valueOf(jo.getString(jn_sendType));
-   else
-    config.sendType = SendType.HIT;
+   config.sendType = SendType.valueOf(jo.optString(jn_sendType, SendType.HIT.name()));
    Log.i(TAG, jn_sendType + ":" + config.sendType.name());
 
    config.dontSendFriendList = new ArrayList<>();
@@ -809,58 +761,31 @@ public class Config
     }
    }
 
-   if(jo.has(jn_recallAnimalType))
-    config.recallAnimalType = RecallAnimalType.valueOf(jo.getString(jn_recallAnimalType));
-   else
-    config.recallAnimalType = RecallAnimalType.ALWAYS;
+   config.recallAnimalType = RecallAnimalType.valueOf(jo.optString(jn_recallAnimalType, RecallAnimalType.ALWAYS.name()));
    Log.i(TAG, jn_recallAnimalType + ":" + config.recallAnimalType.name());
 
-   if(jo.has(jn_receiveFarmToolReward))
-    config.receiveFarmToolReward = jo.getBoolean(jn_receiveFarmToolReward);
-   else
-    config.receiveFarmToolReward = true;
+   config.receiveFarmToolReward = jo.optBoolean(jn_receiveFarmToolReward, true);
    Log.i(TAG, jn_receiveFarmToolReward + ":" + config.receiveFarmToolReward);
 
-   if(jo.has(jn_useNewEggTool))
-    config.useNewEggTool = jo.getBoolean(jn_useNewEggTool);
-   else
-    config.useNewEggTool = true;
+   config.useNewEggTool = jo.optBoolean(jn_useNewEggTool, true);
    Log.i(TAG, jn_useNewEggTool + ":" + config.useNewEggTool);
 
-   if(jo.has(jn_harvestProduce))
-    config.harvestProduce = jo.getBoolean(jn_harvestProduce);
-   else
-    config.harvestProduce = true;
+   config.harvestProduce = jo.optBoolean(jn_harvestProduce, true);
    Log.i(TAG, jn_harvestProduce + ":" + config.harvestProduce);
 
-   if(jo.has(jn_donation))
-    config.donation = jo.getBoolean(jn_donation);
-   else
-    config.donation = true;
+   config.donation = jo.optBoolean(jn_donation, true);
    Log.i(TAG, jn_donation + ":" + config.donation);
 
-   if(jo.has(jn_answerQuestion))
-    config.answerQuestion = jo.getBoolean(jn_answerQuestion);
-   else
-    config.answerQuestion = true;
+   config.answerQuestion = jo.optBoolean(jn_answerQuestion, true);
    Log.i(TAG, jn_answerQuestion + ":" + config.answerQuestion);
 
-   if(jo.has(jn_receiveFarmTaskAward))
-    config.receiveFarmTaskAward = jo.getBoolean(jn_receiveFarmTaskAward);
-   else
-    config.receiveFarmTaskAward = true;
+   config.receiveFarmTaskAward = jo.optBoolean(jn_receiveFarmTaskAward, true);
    Log.i(TAG, jn_receiveFarmTaskAward + ":" + config.receiveFarmTaskAward);
 
-   if(jo.has(jn_feedAnimal))
-    config.feedAnimal = jo.getBoolean(jn_feedAnimal);
-   else
-    config.feedAnimal = true;
+   config.feedAnimal = jo.optBoolean(jn_feedAnimal, true);
    Log.i(TAG, jn_feedAnimal + ":" + config.feedAnimal);
 
-   if(jo.has(jn_useAccelerateTool))
-    config.useAccelerateTool = jo.getBoolean(jn_useAccelerateTool);
-   else
-    config.useAccelerateTool = true;
+   config.useAccelerateTool = jo.optBoolean(jn_useAccelerateTool, true);
    Log.i(TAG, jn_useAccelerateTool + ":" + config.useAccelerateTool);
 
    config.feedFriendAnimalList = new ArrayList<>();
@@ -887,10 +812,7 @@ public class Config
     }
    }
 
-   if(jo.has(jn_notifyFriend))
-    config.notifyFriend = jo.getBoolean(jn_notifyFriend);
-   else
-    config.notifyFriend = true;
+   config.notifyFriend = jo.optBoolean(jn_notifyFriend, true);
    Log.i(TAG, jn_notifyFriend + ":" + config.notifyFriend);
 
    config.dontNotifyFriendList = new ArrayList<>();
@@ -906,16 +828,10 @@ public class Config
    }
 
    /* member */
-   if(jo.has(jn_receivePoint))
-    config.receivePoint = jo.getBoolean(jn_receivePoint);
-   else
-    config.receivePoint = true;
+   config.receivePoint = jo.optBoolean(jn_receivePoint, true);
    Log.i(TAG, jn_receivePoint + ":" + config.receivePoint);
 
-   if(jo.has(jn_receivePointTime))
-    config.receivePointTime = jo.getInt(jn_receivePointTime);
-   else
-    config.receivePointTime = 23;
+   config.receivePointTime = jo.optInt(jn_receivePointTime, 23);
    Log.i(TAG, jn_receivePointTime + ":" + config.receivePointTime);
 
   }catch(Throwable t)
@@ -923,7 +839,7 @@ public class Config
    Log.printStackTrace(TAG, t);
    if(json != null)
    {
-    Log.showToastIgnoreConfig("配置文件格式有误，已重置配置文件并备份原文件", "");
+    Log.i(TAG, "配置文件格式有误，已重置配置文件并备份原文件");
     FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getConfigFile()));
    }
    config = defInit();

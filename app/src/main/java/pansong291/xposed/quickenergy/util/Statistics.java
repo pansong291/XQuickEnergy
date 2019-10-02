@@ -450,7 +450,7 @@ public class Statistics
    Log.printStackTrace(TAG, t);
    if(json != null)
    {
-    Log.showToastIgnoreConfig("统计文件格式有误，已重置统计文件并备份原文件", "");
+    Log.i(TAG, "统计文件格式有误，已重置统计文件并备份原文件");
     FileUtils.write2File(json, FileUtils.getBackupFile(FileUtils.getStatisticsFile()));
    }
    stat = defInit();

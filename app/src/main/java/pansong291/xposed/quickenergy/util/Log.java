@@ -2,7 +2,6 @@ package pansong291.xposed.quickenergy.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.widget.Toast;
 import de.robv.android.xposed.XposedBridge;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,35 +36,6 @@ public class Log
  public static void printStackTrace(String tag, Throwable t)
  {
   Log.i(tag, android.util.Log.getStackTraceString(t));
- }
-
- public static void showToastIgnoreConfig(final String str, String str2)
- {
-  Log.i(TAG, str + str2);
-  final Activity activity = RpcCall.h5Activity;
-  if(activity != null)
-  {
-   try
-   {
-    activity.runOnUiThread(new Runnable()
-     {
-      public void run()
-      {
-       try
-       {
-        Toast.makeText(activity, str, 1).show();
-       }catch(Throwable t)
-       {
-        Log.i(TAG, "showToast err:");
-       }
-      }
-     });
-   }catch(Throwable t)
-   {
-    Log.i(TAG, "showToast err:");
-    Log.printStackTrace(TAG, t);
-   }
-  }
  }
 
  public static boolean forest(String s)

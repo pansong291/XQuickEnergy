@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.EditText;
-import android.widget.Toast;
 import pansong291.xposed.quickenergy.util.Config;
 
 public class EditDialog
