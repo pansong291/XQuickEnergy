@@ -835,6 +835,7 @@ public class AntFarm
 
  private static void notifyFriend(ClassLoader loader)
  {
+  if(foodStock >= foodStockLimit) return;
   try
   {
    boolean hasNext = false;
@@ -856,7 +857,8 @@ public class AntFarm
       jo = jaRankingList.getJSONObject(i);
       String userId = jo.getString("userId");
       String userName = Config.getNameById(userId);
-      if(Config.getDontNotifyFriendList().contains(userId))
+      if(Config.getDontNotifyFriendList().contains(userId)
+        || userId.equals(AntFarmRpcCall.farmId2UserId(ownerFarmId)))
        continue;
       boolean starve = jo.has("actionType") &&  jo.getString("actionType").equals("starve_action");
       if(jo.getBoolean("stealingAnimal") && !starve)
