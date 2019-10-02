@@ -81,15 +81,24 @@ public class AntForest
   onForestEnd(loader);
  }
 
- private static void canCollectSelfEnergy(ClassLoader loader, String resp)
+ private static void canCollectSelfEnergy(ClassLoader loader)
  {
   try
   {
-   JSONObject jo = new JSONObject(resp);
+   long start = System.currentTimeMillis();
+   String s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
+   long end = System.currentTimeMillis();
+   if(s == null)
+   {
+    start = System.currentTimeMillis();
+    s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
+    end = System.currentTimeMillis();
+   }
+   JSONObject jo = new JSONObject(s);
    if(jo.getString("resultCode").equals("SUCCESS"))
    {
     serverTime = jo.getLong("now");
-    offsetTime = System.currentTimeMillis() - serverTime;
+    offsetTime = (start + end) / 2 - serverTime;
     Log.i(TAG, "服务器时间：" + serverTime + "，本地减服务器时间差：" + offsetTime);
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     jo = jo.getJSONObject("userEnergy");
@@ -124,7 +133,7 @@ public class AntForest
     }
    }else
    {
-    Log.recordLog(jo.getString("resultDesc"), resp);
+    Log.recordLog(jo.getString("resultDesc"), s);
    }
    if(Statistics.canReceiveForestTaskAwardToday() && Config.receiveForestTaskAward())
    {
@@ -153,18 +162,14 @@ public class AntForest
  {
   try
   {
+   long start = System.currentTimeMillis();
    String s = AntForestRpcCall.rpcCall_queryNextAction(loader, userId);
+   long end = System.currentTimeMillis();
    JSONObject jo = new JSONObject(s);
-   if(jo.getString("resultCode").equals("PLUGIN_FREQUENCY_INTERCEPT"))
-   {
-    Thread.sleep(RandomUtils.delay());
-    s = AntForestRpcCall.rpcCall_queryNextAction(loader, userId);
-    jo = new JSONObject(s);
-   }
    if(jo.getString("resultCode").equals("SUCCESS"))
    {
     serverTime = jo.getLong("now");
-    offsetTime = System.currentTimeMillis() - serverTime;
+    offsetTime = (start + end) / 2 - serverTime;
     Log.i(TAG, "服务器时间：" + serverTime + "，本地减服务器时间差：" + offsetTime);
     String bizNo = jo.getString("bizNo");
     JSONArray jaProps = jo.getJSONArray("usingUserProps");
@@ -519,10 +524,7 @@ public class AntForest
    @Override
    public void run()
    {
-    String s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
-    if(s == null)
-     s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
-    canCollectSelfEnergy(loader, s);
+    canCollectSelfEnergy(loader);
     queryEnergyRanking(loader, "1");
    }
   }.setData(loader).start();
@@ -553,12 +555,14 @@ public class AntForest
       Log.i(TAG, "开始检查" + unknownIds.length + "个未知id");
       for(int i = 0; i < unknownIds.length; i++)
       {
+       long start = System.currentTimeMillis();
        String s = AntForestRpcCall.rpcCall_queryNextAction(loader, unknownIds[i]);
+       long end = System.currentTimeMillis();
        JSONObject jo = new JSONObject(s);
        if(jo.getString("resultCode").equals("SUCCESS"))
        {
         serverTime = jo.getLong("now");
-        offsetTime = System.currentTimeMillis() - serverTime;
+        offsetTime = (start + end) / 2 - serverTime;
         Log.i(TAG, "服务器时间：" + serverTime + "，本地减服务器时间差：" + offsetTime);
         jo = jo.getJSONObject("userEnergy");
         String userName = jo.getString("displayName");
