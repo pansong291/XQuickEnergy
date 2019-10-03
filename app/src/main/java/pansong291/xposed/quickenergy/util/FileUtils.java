@@ -1,10 +1,15 @@
 package pansong291.xposed.quickenergy.util;
 
+import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+
+import pansong291.xposed.quickenergy.FileProvider;
 
 public class FileUtils
 {
@@ -227,6 +232,15 @@ public class FileUtils
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);
+  }
+ }
+
+ public static Uri getURI(Context context, File file)
+ {
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+   return FileProvider.getUriForFile(context, "pansong291.xposed.quickenergy.fileProvider", file);
+  } else {
+   return Uri.fromFile(file);
   }
  }
 
