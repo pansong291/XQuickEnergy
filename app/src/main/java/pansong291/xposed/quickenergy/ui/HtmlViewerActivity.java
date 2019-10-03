@@ -3,9 +3,14 @@ package pansong291.xposed.quickenergy.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.webkit.WebView;
+
+import java.io.File;
+
+import pansong291.xposed.quickenergy.FileProvider;
 
 public class HtmlViewerActivity extends Activity
 {
@@ -31,6 +36,11 @@ public class HtmlViewerActivity extends Activity
  @Override
  public boolean onCreateOptionsMenu(Menu menu)
  {
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && uri.toString().startsWith("file://"))
+  {
+   uri = FileProvider.getUriForFile(this,
+    "pansong291.xposed.quickenergy.fileProvider", new File(uri.getPath()));
+  }
   Intent it = new Intent(Intent.ACTION_VIEW);
   it.addCategory(Intent.CATEGORY_DEFAULT);  
   it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

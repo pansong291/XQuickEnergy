@@ -235,13 +235,4 @@ public class FileUtils
   }
  }
 
- public static Uri getURI(Context context, File file)
- {
-  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-   return FileProvider.getUriForFile(context, "pansong291.xposed.quickenergy.fileProvider", file);
-  } else {
-   return Uri.fromFile(file);
-  }
- }
-
 }

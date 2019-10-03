@@ -56,7 +56,7 @@ public class MainActivity extends Activity
     break;
   }
   Intent it = new Intent(this, HtmlViewerActivity.class);
-  it.setData(FileUtils.getURI(this, file));
+  it.setData(Uri.fromFile(file));
   startActivity(it);
  }
 
