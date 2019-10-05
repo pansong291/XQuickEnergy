@@ -6,6 +6,7 @@ import pansong291.xposed.quickenergy.hook.AntFarmRpcCall;
 import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.util.Log;
 import pansong291.xposed.quickenergy.util.Statistics;
+import pansong291.xposed.quickenergy.util.RandomUtils;
 
 public class AntFarm
 {
@@ -95,6 +96,11 @@ public class AntFarm
     try
     {
      String s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", Config.getSelfId());
+     if(s == null)
+     {
+      Thread.sleep(RandomUtils.delay());
+      s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", Config.getSelfId());
+     }
      JSONObject jo = new JSONObject(s);
      String memo = jo.getString("memo");
      if(memo.equals("SUCCESS"))
@@ -168,16 +174,14 @@ public class AntFarm
       }
      }
 
-     if(Config.receiveFarmToolReward() && Statistics.canReceiveFarmToolRewardToday())
+     if(Config.receiveFarmToolReward())
      {
       receiveToolTaskReward(loader);
-      Statistics.receiveFarmToolRewardToday();
      }
 
-     if(Config.useNewEggTool() && Statistics.canUseNewEggToolToday())
+     if(Config.useNewEggTool())
      {
       useFarmTool(loader, ownerFarmId, ToolType.NEWEGGTOOL);
-      Statistics.useNewEggToolToday();
       syncAnimalStatus(loader, ownerFarmId);
      }
 
@@ -196,7 +200,6 @@ public class AntFarm
      if(Config.answerQuestion() && Statistics.canAnswerQuestionToday())
      {
       answerQuestion(loader);
-      Statistics.answerQuestionToday();
      }
 
      if(Config.receiveFarmTaskAward())receiveFarmTaskAward(loader);
@@ -586,6 +589,7 @@ public class AntFarm
           Statistics.setQuestionHint(rightReply);
           Log.recordLog("未找到正确答案，放弃作答。提示：" + rightReply, "");
          }
+         Statistics.answerQuestionToday();
         }else
         {
          Log.recordLog(memo, s);
@@ -777,7 +781,6 @@ public class AntFarm
           && AnimalFeedStatus.HUNGRY.name().equals(jo.getString("animalFeedStatus")))
        {
         feedFriendAnimal(loader, friendFarmId, Config.getNameById(userId));
-        Statistics.feedFriendToday(userId);
        }
        break;
       }
@@ -820,6 +823,7 @@ public class AntFarm
      {
       add2FoodStock(-feedFood);
       Log.farm("喂〔" + user + "〕的小鸡〔" + feedFood + "克〕饲料，剩余〔" + foodStock + "克〕");
+      Statistics.feedFriendToday(AntFarmRpcCall.farmId2UserId(friendFarmId));
      }
     }else
     {

@@ -53,16 +53,7 @@
         <activity
             android:name=".ui.HtmlViewerActivity"
             android:resizeableActivity="true"/>
-
-        <provider
-            android:name=".FileProvider"
-            android:authorities="pansong291.xposed.quickenergy.fileProvider"
-            android:grantUriPermissions="true"
-            android:exported="false">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
+        
     </application>
 
 </manifest>

@@ -12,8 +12,8 @@ public class EditDialog
  private static AlertDialog editDialog;
  private static EditText edt;
  public enum EditMode
- { TIME_INTERVAL, ADVANCE_TIME, COLLECT_INTERVAL, COLLECT_TIMEOUT,
-  RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10, RECEIVE_POINT_TIME }
+ { CHECK_INTERVAL, THREAD_COUNT, ADVANCE_TIME, COLLECT_INTERVAL,
+  COLLECT_TIMEOUT, RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10 }
  private static EditMode mode;
 
  public static void showEditDialog(Context c, CharSequence title, EditMode em)
@@ -58,9 +58,14 @@ public class EditDialog
        int i = Integer.parseInt(edt.getText().toString());
        switch(mode)
        {
-        case TIME_INTERVAL:
+        case CHECK_INTERVAL:
          if(i > 0)
-          Config.setTimeInterval(i * 60_000);
+          Config.setCheckInterval(i * 60_000);
+         break;
+
+        case THREAD_COUNT:
+         if(i > 0)
+          Config.setThreadCount(i);
          break;
 
         case ADVANCE_TIME:
@@ -68,7 +73,7 @@ public class EditDialog
          break;
 
         case COLLECT_INTERVAL:
-         if(i > 0)
+         if(i >= 0)
           Config.setCollectInterval(i);
          break;
 
@@ -92,11 +97,6 @@ public class EditDialog
          if(i >= 0)
           Config.setReturnWater10(i);
          break;
-
-        case RECEIVE_POINT_TIME:
-         if(i >= 0 && i < 24)
-          Config.setReceivePointTime(i);
-         break;
        }
       }catch(Throwable t)
       {}
@@ -107,8 +107,12 @@ public class EditDialog
   String str = "";
   switch(mode)
   {
-   case TIME_INTERVAL:
-    str = String.valueOf(Config.timeInterval() / 60_000);
+   case CHECK_INTERVAL:
+    str = String.valueOf(Config.checkInterval() / 60_000);
+    break;
+
+   case THREAD_COUNT:
+    str = String.valueOf(Config.threadCount());
     break;
 
    case ADVANCE_TIME:
@@ -133,10 +137,6 @@ public class EditDialog
 
    case RETURN_WATER_10:
     str = String.valueOf(Config.returnWater10());
-    break;
-
-   case RECEIVE_POINT_TIME:
-    str = String.valueOf(Config.receivePointTime());
     break;
   }
   edt.setText(str);

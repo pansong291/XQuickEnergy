@@ -32,6 +32,8 @@ public class AntForest
    return nickNames[ordinal()];
   }
  }
+ 
+ private static int times = 0;
 
  private static boolean checkingIds = false;
  private static long serverTime = -1;
@@ -62,7 +64,7 @@ public class AntForest
       String userId = jo.getString("userId");
       if(optBoolean && !userId.equals(selfId))
       {
-       canCollectEnergy(loader, userId);
+       canCollectEnergy(loader, userId, true);
       }else
       {
        Config.getNameById(userId);
@@ -90,6 +92,7 @@ public class AntForest
    long end = System.currentTimeMillis();
    if(s == null)
    {
+    Thread.sleep(RandomUtils.delay());
     start = System.currentTimeMillis();
     s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
     end = System.currentTimeMillis();
@@ -104,6 +107,8 @@ public class AntForest
     jo = jo.getJSONObject("userEnergy");
     selfId = jo.getString("userId");
     String selfName = jo.getString("displayName");
+    if(selfName == null || selfName.isEmpty())
+     selfName = "我";
     Config.putIdMap(selfId, selfName);
     Log.recordLog("进入【" + selfName + "】的蚂蚁森林", "");
     Config.saveIdMap();
@@ -124,7 +129,7 @@ public class AntForest
        if(Config.getDontCollectList().contains(selfId))
         break;
        long produceTime = jo.getLong("produceTime");
-       if(produceTime - serverTime < Config.timeInterval())
+       if(produceTime - serverTime < Config.checkInterval())
         execute(loader, selfName, selfId, null, bubbleId, produceTime);
        else
         setLaterTime(produceTime);
@@ -135,30 +140,28 @@ public class AntForest
    {
     Log.recordLog(jo.getString("resultDesc"), s);
    }
-   if(Statistics.canReceiveForestTaskAwardToday() && Config.receiveForestTaskAward())
+   if(times == 0)
    {
     receiveTaskAward(loader);
-    Statistics.receiveForestTaskAwardToday();
-   }
-   if(Statistics.canWaterFriendListToday())
-   {
     for(int i = 0; i < Config.getWaterFriendList().size(); i++)
     {
+     String uid = Config.getWaterFriendList().get(i);
+     if(selfId.equals(uid)) continue;
      int waterCount = Config.getWaterCountList().get(i);
      if(waterCount <= 0) continue;
      if(waterCount > 3) waterCount = 3;
-     waterFriendEnergy(loader, Config.getWaterFriendList().get(i), waterCount);
+     waterFriendEnergy(loader, uid, waterCount);
     }
-    Statistics.waterFriendListToday();
    }
   }catch(Throwable t)
   {
    Log.i(TAG, "canCollectSelfEnergy err:");
    Log.printStackTrace(TAG, t);
   }
+  times = (times + 1) % (3600_000 / Config.checkInterval());
  }
 
- private static void canCollectEnergy(ClassLoader loader, String userId)
+ private static void canCollectEnergy(ClassLoader loader, String userId, boolean laterCollect)
  {
   try
   {
@@ -176,11 +179,11 @@ public class AntForest
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     jo = jo.getJSONObject("userEnergy");
     String userName = jo.getString("displayName");
+    if(userName == null || userName.isEmpty())
+     userName = "*null*";
     String loginId = userName;
     if(jo.has("loginId"))
      loginId += "(" + jo.getString("loginId") + ")";
-    if(loginId == null || loginId.isEmpty())
-     loginId = "*null*";
     Config.putIdMap(userId, loginId);
     Log.recordLog("进入【" + loginId + "】的蚂蚁森林", "");
     Config.saveIdMap();
@@ -212,10 +215,10 @@ public class AntForest
        break;
 
       case WAITING:
-       if(Config.getDontCollectList().contains(userId))
+       if(!laterCollect || Config.getDontCollectList().contains(userId))
         break;
        long produceTime = jo.getLong("produceTime");
-       if(produceTime - serverTime < Config.timeInterval())
+       if(produceTime - serverTime < Config.checkInterval())
         execute(loader, userName, userId, bizNo, bubbleId, produceTime);
        else
         setLaterTime(produceTime);
@@ -235,7 +238,7 @@ public class AntForest
     }
     if(helped > 0)
     {
-     canCollectEnergy(loader, userId);
+     canCollectEnergy(loader, userId, false);
     }
     collectedEnergy += collected;
    }else
@@ -249,7 +252,7 @@ public class AntForest
   }
  }
 
- private static synchronized int collectEnergy(ClassLoader loader, String userId, long bubbleId, String userName, String bizNo)
+ private static int collectEnergy(ClassLoader loader, String userId, long bubbleId, String userName, String bizNo)
  {
   int collected = 0;
   try
@@ -566,11 +569,11 @@ public class AntForest
         Log.i(TAG, "服务器时间：" + serverTime + "，本地减服务器时间差：" + offsetTime);
         jo = jo.getJSONObject("userEnergy");
         String userName = jo.getString("displayName");
+        if(userName == null || userName.isEmpty())
+         userName = "*null*";
         String loginId = userName;
         if(jo.has("loginId"))
          loginId += "(" + jo.getString("loginId") + ")";
-        if(loginId == null || loginId.isEmpty())
-         loginId = "*null*";
         Config.putIdMap(unknownIds[i], loginId);
         Log.recordLog("进入【" + loginId + "】的蚂蚁森林", "");
         Config.saveIdMap();
@@ -589,11 +592,14 @@ public class AntForest
 
  public static void execute(ClassLoader loader, String userName, String userId, String bizNo, long bubbleId, long produceTime)
  {
-  BubbleTimerTask btt = new BubbleTimerTask(loader, userName, userId, bizNo, bubbleId, produceTime);
-  long delay = btt.getDelayTime();
-  btt.start();
-  collectTaskCount++;
-  Log.recordLog(delay / 1000 + "秒后尝试收取能量", "");
+  for(int i = Config.threadCount(); i > 0; i--)
+  {
+   BubbleTimerTask btt = new BubbleTimerTask(loader, userName, userId, bizNo, bubbleId, produceTime);
+   long delay = btt.getDelayTime();
+   btt.start();
+   collectTaskCount++;
+   Log.recordLog(delay / 1000 + "秒后尝试收取能量", "");
+  }
  }
 
  public static class BubbleTimerTask extends Thread
@@ -637,7 +643,8 @@ public class AntForest
     {
      collected = collectEnergy(loader, userId, bubbleId, userName, bizNo);
      if(collected > 0) break;
-     Thread.sleep(Config.collectInterval());
+     if(Config.collectInterval() > 0)
+      Thread.sleep(Config.collectInterval());
     }
    }catch(Throwable t)
    {

@@ -82,7 +82,7 @@ public class XposedHook implements IXposedHookLoadPackage
          AntFarm.start(loader);
          AntMember.receivePoint(loader);
          if(Config.collectEnergy() || Config.enableFarm())
-          handler.postDelayed(this, Config.timeInterval());
+          handler.postDelayed(this, Config.checkInterval());
          else AntForestNotification.stop(service, false);
         }
        }.setData(service);
@@ -90,7 +90,7 @@ public class XposedHook implements IXposedHookLoadPackage
       {
        AntForestNotification.start(service);
        handler.post(runnable);
-       Log.i(TAG, "task start. interval=" + Config.timeInterval());
+       Log.i(TAG, "task start. interval=" + Config.checkInterval());
       }
      }
     });

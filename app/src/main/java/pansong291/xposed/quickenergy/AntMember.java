@@ -11,46 +11,54 @@ public class AntMember
 {
  public static final String TAG = AntMember.class.getCanonicalName();
 
+ private static int times = 0;
+
  public static void receivePoint(ClassLoader loader)
  {
-  if(!Statistics.canReceivePointToday() || !Config.receivePoint())
+  if(!Config.receivePoint())
    return;
-  new Thread()
-  {
-   ClassLoader loader;
 
-   public Thread setData(ClassLoader cl)
+  if(times == 0)
+   new Thread()
    {
-    loader = cl;
-    return this;
-   }
+    ClassLoader loader;
 
-   @Override
-   public void run()
-   {
-    try
+    public Thread setData(ClassLoader cl)
     {
-     String s = AntMemberRpcCall.rpcCall_memberSignin(loader);
-     JSONObject jo = new JSONObject(s);
-     if(jo.getString("resultCode").equals("SUCCESS"))
-     {
-      Log.other(
-       "领取〈每日签到〉〈" + jo.getString("signinPoint") +
-       "积分〉，已签到〈" + jo.getString("signinSumDay") + "天〉");
-     }else
-     {
-      Log.recordLog(jo.getString("resultDesc"), s);
-     }
-     queryPointCert(loader, 1, 8);
-     claimFamilyPoint(loader);
-     Statistics.receivePointToday();
-    }catch(Throwable t)
-    {
-     Log.i(TAG, "receivePoint.run err:");
-     Log.printStackTrace(TAG, t);
+     loader = cl;
+     return this;
     }
-   }
-  }.setData(loader).start();
+
+    @Override
+    public void run()
+    {
+     try
+     {
+      if(Statistics.canMemberSigninToday())
+      {
+       String s = AntMemberRpcCall.rpcCall_memberSignin(loader);
+       JSONObject jo = new JSONObject(s);
+       if(jo.getString("resultCode").equals("SUCCESS"))
+       {
+        Log.other(
+         "领取〈每日签到〉〈" + jo.getString("signinPoint") +
+         "积分〉，已签到〈" + jo.getString("signinSumDay") + "天〉");
+        Statistics.memberSigninToday();
+       }else
+       {
+        Log.recordLog(jo.getString("resultDesc"), s);
+       }
+      }
+      queryPointCert(loader, 1, 8);
+      claimFamilyPoint(loader);
+     }catch(Throwable t)
+     {
+      Log.i(TAG, "receivePoint.run err:");
+      Log.printStackTrace(TAG, t);
+     }
+    }
+   }.setData(loader).start();
+  times = (times + 1) % (3600_000 / Config.checkInterval());
  }
 
  private static void queryPointCert(ClassLoader loader, int page, int pageSize)
@@ -96,7 +104,8 @@ public class AntMember
  {
   try
   {
-   String s = AntMemberRpcCall.rpcCall_familyHomepage(loader);
+   String s = AntMemberRpcCall.rpcCall_familySignin(loader);
+   s = AntMemberRpcCall.rpcCall_familyHomepage(loader);
    JSONObject jo = new JSONObject(s);
    if(jo.getBoolean("success"))
    {

@@ -92,8 +92,12 @@ public class SettingsActivity extends Activity
     Config.setCollectEnergy(cb.isChecked());
     break;
 
-   case R.id.btn_timeInterval:
-    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.TIME_INTERVAL);
+   case R.id.btn_checkInterval:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.CHECK_INTERVAL);
+    break;
+
+   case R.id.btn_threadCount:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.THREAD_COUNT);
     break;
 
    case R.id.btn_advanceTime:
@@ -210,10 +214,6 @@ public class SettingsActivity extends Activity
 
    case R.id.cb_receivePoint:
     Config.setReceivePoint(cb.isChecked());
-    break;
-
-   case R.id.btn_receivePointTime:
-    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.RECEIVE_POINT_TIME);
     break;
 
    case R.id.btn_help:

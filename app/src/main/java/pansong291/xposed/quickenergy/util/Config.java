@@ -29,7 +29,7 @@ public class Config
  /* forest */
  jn_collectEnergy = "collectEnergy", jn_ReturnWater30 = "returnWater30", jn_ReturnWater20 = "returnWater20",
  jn_ReturnWater10 = "returnWater10", jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList",
- jn_dontHelpCollectList = "dontHelpCollectList", jn_onTimeCollect = "onTimeCollect", jn_timeInterval = "timeInterval",
+ jn_dontHelpCollectList = "dontHelpCollectList", jn_checkInterval = "checkInterval", jn_threadCount = "threadCount",
  jn_advanceTime = "advanceTime", jn_collectInterval = "collectInterval", jn_collectTimeout = "collectTimeout",
  jn_receiveForestTaskAward = "receiveForestTaskAward", jn_waterFriendList = "waterFriendList",
  /* farm */
@@ -54,7 +54,8 @@ public class Config
 
  /* forest */
  private boolean collectEnergy;
- private int timeInterval;
+ private int checkInterval;
+ private int threadCount;
  private int advanceTime;
  private int collectInterval;
  private int collectTimeout;
@@ -89,7 +90,6 @@ public class Config
 
  /* member */
  private boolean receivePoint;
- private int receivePointTime;
 
  /* other */
  private boolean reInit;
@@ -155,15 +155,26 @@ public class Config
   return getConfig().collectEnergy;
  }
 
- public static void setTimeInterval(int i)
+ public static void setCheckInterval(int i)
  {
-  getConfig().timeInterval = i;
+  getConfig().checkInterval = i;
   hasConfigChanged = true;
  }
 
- public static int timeInterval()
+ public static int checkInterval()
  {
-  return getConfig().timeInterval;
+  return getConfig().checkInterval;
+ }
+
+ public static void setThreadCount(int i)
+ {
+  getConfig().threadCount = i;
+  hasConfigChanged = true;
+ }
+
+ public static int threadCount()
+ {
+  return getConfig().threadCount;
  }
 
  public static void setAdvanceTime(int i)
@@ -450,17 +461,6 @@ public class Config
   return getConfig().receivePoint;
  }
 
- public static void setReceivePointTime(int i)
- {
-  getConfig().receivePointTime = i;
-  hasConfigChanged = true;
- }
-
- public static int receivePointTime()
- {
-  return getConfig().receivePointTime;
- }
-
  /* other */
  private static Config getConfig()
  {
@@ -532,7 +532,7 @@ public class Config
   if(getIdMap().containsKey(id))
   {
    String n = getIdMap().get(id).toString();
-   int ind = n.indexOf('(');
+   int ind = n.lastIndexOf('(');
    if(ind > 0) n = n.substring(0, ind);
    if(!n.equals("*")) return n;
   }else
@@ -600,7 +600,8 @@ public class Config
   c.enableFarm = true;
 
   c.collectEnergy = true;
-  c.timeInterval = 120_000;
+  c.checkInterval = 120_000;
+  c.threadCount = 1;
   c.advanceTime = 500;
   c.collectInterval = 100;
   c.collectTimeout = 2_000;
@@ -633,7 +634,6 @@ public class Config
   if(c.dontNotifyFriendList == null) c.dontNotifyFriendList = new ArrayList<>();
 
   c.receivePoint = true;
-  c.receivePointTime = 23;
   return c;
  }
 
@@ -661,8 +661,11 @@ public class Config
    config.collectEnergy = jo.optBoolean(jn_collectEnergy, true);
    Log.i(TAG, jn_collectEnergy + ":" + config.collectEnergy);
 
-   config.timeInterval = jo.optInt(jn_timeInterval, 120_000);
-   Log.i(TAG, jn_timeInterval + ":" + config.timeInterval);
+   config.checkInterval = jo.optInt(jn_checkInterval, 120_000);
+   Log.i(TAG, jn_checkInterval + ":" + config.checkInterval);
+
+   config.threadCount = jo.optInt(jn_threadCount, 1);
+   Log.i(TAG, jn_threadCount + ":" + config.threadCount);
 
    config.advanceTime = jo.optInt(jn_advanceTime, 500);
    Log.i(TAG, jn_advanceTime + ":" + config.advanceTime);
@@ -831,9 +834,6 @@ public class Config
    config.receivePoint = jo.optBoolean(jn_receivePoint, true);
    Log.i(TAG, jn_receivePoint + ":" + config.receivePoint);
 
-   config.receivePointTime = jo.optInt(jn_receivePointTime, 23);
-   Log.i(TAG, jn_receivePointTime + ":" + config.receivePointTime);
-
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);
@@ -868,7 +868,9 @@ public class Config
    /* forest */
    jo.put(jn_collectEnergy, config.collectEnergy);
 
-   jo.put(jn_timeInterval, config.timeInterval);
+   jo.put(jn_checkInterval, config.checkInterval);
+
+   jo.put(jn_threadCount, config.threadCount);
 
    jo.put(jn_advanceTime, config.advanceTime);
 
@@ -965,8 +967,6 @@ public class Config
 
    /* member */
    jo.put(jn_receivePoint, config.receivePoint);
-
-   jo.put(jn_receivePointTime, config.receivePointTime);
 
   }catch(Throwable t)
   {

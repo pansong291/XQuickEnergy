@@ -31,12 +31,12 @@ public class Statistics
   }
  }
 
- private class FeedFriendTask
+ private class FeedFriendLog
  {
   String userId;
   int today = 0;
   int feedCount = 0;
-  public FeedFriendTask(String id)
+  public FeedFriendLog(String id)
   {
    userId = id;
   }
@@ -46,25 +46,21 @@ public class Statistics
  private static final String
  jn_year = "year", jn_month = "month", jn_day = "day",
  jn_collected = "collected", jn_helped = "helped", jn_watered = "watered",
- jn_questionHint = "questionHint";
+ jn_questionHint = "questionHint", jn_memberSignin = "memberSignin";
 
  private TimeStatistics year;
  private TimeStatistics month;
  private TimeStatistics day;
 
  // forest
- private int receiveForestTaskAward = 0;
- private int waterFriendList = 0;
 
  // farm
- private int receiveFarmToolReward = 0;
- private int useNewEggTool = 0;
  private int answerQuestion = 0;
  private String questionHint;
- private ArrayList<FeedFriendTask> feedFriendTaskList;
+ private ArrayList<FeedFriendLog> feedFriendLogList;
 
  // member
- private int receivePoint = 0;
+ private int memberSignin = 0;
 
  private static Statistics statistics;
 
@@ -152,58 +148,6 @@ public class Statistics
   return sb.toString();
  }
 
- public static boolean canReceiveForestTaskAwardToday()
- {
-  Statistics stat = getStatistics();
-  return stat.receiveForestTaskAward < stat.day.time;
- }
-
- public static void receiveForestTaskAwardToday()
- {
-  Statistics stat = getStatistics();
-  stat.receiveForestTaskAward = stat.day.time;
-  save();
- }
-
- public static boolean canWaterFriendListToday()
- {
-  Statistics stat = getStatistics();
-  return stat.waterFriendList < stat.day.time;
- }
-
- public static void waterFriendListToday()
- {
-  Statistics stat = getStatistics();
-  stat.waterFriendList = stat.day.time;
-  save();
- }
-
- public static boolean canReceiveFarmToolRewardToday()
- {
-  Statistics stat = getStatistics();
-  return stat.receiveFarmToolReward < stat.day.time;
- }
-
- public static void receiveFarmToolRewardToday()
- {
-  Statistics stat = getStatistics();
-  stat.receiveFarmToolReward = stat.day.time;
-  save();
- }
-
- public static boolean canUseNewEggToolToday()
- {
-  Statistics stat = getStatistics();
-  return stat.useNewEggTool < stat.day.time;
- }
-
- public static void useNewEggToolToday()
- {
-  Statistics stat = getStatistics();
-  stat.useNewEggTool = stat.day.time;
-  save();
- }
-
  public static boolean canAnswerQuestionToday()
  {
   Statistics stat = getStatistics();
@@ -227,63 +171,61 @@ public class Statistics
  {
   Statistics stat = getStatistics();
   int index = -1;
-  for(int i = 0; i < stat.feedFriendTaskList.size(); i++)
-   if(stat.feedFriendTaskList.get(i).userId.equals(id))
+  for(int i = 0; i < stat.feedFriendLogList.size(); i++)
+   if(stat.feedFriendLogList.get(i).userId.equals(id))
    {
     index = i;
     break;
    }
   if(index < 0) return true;
-  FeedFriendTask fft = stat.feedFriendTaskList.get(index);
-  if(fft.today < stat.day.time)
+  FeedFriendLog ffl = stat.feedFriendLogList.get(index);
+  if(ffl.today < stat.day.time)
   {
    return true;
   }
-  return fft.feedCount < count;
+  return ffl.feedCount < count;
  }
 
  public static void feedFriendToday(String id)
  {
   Statistics stat = getStatistics();
-  FeedFriendTask fft;
+  FeedFriendLog ffl;
   int index = -1;
-  for(int i = 0; i < stat.feedFriendTaskList.size(); i++)
-   if(stat.feedFriendTaskList.get(i).userId.equals(id))
+  for(int i = 0; i < stat.feedFriendLogList.size(); i++)
+   if(stat.feedFriendLogList.get(i).userId.equals(id))
    {
     index = i;
     break;
    }
   if(index < 0)
   {
-   fft = stat.new FeedFriendTask(id);
-   stat.feedFriendTaskList.add(fft);
+   ffl = stat.new FeedFriendLog(id);
+   stat.feedFriendLogList.add(ffl);
   }else
   {
-   fft = stat.feedFriendTaskList.get(index);
+   ffl = stat.feedFriendLogList.get(index);
   }
-  if(fft.today < stat.day.time)
+  if(ffl.today < stat.day.time)
   {
-   fft.today = stat.day.time;
-   fft.feedCount = 1;
+   ffl.today = stat.day.time;
+   ffl.feedCount = 1;
   }else
   {
-   fft.feedCount++;
+   ffl.feedCount++;
   }
   save();
  }
 
- public static boolean canReceivePointToday()
+ public static boolean canMemberSigninToday()
  {
   Statistics stat = getStatistics();
-  int hour = Integer.parseInt(Log.getFormatTime().split(":")[0]);
-  if(hour < Config.receivePointTime()) return false;
-  return stat.receivePoint < stat.day.time;
+  return stat.memberSignin < stat.day.time;
  }
 
- public static void receivePointToday()
+ public static void memberSigninToday()
  {
   Statistics stat = getStatistics();
-  stat.receivePoint = stat.day.time;
+  stat.memberSignin = stat.day.time;
   save();
  }
 
@@ -330,13 +272,9 @@ public class Statistics
  private static void monthClear()
  {
   Statistics stat = getStatistics();
-  stat.receiveForestTaskAward = 0;
-  stat.waterFriendList = 0;
-  stat.receiveFarmToolReward = 0;
-  stat.useNewEggTool = 0;
   stat.answerQuestion = 0;
-  stat.feedFriendTaskList.clear();
-  stat.receivePoint = 0;
+  stat.feedFriendLogList.clear();
+  stat.memberSignin = 0;
   save();
   FileUtils.getOtherLogFile().delete();
  }
@@ -357,8 +295,8 @@ public class Statistics
    stat.month = stat.new TimeStatistics(Integer.parseInt(date[1]));
   if(stat.day == null)
    stat.day = stat.new TimeStatistics(Integer.parseInt(date[2]));
-  if(stat.feedFriendTaskList == null)
-   stat.feedFriendTaskList = new ArrayList<>();
+  if(stat.feedFriendLogList == null)
+   stat.feedFriendLogList = new ArrayList<>();
   return stat;
  }
 
@@ -401,22 +339,6 @@ public class Statistics
    stat.day.watered = joo.getInt(jn_watered);
    Log.i(TAG, "  " + jn_watered + ":" + stat.day.watered);
 
-   if(jo.has(Config.jn_receiveForestTaskAward))
-    stat.receiveForestTaskAward = jo.getInt(Config.jn_receiveForestTaskAward);
-   Log.i(TAG, Config.jn_receiveForestTaskAward + ":" + stat.receiveForestTaskAward);
-
-   if(jo.has(Config.jn_waterFriendList))
-    stat.waterFriendList = jo.getInt(Config.jn_waterFriendList);
-   Log.i(TAG, Config.jn_waterFriendList + ":" + stat.waterFriendList);
-
-   if(jo.has(Config.jn_receiveFarmToolReward))
-    stat.receiveFarmToolReward = jo.getInt(Config.jn_receiveFarmToolReward);
-   Log.i(TAG, Config.jn_receiveFarmToolReward + ":" + stat.receiveFarmToolReward);
-
-   if(jo.has(Config.jn_useNewEggTool))
-    stat.useNewEggTool = jo.getInt(Config.jn_useNewEggTool);
-   Log.i(TAG, Config.jn_useNewEggTool + ":" + stat.useNewEggTool);
-
    if(jo.has(Config.jn_answerQuestion))
     stat.answerQuestion = jo.getInt(Config.jn_answerQuestion);
    Log.i(TAG, Config.jn_answerQuestion + ":" + stat.answerQuestion);
@@ -425,7 +347,7 @@ public class Statistics
     stat.questionHint = jo.getString(jn_questionHint);
    Log.i(TAG, jn_questionHint + ":" + stat.questionHint);
 
-   stat.feedFriendTaskList = new ArrayList<>();
+   stat.feedFriendLogList = new ArrayList<>();
    Log.i(TAG, Config.jn_feedFriendAnimalList + ":[");
    if(jo.has(Config.jn_feedFriendAnimalList))
    {
@@ -433,17 +355,17 @@ public class Statistics
     for(int i = 0; i < ja.length(); i++)
     {
      JSONArray jaa = ja.getJSONArray(i);
-     FeedFriendTask fft = stat.new FeedFriendTask(jaa.getString(0));
-     fft.today = jaa.getInt(1);
-     fft.feedCount = jaa.getInt(2);
-     stat.feedFriendTaskList.add(fft);
-     Log.i(TAG, "  " + fft.userId + "," + fft.today + "," + fft.feedCount + ",");
+     FeedFriendLog ffl = stat.new FeedFriendLog(jaa.getString(0));
+     ffl.today = jaa.getInt(1);
+     ffl.feedCount = jaa.getInt(2);
+     stat.feedFriendLogList.add(ffl);
+     Log.i(TAG, "  " + ffl.userId + "," + ffl.today + "," + ffl.feedCount + ",");
     }
    }
 
-   if(jo.has(Config.jn_receivePoint))
-    stat.receivePoint = jo.getInt(Config.jn_receivePoint);
-   Log.i(TAG, Config.jn_receivePoint + ":" + stat.receivePoint);
+   if(jo.has(jn_memberSignin))
+    stat.memberSignin = jo.getInt(jn_memberSignin);
+   Log.i(TAG, jn_memberSignin + ":" + stat.memberSignin);
 
   }catch(Throwable t)
   {
@@ -491,27 +413,23 @@ public class Statistics
    joo.put(jn_watered, stat.day.watered);
    jo.put(jn_day, joo);
 
-   jo.put(Config.jn_receiveForestTaskAward, stat.receiveForestTaskAward);
-   jo.put(Config.jn_waterFriendList, stat.waterFriendList);
-   jo.put(Config.jn_receiveFarmToolReward, stat.receiveFarmToolReward);
-   jo.put(Config.jn_useNewEggTool, stat.useNewEggTool);
    jo.put(Config.jn_answerQuestion, stat.answerQuestion);
    if(stat.questionHint != null)
     jo.put(jn_questionHint, stat.questionHint);
 
    JSONArray ja = new JSONArray();
-   for(int i = 0; i < stat.feedFriendTaskList.size(); i++)
+   for(int i = 0; i < stat.feedFriendLogList.size(); i++)
    {
-    FeedFriendTask fft = stat.feedFriendTaskList.get(i);
+    FeedFriendLog ffl = stat.feedFriendLogList.get(i);
     JSONArray jaa = new JSONArray();
-    jaa.put(fft.userId);
-    jaa.put(fft.today);
-    jaa.put(fft.feedCount);
+    jaa.put(ffl.userId);
+    jaa.put(ffl.today);
+    jaa.put(ffl.feedCount);
     ja.put(jaa);
    }
    jo.put(Config.jn_feedFriendAnimalList, ja);
 
-   jo.put(Config.jn_receivePoint, stat.receivePoint);
+   jo.put(jn_memberSignin, stat.memberSignin);
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);

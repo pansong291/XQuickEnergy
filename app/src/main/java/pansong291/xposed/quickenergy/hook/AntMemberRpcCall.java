@@ -66,6 +66,21 @@ public class AntMemberRpcCall
  }
 
  /* family point*/
+ public static String rpcCall_familySignin(ClassLoader loader)
+ {
+  try
+  {
+   String args1 = "[{\"appVersion\": \"" + appVersion +
+    "\",\"clientTraceId\": \"\",\"source\": \"JTHYJGW\"}]";
+   return RpcCall.invoke(loader, "alipay.peerpayprod.family.signin", args1);
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "rpcCall_familySignin err:");
+   Log.printStackTrace(TAG, t);
+  }
+  return null;
+ }
+
  public static String rpcCall_familyHomepage(ClassLoader loader)
  {
   try
