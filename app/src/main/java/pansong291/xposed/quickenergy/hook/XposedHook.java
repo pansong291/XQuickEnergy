@@ -1,6 +1,9 @@
 package pansong291.xposed.quickenergy.hook;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.PowerManager;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -118,6 +121,14 @@ public class XposedHook implements IXposedHookLoadPackage
       Log.recordLog("支付宝前台服务被销毁", "");
       handler.removeCallbacks(runnable);
       AntForestNotification.stop(service, false);
+      if(Config.autoRestart())
+      {
+       AlarmManager alarmManager = (AlarmManager) service.getSystemService(service.ALARM_SERVICE);
+       Intent it = new Intent();
+       it.setClassName(service.getApplicationContext(), ClassMember.com_alipay_android_launcher_service_LauncherService);
+       PendingIntent pi = PendingIntent.getService(service, 0, it, PendingIntent.FLAG_UPDATE_CURRENT);
+       alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pi);
+      }
      }
     });
    Log.i(TAG, "hook " + ClassMember.onDestroy + " successfully");

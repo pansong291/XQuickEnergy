@@ -25,7 +25,7 @@ public class Config
  private static final String TAG = Config.class.getCanonicalName();
  public static final String
  /* application */
- jn_immediateEffect = "immediateEffect", jn_recordLog = "recordLog",
+ jn_immediateEffect = "immediateEffect", jn_recordLog = "recordLog", jn_autoRestart = "autoRestart",
  /* forest */
  jn_collectEnergy = "collectEnergy", jn_ReturnWater30 = "returnWater30", jn_ReturnWater20 = "returnWater20",
  jn_ReturnWater10 = "returnWater10", jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList",
@@ -49,8 +49,7 @@ public class Config
  /* application */
  private boolean immediateEffect;
  private boolean recordLog;
- private boolean enableForest;
- private boolean enableFarm;
+ private boolean autoRestart;
 
  /* forest */
  private boolean collectEnergy;
@@ -70,6 +69,7 @@ public class Config
  private List<Integer> waterCountList;
 
  /* farm */
+ private boolean enableFarm;
  private boolean rewardFriend;
  private boolean sendBackAnimal;
  private SendType sendType;
@@ -121,26 +121,15 @@ public class Config
   return getConfig().recordLog;
  }
 
- public static void setEnableForest(boolean b)
+ public static void setAutoRestart(boolean b)
  {
-  getConfig().enableForest = b;
+  getConfig().autoRestart = b;
   hasConfigChanged = true;
  }
 
- public static boolean enableForest()
+ public static boolean autoRestart()
  {
-  return getConfig().enableForest;
- }
-
- public static void setEnableFarm(boolean b)
- {
-  getConfig().enableFarm = b;
-  hasConfigChanged = true;
- }
-
- public static boolean enableFarm()
- {
-  return getConfig().enableFarm;
+  return getConfig().autoRestart;
  }
 
  /* forest */
@@ -286,6 +275,17 @@ public class Config
  }
 
  /* farm */
+ public static void setEnableFarm(boolean b)
+ {
+  getConfig().enableFarm = b;
+  hasConfigChanged = true;
+ }
+
+ public static boolean enableFarm()
+ {
+  return getConfig().enableFarm;
+ }
+
  public static void setRewardFriend(boolean b)
  {
   getConfig().rewardFriend = b;
@@ -596,8 +596,7 @@ public class Config
 
   c.immediateEffect = true;
   c.recordLog = true;
-  c.enableForest = true;
-  c.enableFarm = true;
+  c.autoRestart = true;
 
   c.collectEnergy = true;
   c.checkInterval = 120_000;
@@ -615,6 +614,7 @@ public class Config
   if(c.waterFriendList == null) c.waterFriendList = new ArrayList<>();
   if(c.waterCountList == null) c.waterCountList = new ArrayList<>();
 
+  c.enableFarm = true;
   c.rewardFriend = true;
   c.sendBackAnimal = true;
   c.sendType = SendType.HIT;
@@ -656,6 +656,9 @@ public class Config
 
    config.recordLog = jo.optBoolean(jn_recordLog, true);
    Log.i(TAG, jn_recordLog + ":" + config.recordLog);
+
+   config.autoRestart = jo.optBoolean(jn_autoRestart);
+   Log.i(TAG, jn_autoRestart + ":" + config.autoRestart);
 
    /* forest */
    config.collectEnergy = jo.optBoolean(jn_collectEnergy, true);
@@ -864,6 +867,8 @@ public class Config
    jo.put(jn_immediateEffect, config.immediateEffect);
 
    jo.put(jn_recordLog, config.recordLog);
+
+   jo.put(jn_autoRestart, config.autoRestart);
 
    /* forest */
    jo.put(jn_collectEnergy, config.collectEnergy);

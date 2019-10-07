@@ -14,7 +14,7 @@ import pansong291.xposed.quickenergy.util.Config;
 
 public class SettingsActivity extends Activity
 {
- CheckBox cb_immediateEffect, cb_recordLog,
+ CheckBox cb_immediateEffect, cb_recordLog, cb_autoRestart,
  cb_collectEnergy, cb_helpFriendCollect,
  cb_receiveForestTaskAward, cb_enableFarm, cb_rewardFriend,
  cb_sendBackAnimal, cb_receiveFarmToolReward, cb_useNewEggTool,
@@ -32,6 +32,7 @@ public class SettingsActivity extends Activity
 
   cb_immediateEffect = (CheckBox) findViewById(R.id.cb_immediateEffect);
   cb_recordLog = (CheckBox) findViewById(R.id.cb_recordLog);
+  cb_autoRestart = (CheckBox) findViewById(R.id.cb_autoRestart);
   cb_collectEnergy = (CheckBox) findViewById(R.id.cb_collectEnergy);
   cb_helpFriendCollect = (CheckBox) findViewById(R.id.cb_helpFriendCollect);
   cb_receiveForestTaskAward = (CheckBox) findViewById(R.id.cb_receiveForestTaskAward);
@@ -56,6 +57,7 @@ public class SettingsActivity extends Activity
   super.onResume();
   cb_immediateEffect.setChecked(Config.immediateEffect());
   cb_recordLog.setChecked(Config.recordLog());
+  cb_autoRestart.setChecked(Config.autoRestart());
   cb_enableFarm.setChecked(Config.enableFarm());
   cb_collectEnergy.setChecked(Config.collectEnergy());
   cb_helpFriendCollect.setChecked(Config.helpFriendCollect());
@@ -86,6 +88,10 @@ public class SettingsActivity extends Activity
 
    case R.id.cb_recordLog:
     Config.setRecordLog(cb.isChecked());
+    break;
+
+   case R.id.cb_autoRestart:
+    Config.setAutoRestart(cb.isChecked());
     break;
 
    case R.id.cb_collectEnergy:
