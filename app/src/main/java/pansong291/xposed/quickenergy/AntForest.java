@@ -35,7 +35,6 @@ public class AntForest
  
  private static int times = 0;
 
- private static boolean checkingIds = false;
  private static long serverTime = -1;
  private static long offsetTime = -1;
  private static long laterTime = -1;
@@ -152,6 +151,7 @@ public class AntForest
      if(waterCount > 3) waterCount = 3;
      waterFriendEnergy(loader, uid, waterCount);
     }
+    checkUnknownId(loader);
    }
   }catch(Throwable t)
   {
@@ -506,7 +506,6 @@ public class AntForest
    AntForestNotification.setContentText(Log.getFormatTime() + sb.toString());
   }
   laterTime = -1;
-  checkUnknownId(loader);
  }
 
  public static void checkEnergyRanking(ClassLoader loader)
@@ -535,11 +534,9 @@ public class AntForest
 
  public static void checkUnknownId(ClassLoader loader)
  {
-  if(checkingIds) return;
   String[] unknownIds = Config.getUnknownIds();
   if(unknownIds != null)
   {
-   checkingIds = true;
    new Thread()
    {
     ClassLoader loader;
@@ -584,7 +581,6 @@ public class AntForest
       Log.i(TAG, "checkUnknownId.run err:");
       Log.printStackTrace(TAG, t);
      }
-     checkingIds = false;
     }
    }.setData(loader, unknownIds).start();
   }
