@@ -493,6 +493,16 @@ public class Config
   }
  }
 
+ public static void removeIdMap(String key)
+ {
+  if(key == null || key.isEmpty()) return;
+  if(getIdMap().containsKey(key))
+  {
+   getIdMap().remove(key);
+   hasIdMapChanged = true;
+  }
+ }
+
  public static boolean saveIdMap()
  {
   if(hasIdMapChanged)

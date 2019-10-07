@@ -32,4 +32,17 @@ public class AlipayUser
   return list;
  }
 
+ public static void remove(String id)
+ {
+  getAlipayUserList();
+  for(int i = 0; i < list.size(); i++)
+  {
+   if(list.get(i).id.equals(id))
+   {
+    list.remove(i);
+    break;
+   }
+  }
+ }
+
 }

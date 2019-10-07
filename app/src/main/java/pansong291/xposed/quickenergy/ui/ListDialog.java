@@ -8,13 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import java.util.List;
-import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.R;
+import pansong291.xposed.quickenergy.util.Config;
 
 public class ListDialog
 {
@@ -29,6 +30,8 @@ public class ListDialog
 
  static AlertDialog edtDialog;
  static EditText edt_count;
+
+ static AlertDialog deleteDialog;
 
  public static void show(Context c, CharSequence title, List<String> l, List<Integer> lc)
  {
@@ -78,8 +81,8 @@ public class ListDialog
     @Override
     public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
     {
-     curViewHolder = (ListAdapter.ViewHolder)p2.getTag();
-     curAlipayUser = (AlipayUser)p1.getAdapter().getItem(p3);
+     curViewHolder = (ListAdapter.ViewHolder) p2.getTag();
+     curAlipayUser = (AlipayUser) p1.getAdapter().getItem(p3);
      if(countList == null)
      {
       if(curViewHolder.cb.isChecked())
@@ -111,6 +114,25 @@ public class ListDialog
       else
        edt_count.getText().clear();
      }
+    }
+   });
+  lv_list.setOnItemLongClickListener(
+   new OnItemLongClickListener()
+   {
+    @Override
+    public boolean onItemLongClick(AdapterView<?> p1, View p2, int p3, long p4)
+    {
+     curAlipayUser = (AlipayUser) p1.getAdapter().getItem(p3);
+     try
+     {
+      getDeleteDialog(p1.getContext()).show();
+     }catch(Throwable t)
+     {
+      deleteDialog = null;
+      getDeleteDialog(p1.getContext()).show();
+     }
+     deleteDialog.setMessage("删除用户 " + curAlipayUser.name);
+     return true;
     }
    });
   return v;
@@ -182,6 +204,42 @@ public class ListDialog
     .create();
   }
   return edtDialog;
+ }
+
+ private static AlertDialog getDeleteDialog(Context c)
+ {
+  if(deleteDialog == null)
+  {
+   OnClickListener listener = new OnClickListener()
+   {
+    Context c;
+
+    public OnClickListener setContext(Context c)
+    {
+     this.c = c;
+     return this;
+    }
+
+    @Override
+    public void onClick(DialogInterface p1, int p2)
+    {
+     switch(p2)
+     {
+      case DialogInterface.BUTTON_POSITIVE:
+       Config.removeIdMap(curAlipayUser.id);
+       AlipayUser.remove(curAlipayUser.id);
+       break;
+     }
+     ListAdapter.get(c).notifyDataSetChanged();
+    }
+   }.setContext(c);
+   deleteDialog = new AlertDialog.Builder(c)
+   .setMessage("msg")
+   .setPositiveButton("确定", listener)
+   .setNegativeButton("取消", null)
+   .create();
+  }
+  return deleteDialog;
  }
 
  static class OnBtnClickListener implements View.OnClickListener
