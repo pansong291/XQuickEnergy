@@ -434,7 +434,7 @@ public class Statistics
   {
    Log.printStackTrace(TAG, t);
   }
-  return Config.formatJson(jo);
+  return Config.formatJson(jo, false);
  }
 
  private static boolean save()

@@ -65,6 +65,7 @@ public class AntFarm
   public int toolCount, toolHoldLimit;
   }/**/
 
+ public static String currentUid;
  private static String ownerFarmId;
  private static Animal[] animals;
  private static Animal ownerAnimal;
@@ -95,11 +96,11 @@ public class AntFarm
    {
     try
     {
-     String s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", Config.getSelfId());
+     String s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", currentUid);
      if(s == null)
      {
       Thread.sleep(RandomUtils.delay());
-      s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", Config.getSelfId());
+      s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", currentUid);
      }
      JSONObject jo = new JSONObject(s);
      String memo = jo.getString("memo");

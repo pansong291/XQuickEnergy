@@ -105,6 +105,7 @@ public class AntForest
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     jo = jo.getJSONObject("userEnergy");
     selfId = jo.getString("userId");
+    AntFarm.currentUid = selfId;
     String selfName = jo.getString("displayName");
     if(selfName == null || selfName.isEmpty())
      selfName = "我";

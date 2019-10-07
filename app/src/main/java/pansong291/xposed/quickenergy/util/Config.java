@@ -511,7 +511,7 @@ public class Config
   return hasIdMapChanged;
  }
 
- public static String getSelfId()
+ private static String getSelfId()
  {
   if(selfId == null)
   {
@@ -647,7 +647,7 @@ public class Config
   Config config = null;
   try
   {
-   JSONObject jo = new JSONObject(removeOutcomment(json));
+   JSONObject jo = new JSONObject(json);
    JSONArray ja = null, jaa = null;
    config = new Config();
 
@@ -977,10 +977,10 @@ public class Config
   {
    Log.printStackTrace(TAG, t);
   }
-  return formatJson(jo);
+  return formatJson(jo, true);
  }
 
- public static String formatJson(JSONObject jo)
+ public static String formatJson(JSONObject jo, boolean removeQuote)
  {
   String formated = null;
   try
@@ -990,6 +990,7 @@ public class Config
   {
    return jo.toString();
   }
+  if(!removeQuote) return formated;
   StringBuilder sb = new StringBuilder(formated);
   char currentChar, lastNonSpaceChar = 0;
   for(int i = 0; i < sb.length(); i++)
