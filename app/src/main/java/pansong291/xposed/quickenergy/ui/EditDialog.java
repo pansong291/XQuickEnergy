@@ -21,22 +21,22 @@ public class EditDialog
   mode = em;
   try
   {
-   getEditDialog(c, title).show();
+   getEditDialog(c).show();
   }catch(Throwable t)
   {
    editDialog = null;
-   getEditDialog(c, title).show();
+   getEditDialog(c).show();
   }
   editDialog.setTitle(title);
  }
 
- private static AlertDialog getEditDialog(Context c, CharSequence title)
+ private static AlertDialog getEditDialog(Context c)
  {
   if(editDialog == null)
   {
    edt = new EditText(c);
    editDialog = new AlertDialog.Builder(c)
-    .setTitle(title)
+    .setTitle("title")
     .setView(edt)
     .setPositiveButton(
     "确定",
