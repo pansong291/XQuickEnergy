@@ -200,7 +200,7 @@ public class AntFarm
       donation(loader);
      }
 
-     if(Config.answerQuestion() && Statistics.canAnswerQuestionToday())
+     if(Config.answerQuestion() && Statistics.canAnswerQuestionToday(currentUid))
      {
       answerQuestion(loader);
      }
@@ -582,7 +582,7 @@ public class AntFarm
           {
            s = jo.getBoolean("rightAnswer") ? "正确": "错误";
            Log.farm("答题" + s + "，可领取［" + jo.getInt("awardCount") + "克］");
-           Statistics.answerQuestionToday();
+           Statistics.answerQuestionToday(currentUid);
           }else
           {
            Log.recordLog(memo, s);
@@ -592,7 +592,7 @@ public class AntFarm
          {
           Statistics.setQuestionHint(rightReply);
           Log.farm("未找到正确答案，放弃作答。提示：" + rightReply);
-          Statistics.answerQuestionToday();
+          Statistics.answerQuestionToday(currentUid);
          }
         }else
         {
@@ -603,13 +603,13 @@ public class AntFarm
        case RECEIVED:
         Statistics.setQuestionHint(null);
         Log.recordLog("今日答题已完成", "");
-        Statistics.answerQuestionToday();
+        Statistics.answerQuestionToday(currentUid);
         break;
 
        case FINISHED:
         Statistics.setQuestionHint(null);
         Log.recordLog("已经答过题了，饲料待领取", "");
-        Statistics.answerQuestionToday();
+        Statistics.answerQuestionToday(currentUid);
         break;
       }
       break;

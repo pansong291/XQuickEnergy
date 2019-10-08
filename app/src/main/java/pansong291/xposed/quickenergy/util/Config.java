@@ -667,7 +667,7 @@ public class Config
    config.recordLog = jo.optBoolean(jn_recordLog, true);
    Log.i(TAG, jn_recordLog + ":" + config.recordLog);
 
-   config.autoRestart = jo.optBoolean(jn_autoRestart);
+   config.autoRestart = jo.optBoolean(jn_autoRestart, true);
    Log.i(TAG, jn_autoRestart + ":" + config.autoRestart);
 
    /* forest */

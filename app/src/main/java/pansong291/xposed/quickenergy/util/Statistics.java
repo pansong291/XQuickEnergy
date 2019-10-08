@@ -34,7 +34,6 @@ public class Statistics
  private class FeedFriendLog
  {
   String userId;
-  int today = 0;
   int feedCount = 0;
   public FeedFriendLog(String id)
   {
@@ -46,6 +45,7 @@ public class Statistics
  private static final String
  jn_year = "year", jn_month = "month", jn_day = "day",
  jn_collected = "collected", jn_helped = "helped", jn_watered = "watered",
+ jn_answerQuestionList = "answerQuestionList",
  jn_questionHint = "questionHint", jn_memberSignin = "memberSignin";
 
  private TimeStatistics year;
@@ -55,7 +55,7 @@ public class Statistics
  // forest
 
  // farm
- private int answerQuestion = 0;
+ private ArrayList<String> answerQuestionList;
  private String questionHint;
  private ArrayList<FeedFriendLog> feedFriendLogList;
 
@@ -148,17 +148,20 @@ public class Statistics
   return sb.toString();
  }
 
- public static boolean canAnswerQuestionToday()
+ public static boolean canAnswerQuestionToday(String uid)
  {
   Statistics stat = getStatistics();
-  return stat.answerQuestion < stat.day.time;
+  return stat.answerQuestionList.contains(uid);
  }
 
- public static void answerQuestionToday()
+ public static void answerQuestionToday(String uid)
  {
   Statistics stat = getStatistics();
-  stat.answerQuestion = stat.day.time;
-  save();
+  if(!stat.answerQuestionList.contains(uid))
+  {
+   stat.answerQuestionList.add(uid);
+   save();
+  }
  }
 
  public static void setQuestionHint(String s)
@@ -179,10 +182,6 @@ public class Statistics
    }
   if(index < 0) return true;
   FeedFriendLog ffl = stat.feedFriendLogList.get(index);
-  if(ffl.today < stat.day.time)
-  {
-   return true;
-  }
   return ffl.feedCount < count;
  }
 
@@ -205,14 +204,7 @@ public class Statistics
   {
    ffl = stat.feedFriendLogList.get(index);
   }
-  if(ffl.today < stat.day.time)
-  {
-   ffl.today = stat.day.time;
-   ffl.feedCount = 1;
-  }else
-  {
-   ffl.feedCount++;
-  }
+  ffl.feedCount++;
   save();
  }
 
@@ -271,16 +263,16 @@ public class Statistics
 
  private static void monthClear()
  {
-  Statistics stat = getStatistics();
-  stat.answerQuestion = 0;
-  stat.feedFriendLogList.clear();
-  stat.memberSignin = 0;
-  save();
   FileUtils.getOtherLogFile().delete();
  }
 
  private static void dayClear()
  {
+  Statistics stat = getStatistics();
+  stat.answerQuestionList.clear();
+  stat.feedFriendLogList.clear();
+  stat.memberSignin = 0;
+  save();
   FileUtils.getForestLogFile().delete();
   FileUtils.getFarmLogFile().delete();
  }
@@ -339,9 +331,17 @@ public class Statistics
    stat.day.watered = joo.getInt(jn_watered);
    Log.i(TAG, "  " + jn_watered + ":" + stat.day.watered);
 
-   if(jo.has(Config.jn_answerQuestion))
-    stat.answerQuestion = jo.getInt(Config.jn_answerQuestion);
-   Log.i(TAG, Config.jn_answerQuestion + ":" + stat.answerQuestion);
+   stat.answerQuestionList = new ArrayList<>();
+   Log.i(TAG, jn_answerQuestionList + ":[");
+   if(jo.has(jn_answerQuestionList))
+   {
+    JSONArray ja = jo.getJSONArray(jn_answerQuestionList);
+    for(int i = 0; i < ja.length(); i++)
+    {
+     stat.answerQuestionList.add(ja.getString(i));
+     Log.i(TAG, stat.answerQuestionList.get(i) + ",");
+    }
+   }
 
    if(jo.has(jn_questionHint))
     stat.questionHint = jo.getString(jn_questionHint);
@@ -356,10 +356,9 @@ public class Statistics
     {
      JSONArray jaa = ja.getJSONArray(i);
      FeedFriendLog ffl = stat.new FeedFriendLog(jaa.getString(0));
-     ffl.today = jaa.getInt(1);
-     ffl.feedCount = jaa.getInt(2);
+     ffl.feedCount = jaa.getInt(1);
      stat.feedFriendLogList.add(ffl);
-     Log.i(TAG, "  " + ffl.userId + "," + ffl.today + "," + ffl.feedCount + ",");
+     Log.i(TAG, "  " + ffl.userId + "," + ffl.feedCount + ",");
     }
    }
 
@@ -389,6 +388,7 @@ public class Statistics
  private static String statistics2Json(Statistics stat)
  {
   JSONObject jo = new JSONObject();
+  JSONArray ja = null;
   try
   {
    if(stat == null) stat = Statistics.defInit();
@@ -413,17 +413,22 @@ public class Statistics
    joo.put(jn_watered, stat.day.watered);
    jo.put(jn_day, joo);
 
-   jo.put(Config.jn_answerQuestion, stat.answerQuestion);
+   ja = new JSONArray();
+   for(int i = 0; i < stat.answerQuestionList.size(); i++)
+   {
+    ja.put(stat.answerQuestionList.get(i));
+   }
+   jo.put(jn_answerQuestionList, ja);
+
    if(stat.questionHint != null)
     jo.put(jn_questionHint, stat.questionHint);
 
-   JSONArray ja = new JSONArray();
+   ja = new JSONArray();
    for(int i = 0; i < stat.feedFriendLogList.size(); i++)
    {
     FeedFriendLog ffl = stat.feedFriendLogList.get(i);
     JSONArray jaa = new JSONArray();
     jaa.put(ffl.userId);
-    jaa.put(ffl.today);
     jaa.put(ffl.feedCount);
     ja.put(jaa);
    }
