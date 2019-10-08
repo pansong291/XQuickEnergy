@@ -32,7 +32,7 @@ public class AntForest
    return nickNames[ordinal()];
   }
  }
- 
+
  private static int times = 0;
 
  private static long serverTime = -1;
@@ -112,30 +112,31 @@ public class AntForest
     Config.putIdMap(selfId, selfName);
     Log.recordLog("进入【" + selfName + "】的蚂蚁森林", "");
     Config.saveIdMap();
-    for(int i = 0; i < jaBubbles.length(); i++)
-    {
-     jo = jaBubbles.getJSONObject(i);
-     long bubbleId = jo.getLong("id");
-     switch(CollectStatus.valueOf(jo.getString("collectStatus")))
+    if(Config.collectEnergy())
+     for(int i = 0; i < jaBubbles.length(); i++)
      {
-      case AVAILABLE:
-       if(Config.getDontCollectList().contains(selfId))
-        Log.recordLog("不偷取【" + selfName + "】", ", userId=" + selfId);
-       else
-        collectedEnergy += collectEnergy(loader, selfId, bubbleId, selfName, null);
-       break;
-
-      case WAITING:
-       if(Config.getDontCollectList().contains(selfId))
+      jo = jaBubbles.getJSONObject(i);
+      long bubbleId = jo.getLong("id");
+      switch(CollectStatus.valueOf(jo.getString("collectStatus")))
+      {
+       case AVAILABLE:
+        if(Config.getDontCollectList().contains(selfId))
+         Log.recordLog("不偷取【" + selfName + "】", ", userId=" + selfId);
+        else
+         collectedEnergy += collectEnergy(loader, selfId, bubbleId, selfName, null);
         break;
-       long produceTime = jo.getLong("produceTime");
-       if(produceTime - serverTime < Config.checkInterval())
-        execute(loader, selfName, selfId, null, bubbleId, produceTime);
-       else
-        setLaterTime(produceTime);
-       break;
+
+       case WAITING:
+        if(Config.getDontCollectList().contains(selfId))
+         break;
+        long produceTime = jo.getLong("produceTime");
+        if(produceTime - serverTime < Config.checkInterval())
+         execute(loader, selfName, selfId, null, bubbleId, produceTime);
+        else
+         setLaterTime(produceTime);
+        break;
+      }
      }
-    }
    }else
    {
     Log.recordLog(jo.getString("resultDesc"), s);
@@ -511,8 +512,6 @@ public class AntForest
 
  public static void checkEnergyRanking(ClassLoader loader)
  {
-  if(!Config.collectEnergy())
-   return;
   Log.recordLog("定时检测开始", "");
   new Thread()
   {
@@ -528,7 +527,8 @@ public class AntForest
    public void run()
    {
     canCollectSelfEnergy(loader);
-    queryEnergyRanking(loader, "1");
+    if(Config.collectEnergy())
+     queryEnergyRanking(loader, "1");
    }
   }.setData(loader).start();
  }

@@ -125,7 +125,7 @@ public class XposedHook implements IXposedHookLoadPackage
       {
        AlarmManager alarmManager = (AlarmManager) service.getSystemService(service.ALARM_SERVICE);
        Intent it = new Intent();
-       it.setClassName(service.getApplicationContext(), ClassMember.com_alipay_android_launcher_service_LauncherService);
+       it.setClassName(ClassMember.com_eg_android_AlipayGphone, ClassMember.com_alipay_android_launcher_service_LauncherService);
        PendingIntent pi = PendingIntent.getService(service, 0, it, PendingIntent.FLAG_UPDATE_CURRENT);
        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pi);
       }
