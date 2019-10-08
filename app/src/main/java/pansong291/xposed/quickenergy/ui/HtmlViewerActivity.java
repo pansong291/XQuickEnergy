@@ -9,22 +9,17 @@ import android.webkit.WebView;
 
 public class HtmlViewerActivity extends Activity
 {
- private WebView webView;
+ private MyWebView mWebView;
  private Uri uri;
 
  @Override
  protected void onCreate(Bundle savedInstanceState)
  {
   super.onCreate(savedInstanceState);
-  webView = new WebView(this);
-  setContentView(webView);
+  mWebView = new MyWebView(this);
+  setContentView(mWebView);
   uri = getIntent().getData();
-  webView.getSettings().setSupportZoom(true);
-  webView.getSettings().setBuiltInZoomControls(true);
-  webView.getSettings().setDisplayZoomControls(false);
-  webView.getSettings().setUseWideViewPort(true);
-  webView.getSettings().setAllowFileAccess(true);
-  webView.loadUrl(uri.toString());
+  mWebView.loadUrl(uri.toString());
   setTitle(uri.getLastPathSegment());
  }
 
