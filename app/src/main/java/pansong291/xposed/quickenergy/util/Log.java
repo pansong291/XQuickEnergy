@@ -41,19 +41,20 @@ public class Log
  public static boolean forest(String s)
  {
   recordLog(s, "");
-  return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getForestLogFile());
+  return FileUtils.append2File(getFormatTime() + " " + s + "\n", FileUtils.getForestLogFile());
  }
 
  public static boolean farm(String s)
  {
   recordLog(s, "");
-  return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getFarmLogFile());
+  return FileUtils.append2File(getFormatTime() + " " + s + "\n", FileUtils.getFarmLogFile());
  }
 
  public static boolean other(String s)
  {
   recordLog(s, "");
-  return FileUtils.append2File(getFormatDateTime() + "  " + s + "\n", FileUtils.getOtherLogFile());
+  String day = getFormatDateTime().split("-")[2];
+  return FileUtils.append2File(day + " " + s + "\n", FileUtils.getOtherLogFile());
  }
 
  public static boolean recordLog(String str, String str2)

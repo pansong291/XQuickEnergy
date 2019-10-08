@@ -96,6 +96,8 @@ public class AntFarm
    {
     try
     {
+     while(currentUid == null || currentUid.isEmpty())
+      Thread.sleep(100);
      String s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", currentUid);
      if(s == null)
      {
@@ -351,7 +353,7 @@ public class AntFarm
    if(memo.equals("SUCCESS"))
    {
     double foodHaveStolen = jo.getDouble("foodHaveStolen");
-    Log.farm("召回小鸡，偷吃了〔" + user + "〕的〔" + foodHaveStolen + "克〕饲料");
+    Log.farm("召回小鸡，偷吃〔" + user + "〕〔" + foodHaveStolen + "克〕");
     // 这里不需要加
     // add2FoodStock((int)foodHaveStolen);
    }else
@@ -391,11 +393,11 @@ public class AntFarm
       {
        if(jo.has("hitLossFood"))
        {
-        s = "胖揍〔" + user + "〕的小鸡，掉落了〔" + jo.getInt("hitLossFood") + "克〕饲料";
+        s = "胖揍〔" + user + "〕小鸡，掉落〔" + jo.getInt("hitLossFood") + "克〕";
         if(jo.has("finalFoodStorage"))
          foodStock = jo.getInt("finalFoodStorage");
        }else
-        s = "〔" + user + "〕的小鸡躲开了你的攻击";
+        s = "〔" + user + "〕的小鸡躲开了攻击";
       }else
       {
        s = "赶走〔" + user + "〕的小鸡";
@@ -579,7 +581,8 @@ public class AntFarm
           if(memo.equals("SUCCESS"))
           {
            s = jo.getBoolean("rightAnswer") ? "正确": "错误";
-           Log.farm("答题" + s + "，可领取［" + jo.getInt("awardCount") + "克］饲料");
+           Log.farm("答题" + s + "，可领取［" + jo.getInt("awardCount") + "克］");
+           Statistics.answerQuestionToday();
           }else
           {
            Log.recordLog(memo, s);
@@ -588,9 +591,9 @@ public class AntFarm
          }else
          {
           Statistics.setQuestionHint(rightReply);
-          Log.recordLog("未找到正确答案，放弃作答。提示：" + rightReply, "");
+          Log.farm("未找到正确答案，放弃作答。提示：" + rightReply);
+          Statistics.answerQuestionToday();
          }
-         Statistics.answerQuestionToday();
         }else
         {
          Log.recordLog(memo, s);
@@ -600,11 +603,13 @@ public class AntFarm
        case RECEIVED:
         Statistics.setQuestionHint(null);
         Log.recordLog("今日答题已完成", "");
+        Statistics.answerQuestionToday();
         break;
 
        case FINISHED:
         Statistics.setQuestionHint(null);
         Log.recordLog("已经答过题了，饲料待领取", "");
+        Statistics.answerQuestionToday();
         break;
       }
       break;
@@ -655,7 +660,7 @@ public class AntFarm
        if(memo.equals("SUCCESS"))
        {
         foodStock = jo.getInt("foodStock");
-        Log.farm("领取〔" + jo.getInt("haveAddFoodStock") + "克〕饲料，来源：" + taskTitle);
+        Log.farm("领取〔" + jo.getInt("haveAddFoodStock") + "克〕，来源：" + taskTitle);
         if(unreceiveTaskAward > 0)unreceiveTaskAward--;
        }else
        {
@@ -696,7 +701,7 @@ public class AntFarm
     {
      int feedFood = foodStock - jo.getInt("foodStock");
      add2FoodStock(-feedFood);
-     Log.farm("喂小鸡［" + feedFood + "克］饲料，剩余〔" + foodStock + "克〕");
+     Log.farm("喂小鸡［" + feedFood + "克］，剩余〔" + foodStock + "克〕");
     }else
     {
      Log.recordLog(memo, s);
@@ -759,7 +764,7 @@ public class AntFarm
    for(int i = 0; i < Config.getFeedFriendAnimalList().size(); i++)
    {
     String userId = Config.getFeedFriendAnimalList().get(i);
-    if(userId.equals(AntFarmRpcCall.farmId2UserId(ownerFarmId)))
+    if(userId.equals(currentUid))
      continue;
     if(!Statistics.canFeedFriendToday(userId, Config.getFeedFriendCountList().get(i)))
      continue;
@@ -823,7 +828,7 @@ public class AntFarm
      if(feedFood > 0)
      {
       add2FoodStock(-feedFood);
-      Log.farm("喂〔" + user + "〕的小鸡〔" + feedFood + "克〕饲料，剩余〔" + foodStock + "克〕");
+      Log.farm("喂〔" + user + "〕的小鸡〔" + feedFood + "克〕，剩余〔" + foodStock + "克〕");
       Statistics.feedFriendToday(AntFarmRpcCall.farmId2UserId(friendFarmId));
      }
     }else
@@ -863,7 +868,7 @@ public class AntFarm
       String userId = jo.getString("userId");
       String userName = Config.getNameById(userId);
       if(Config.getDontNotifyFriendList().contains(userId)
-        || userId.equals(AntFarmRpcCall.farmId2UserId(ownerFarmId)))
+        || userId.equals(currentUid))
        continue;
       boolean starve = jo.has("actionType") &&  jo.getString("actionType").equals("starve_action");
       if(jo.getBoolean("stealingAnimal") && !starve)
@@ -925,7 +930,7 @@ public class AntFarm
       foodStock = (int)jo.getDouble("finalFoodStock");
      else
       add2FoodStock((int)rewardCount);
-     Log.farm("通知〔" + user + "〕饲料被偷吃，奖励〔" + rewardCount + "克〕饲料");
+     Log.farm("通知〔" + user + "〕被偷吃，奖励〔" + rewardCount + "克〕");
      return true;
     }else
     {
