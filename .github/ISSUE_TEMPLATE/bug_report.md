@@ -1,5 +1,5 @@
 ---
-name: Bug report
+name: Bug 反馈 / Bug report
 about: Create a report to help us improve
 title: 这是标题！This is the title!
 labels: bug
