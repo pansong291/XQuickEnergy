@@ -501,7 +501,7 @@ public class AntForest
     if(minute > 0) sb.append(minute + "分");
     sb.append(second + "秒");
    }
-   Log.recordLog(sb.toString(), "");
+   AntForestToast.show(sb.toString());
    AntForestNotification.setContentText(Log.getFormatTime() + sb.toString());
   }
   laterTime = -1;

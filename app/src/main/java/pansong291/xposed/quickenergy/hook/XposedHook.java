@@ -16,6 +16,7 @@ import pansong291.xposed.quickenergy.AntCooperate;
 import pansong291.xposed.quickenergy.AntFarm;
 import pansong291.xposed.quickenergy.AntForest;
 import pansong291.xposed.quickenergy.AntForestNotification;
+import pansong291.xposed.quickenergy.AntForestToast;
 import pansong291.xposed.quickenergy.AntMember;
 import pansong291.xposed.quickenergy.hook.ClassMember;
 import pansong291.xposed.quickenergy.ui.MainActivity;
@@ -27,7 +28,7 @@ public class XposedHook implements IXposedHookLoadPackage
 {
  private static final String TAG = XposedHook.class.getCanonicalName();
  private static PowerManager.WakeLock wakeLock;
- private static Handler handler;
+ public static Handler handler;
  private static Runnable runnable;
  private static int times;
 
@@ -64,6 +65,7 @@ public class XposedHook implements IXposedHookLoadPackage
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
       Service service = (Service) param.thisObject;
+      AntForestToast.context = service.getApplicationContext();
       times = 0;
       PowerManager pm = (PowerManager) service.getSystemService(service.POWER_SERVICE);
       wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, service.getClass().getName());
