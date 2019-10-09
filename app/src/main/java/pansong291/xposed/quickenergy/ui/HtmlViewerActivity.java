@@ -30,10 +30,10 @@ public class HtmlViewerActivity extends Activity
   it.addCategory(Intent.CATEGORY_DEFAULT);  
   it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
   it.setDataAndType(uri, "text/html");
-  menu.add(0, 1, 0, "使用浏览器打开")
-   .setIntent(Intent.createChooser(it, "选择浏览器"));
-  menu.add(0, 2, 0, "滚动到顶部");
-  menu.add(0, 3, 0, "滚动到底部");
+  menu.add(0, 1, 0, "Open with other browser")
+   .setIntent(Intent.createChooser(it, "Choose a browser"));
+  menu.add(0, 2, 0, "Scroll to top");
+  menu.add(0, 3, 0, "Scroll to bottom");
   return super.onCreateOptionsMenu(menu);
  }
 

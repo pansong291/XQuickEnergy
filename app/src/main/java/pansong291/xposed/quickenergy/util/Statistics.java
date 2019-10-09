@@ -130,21 +130,21 @@ public class Statistics
  {
   statistics = null;
   Statistics stat = getStatistics();
-  StringBuilder sb = new StringBuilder(getData(TimeType.YEAR, DataType.TIME) + "年：收");
+  StringBuilder sb = new StringBuilder("year " + getData(TimeType.YEAR, DataType.TIME) + " : collect ");
   sb.append(getData(TimeType.YEAR, DataType.COLLECTED));
-  sb.append("，  帮" + getData(TimeType.YEAR, DataType.HELPED));
-  sb.append("，  浇" + getData(TimeType.YEAR, DataType.WATERED));
-  sb.append("\n" + getData(TimeType.MONTH, DataType.TIME) + "月：收");
+  sb.append(",   help " + getData(TimeType.YEAR, DataType.HELPED));
+  sb.append(",   water " + getData(TimeType.YEAR, DataType.WATERED));
+  sb.append("\nmonth " + getData(TimeType.MONTH, DataType.TIME) + " : collect ");
   sb.append(getData(TimeType.MONTH, DataType.COLLECTED));
-  sb.append("，  帮" + getData(TimeType.MONTH, DataType.HELPED));
-  sb.append("，  浇" + getData(TimeType.MONTH, DataType.WATERED));
-  sb.append("\n" + getData(TimeType.DAY, DataType.TIME) + "日：收");
+  sb.append(",   help " + getData(TimeType.MONTH, DataType.HELPED));
+  sb.append(",   water " + getData(TimeType.MONTH, DataType.WATERED));
+  sb.append("\nday " + getData(TimeType.DAY, DataType.TIME) + " : collect ");
   sb.append(getData(TimeType.DAY, DataType.COLLECTED));
-  sb.append("，  帮" + getData(TimeType.DAY, DataType.HELPED));
-  sb.append("，  浇" + getData(TimeType.DAY, DataType.WATERED));
+  sb.append(",   help " + getData(TimeType.DAY, DataType.HELPED));
+  sb.append(",   water " + getData(TimeType.DAY, DataType.WATERED));
   if(stat.questionHint != null && !stat.questionHint.isEmpty())
   {
-   sb.append("\n今日答题提示：" + stat.questionHint);
+   sb.append("\nquestion hint : " + stat.questionHint);
   }
   return sb.toString();
  }

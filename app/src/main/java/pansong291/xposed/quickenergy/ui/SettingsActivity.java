@@ -243,12 +243,6 @@ public class SettingsActivity extends Activity
     Config.setReceivePoint(cb.isChecked());
     break;
 
-   case R.id.btn_help:
-    Intent it = new Intent(this, HtmlViewerActivity.class);
-    it.setData(Uri.parse("https://github.com/pansong291/XQuickEnergy/wiki"));
-    startActivity(it);
-    break;
-
    case R.id.btn_donation_developer:
     Intent it2 = new Intent(Intent.ACTION_VIEW, Uri.parse("alipays://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/tsx00339eflkuhhtfctcn48"));
     startActivity(it2);
@@ -263,7 +257,7 @@ public class SettingsActivity extends Activity
   if(Config.hasChanged)
   {
    Config.hasChanged = !Config.saveConfigFile();
-   Toast.makeText(this, "配置已保存", 0).show();
+   Toast.makeText(this, "Configuration saved", 0).show();
   }
   FriendIdMap.saveIdMap();
   CooperationIdMap.saveIdMap();

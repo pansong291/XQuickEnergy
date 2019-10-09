@@ -45,11 +45,17 @@ public class MainActivity extends Activity
    case R.id.btn_forest_log:
     data += FileUtils.getForestLogFile().getAbsolutePath();
     break;
+
    case R.id.btn_farm_log:
     data += FileUtils.getFarmLogFile().getAbsolutePath();
     break;
+
    case R.id.btn_other_log:
     data += FileUtils.getOtherLogFile().getAbsolutePath();
+    break;
+
+   case R.id.btn_help:
+    data = "https://github.com/pansong291/XQuickEnergy/wiki";
     break;
   }
   Intent it = new Intent(this, HtmlViewerActivity.class);
@@ -62,10 +68,10 @@ public class MainActivity extends Activity
  {
   int state = getPackageManager()
    .getComponentEnabledSetting(new ComponentName(this, getClass().getCanonicalName() + "Alias"));
-  menu.add(0, 1, 0, "隐藏应用图标")
+  menu.add(0, 1, 0, "Hide the application icon")
    .setCheckable(true)
    .setChecked(state > PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-  menu.add(0, 2, 0, "设置");
+  menu.add(0, 2, 0, "Settings");
   return super.onCreateOptionsMenu(menu);
  }
 

@@ -60,7 +60,7 @@ public class ListDialog
    listDialog = new AlertDialog.Builder(c)
     .setTitle("title")
     .setView(getListView(c))
-    .setPositiveButton("确定", null)
+    .setPositiveButton("OK", null)
     .create();
   listDialog.setOnShowListener(
    new OnShowListener()
@@ -127,9 +127,9 @@ public class ListDialog
       }
       edtDialog.setTitle(curAlipayId.name);
       if(curAlipayId instanceof AlipayCooperate)
-       edt_count.setHint("克数");
+       edt_count.setHint("grams");
       else
-       edt_count.setHint("次数");
+       edt_count.setHint("count");
       int i = selectedList.indexOf(curAlipayId.id);
       if(i >= 0)
        edt_count.setText(String.valueOf(countList.get(i)));
@@ -153,7 +153,7 @@ public class ListDialog
       deleteDialog = null;
       getDeleteDialog(p1.getContext()).show();
      }
-     deleteDialog.setMessage("删除 " + curAlipayId.name);
+     deleteDialog.setMessage("Delete " + curAlipayId.name);
      return true;
     }
    });
@@ -220,8 +220,8 @@ public class ListDialog
    edtDialog = new AlertDialog.Builder(c)
     .setTitle("title")
     .setView(edt_count)
-    .setPositiveButton("确定", listener)
-    .setNegativeButton("取消", null)
+    .setPositiveButton("OK", listener)
+    .setNegativeButton("CANCEL", null)
     .create();
   }
   return edtDialog;
@@ -265,8 +265,8 @@ public class ListDialog
    }.setContext(c);
    deleteDialog = new AlertDialog.Builder(c)
     .setMessage("msg")
-    .setPositiveButton("确定", listener)
-    .setNegativeButton("取消", null)
+    .setPositiveButton("OK", listener)
+    .setNegativeButton("CANCEL", null)
     .create();
   }
   return deleteDialog;
@@ -294,7 +294,7 @@ public class ListDialog
    }
    if(index < 0)
    {
-    Toast.makeText(p1.getContext(), "未找到", Toast.LENGTH_SHORT).show();
+    Toast.makeText(p1.getContext(), "Not find", Toast.LENGTH_SHORT).show();
    }else
    {
     lv_list.setSelection(index);

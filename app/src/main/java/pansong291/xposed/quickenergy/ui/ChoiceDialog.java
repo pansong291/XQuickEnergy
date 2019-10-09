@@ -30,7 +30,7 @@ public class ChoiceDialog
   if(sendTypeDialog == null)
    sendTypeDialog = new AlertDialog.Builder(c)
     .setTitle(title)
-    .setSingleChoiceItems(SendType.nickNames, Config.sendType().ordinal(),
+    .setSingleChoiceItems(SendType.names, Config.sendType().ordinal(),
     new OnClickListener()
     {
      @Override
@@ -39,7 +39,7 @@ public class ChoiceDialog
       Config.setSendType(p2);
      }
     })
-    .setPositiveButton("确定", null)
+    .setPositiveButton("OK", null)
     .create();
   return sendTypeDialog;
  }
@@ -61,7 +61,7 @@ public class ChoiceDialog
   if(recallAnimalTypeDialog == null)
    recallAnimalTypeDialog = new AlertDialog.Builder(c)
     .setTitle(title)
-    .setSingleChoiceItems(RecallAnimalType.nickNames, Config.recallAnimalType().ordinal(),
+    .setSingleChoiceItems(RecallAnimalType.names, Config.recallAnimalType().ordinal(),
     new OnClickListener()
     {
      @Override
@@ -70,7 +70,7 @@ public class ChoiceDialog
       Config.setRecallAnimalType(p2);
      }
     })
-    .setPositiveButton("确定", null)
+    .setPositiveButton("OK", null)
     .create();
   return recallAnimalTypeDialog;
  }

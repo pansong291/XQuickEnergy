@@ -14,7 +14,7 @@
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="基本设置"
+			android:text="BASE CONFIGURATION"
 			android:background="#FF898989"
 			android:textColor="#FFFFFFFF"
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -22,7 +22,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="即时生效"
+			android:text="Immediate effect"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_immediateEffect"/>
@@ -30,7 +30,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="记录 log"
+			android:text="Record log"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_recordLog"/>
@@ -38,7 +38,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Toast 气泡提示"
+			android:text="Show toast"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_showToast"/>
@@ -46,7 +46,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="自动重启服务"
+			android:text="Auto restart service"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_autoRestart"/>
@@ -61,7 +61,7 @@
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="森林功能"
+			android:text="FOREST CONFIGURATION"
 			android:background="#FF898989"
 			android:textColor="#FFFFFFFF"
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -69,7 +69,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="收取能量"
+			android:text="Collect energy"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_collectEnergy"/>
@@ -78,7 +78,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="检测间隔（分钟）"
+			android:text="Check interval (minutes)"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -90,7 +91,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="收能量线程数"
+			android:text="Thread count"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -102,7 +104,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="提前时间（毫秒）"
+			android:text="Advance time (milliseconds)"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -114,7 +117,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="收取间隔（毫秒）"
+			android:text="Collect interval (milliseconds)"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -126,7 +130,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="收取超时（秒）"
+			android:text="Collect timeout (seconds)"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -138,7 +143,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="偷X克返水30克"
+			android:text="Water three times while collect X"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -150,7 +156,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="偷X克返水20克"
+			android:text="Water twice while collect X"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -162,7 +169,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="偷X克返水10克"
+			android:text="Water once while collect X"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -173,7 +181,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="帮好友收取能量"
+			android:text="Help friend collect"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_helpFriendCollect"/>
@@ -182,7 +190,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="不偷取能量的好友列表"
+			android:text="Don't collect list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -194,7 +203,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="不帮收能量的好友列表"
+			android:text="Don't help collect list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -205,7 +215,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="领取森林任务奖励"
+			android:text="Receive forest task award"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_receiveForestTaskAward"/>
@@ -214,7 +224,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="帮浇水的好友列表"
+			android:text="Water friend list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -225,7 +236,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="合种浇水"
+			android:text="Cooperate water"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_cooperateWater"/>
@@ -234,7 +245,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="合种浇水列表"
+			android:text="Cooperate water list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -252,7 +264,7 @@
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="庄园功能"
+			android:text="FARM CONFIGURATION"
 			android:background="#FF898989"
 			android:textColor="#FFFFFFFF"
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -260,7 +272,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="启用庄园功能"
+			android:text="Enable farm"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_enableFarm"/>
@@ -268,7 +280,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="打赏好友"
+			android:text="Reward friend"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_rewardFriend"/>
@@ -276,7 +288,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="赶鸡"
+			android:text="Send back animal"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_sendBackAnimal"/>
@@ -285,7 +297,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="赶鸡方式"
+			android:text="Send type"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -297,7 +310,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="不赶鸡的好友列表"
+			android:text="Don't send firend list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -309,7 +323,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="召回小鸡方式"
+			android:text="Recall animal type"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -320,7 +335,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="领取道具卡奖励"
+			android:text="Receive farm tool reward"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_receiveFarmToolReward"/>
@@ -328,7 +343,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="使用新蛋卡"
+			android:text="Use new egg tool"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_useNewEggTool"/>
@@ -336,7 +351,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="收取爱心鸡蛋"
+			android:text="Harvest produce"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_harvestProduce"/>
@@ -344,7 +359,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="捐赠爱心鸡蛋"
+			android:text="Donation"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_donation"/>
@@ -352,7 +367,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="答题"
+			android:text="Answer question"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_answerQuestion"/>
@@ -360,7 +375,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="领取庄园任务奖励"
+			android:text="Receive farm task award"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_receiveFarmTaskAward"/>
@@ -368,7 +383,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="喂鸡"
+			android:text="Feed animal"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_feedAnimal"/>
@@ -376,7 +391,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="使用加速卡"
+			android:text="Use accelerate tool"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_useAccelerateTool"/>
@@ -385,7 +400,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="帮喂鸡的好友列表"
+			android:text="Feed friend animal list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -396,7 +412,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="通知好友赶鸡"
+			android:text="Notify friend"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_notifyFriend"/>
@@ -405,7 +421,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="不通知赶鸡的好友列表"
+			android:text="Don't notify friend list"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"
@@ -423,7 +440,7 @@
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="其他功能"
+			android:text="OTHER CONFIGURATION"
 			android:background="#FF898989"
 			android:textColor="#FFFFFFFF"
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -431,7 +448,7 @@
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="领取蚂蚁会员积分"
+			android:text="Receive point"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:id="@+id/cb_receivePoint"/>
@@ -446,7 +463,7 @@
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="更多"
+			android:text="MORE"
 			android:background="#FF898989"
 			android:textColor="#FFFFFFFF"
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -455,19 +472,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
-			android:text="帮助"
-			android:onClick="onClick"
-			android:minHeight="50dp"
-			android:gravity="left|center_vertical"
-			android:background="@drawable/button"
-			android:id="@+id/btn_help"
-			android:paddingLeft="8dp"/>
-
-		<Button
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="?android:attr/buttonBarButtonStyle"
-			android:text="捐赠"
+			android:text="Support developer"
+            android:textAllCaps="false"
 			android:onClick="onClick"
 			android:minHeight="50dp"
 			android:gravity="left|center_vertical"

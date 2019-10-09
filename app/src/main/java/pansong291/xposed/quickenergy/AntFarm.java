@@ -16,6 +16,8 @@ public class AntFarm
  public enum SendType
  {
   HIT, NORMAL;
+  public static final CharSequence[] names =
+  {HIT.name(), NORMAL.name()};
   public static final CharSequence[] nickNames =
   {"攻击", "常规"};
   public SendType another()

@@ -14,6 +14,8 @@ public class Config
  public enum RecallAnimalType
  {
   ALWAYS, WHEN_THIEF, WHEN_HUNGRY, NEVER;
+  public static final CharSequence[] names =
+  {ALWAYS.name(), WHEN_THIEF.name(), WHEN_HUNGRY.name(), NEVER.name()};
   public static final CharSequence[] nickNames =
   {"始终召回", "作贼时召回", "饥饿时召回", "不召回"};
   public CharSequence nickName()
