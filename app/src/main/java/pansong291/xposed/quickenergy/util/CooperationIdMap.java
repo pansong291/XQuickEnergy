@@ -81,6 +81,7 @@ public class CooperationIdMap
  {
   if(idMap == null || shouldReload)
   {
+   shouldReload = false;
    idMap = new TreeMap<>();
    String str = FileUtils.readFromFile(FileUtils.getCooperationIdMapFile());
    if(str != null && str.length() > 0)

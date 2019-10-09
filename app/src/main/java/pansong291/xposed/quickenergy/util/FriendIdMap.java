@@ -119,6 +119,7 @@ public class FriendIdMap
  {
   if(idMap == null || shouldReload)
   {
+   shouldReload = false;
    idMap = new TreeMap<>();
    String str = FileUtils.readFromFile(FileUtils.getFriendIdMapFile());
    if(str != null && str.length() > 0)

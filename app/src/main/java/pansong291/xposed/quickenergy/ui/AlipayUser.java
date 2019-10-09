@@ -18,7 +18,7 @@ public class AlipayUser extends AlipayId
 
  public static List<AlipayUser> getList()
  {
-  if(list == null)
+  if(list == null || FriendIdMap.shouldReload)
   {
    list = new ArrayList<AlipayUser>();
    Set idSet = FriendIdMap.getIdMap().entrySet();
