@@ -20,6 +20,20 @@ public class AntCooperateRpcCall
   return null;
  }
 
+ public static String rpcCall_queryCooperatePlant(ClassLoader loader, String coopId)
+ {
+  try
+  {
+   String args1 = "[{\"cooperationId\":\"" + coopId + "\"}]";
+   return RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryCooperatePlant", args1);
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "rpcCall_queryCooperatePlant err:");
+   Log.printStackTrace(TAG, t);
+  }
+  return null;
+ }
+
  public static String rpcCall_cooperateWater(ClassLoader loader, String uid, String coopId, int count)
  {
   try

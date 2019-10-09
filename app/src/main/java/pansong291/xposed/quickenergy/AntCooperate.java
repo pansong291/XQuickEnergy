@@ -50,6 +50,11 @@ public class AntCooperate
       {
        jo = ja.getJSONObject(i);
        String cooperationId = jo.getString("cooperationId");
+       if(!jo.has("name"))
+       {
+        s = AntCooperateRpcCall.rpcCall_queryCooperatePlant(loader, cooperationId);
+        jo = new JSONObject(s).getJSONObject("cooperatePlant");
+       }
        String name = jo.getString("name");
        int waterDayLimit = jo.getInt("waterDayLimit");
        CooperationIdMap.putIdMap(cooperationId, name);
