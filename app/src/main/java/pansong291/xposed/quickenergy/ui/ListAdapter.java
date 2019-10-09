@@ -23,7 +23,7 @@ public class ListAdapter extends BaseAdapter
  }
 
  Context context;
- List<AlipayUser>list;
+ List<?> list;
  List<String> selects;
  int findIndex = -1;
  CharSequence findWord = null;
@@ -33,8 +33,9 @@ public class ListAdapter extends BaseAdapter
   context = c;
  }
 
- public void setAlipayUserList(List<AlipayUser> l)
+ public void setBaseList(List<?> l)
  {
+  if(l != list) exitFind();
   list = l;
  }
 
@@ -45,6 +46,7 @@ public class ListAdapter extends BaseAdapter
 
  public int findLast(CharSequence cs)
  {
+  if(list == null || list.size() == 0) return -1;
   if(!cs.equals(findWord))
   {
    findIndex = -1;
@@ -55,7 +57,8 @@ public class ListAdapter extends BaseAdapter
   for(;;)
   {
    i = (i + list.size() - 1) % list.size();
-   if(list.get(i).name.contains(cs))
+   AlipayId ai = (AlipayId) list.get(i);
+   if(ai.name.contains(cs))
    {
     findIndex = i;
     break;
@@ -69,6 +72,7 @@ public class ListAdapter extends BaseAdapter
 
  public int findNext(CharSequence cs)
  {
+  if(list == null || list.size() == 0) return -1;
   if(!cs.equals(findWord))
   {
    findIndex = -1;
@@ -77,7 +81,8 @@ public class ListAdapter extends BaseAdapter
   for(int i = findIndex;;)
   {
    i = (i + 1) % list.size();
-   if(list.get(i).name.contains(cs))
+   AlipayId ai = (AlipayId) list.get(i);
+   if(ai.name.contains(cs))
    {
     findIndex = i;
     break;
@@ -92,13 +97,12 @@ public class ListAdapter extends BaseAdapter
  public void exitFind()
  {
   findIndex = -1;
-  notifyDataSetChanged();
  }
 
  @Override
  public int getCount()
  {
-  return list.size();
+  return list == null ? 0: list.size();
  }
 
  @Override
@@ -129,10 +133,10 @@ public class ListAdapter extends BaseAdapter
    vh = (ViewHolder)p2.getTag();
   }
 
-  AlipayUser au = list.get(p1);
-  vh.tv.setText(au.name);
+  AlipayId ai = (AlipayId) list.get(p1);
+  vh.tv.setText(ai.name);
   vh.tv.setTextColor(findIndex == p1 ? Color.RED: Color.BLACK);
-  vh.cb.setChecked(selects == null ? false: selects.contains(au.id));
+  vh.cb.setChecked(selects == null ? false: selects.contains(ai.id));
   return p2;
  }
 

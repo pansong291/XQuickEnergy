@@ -32,6 +32,7 @@ public class Config
  jn_dontHelpCollectList = "dontHelpCollectList", jn_checkInterval = "checkInterval", jn_threadCount = "threadCount",
  jn_advanceTime = "advanceTime", jn_collectInterval = "collectInterval", jn_collectTimeout = "collectTimeout",
  jn_receiveForestTaskAward = "receiveForestTaskAward", jn_waterFriendList = "waterFriendList",
+ jn_cooperateWater = "cooperateWater", jn_cooperateWaterList = "cooperateWaterList",
  /* farm */
  jn_enableFarm = "enableFarm",
  jn_rewardFriend = "rewardFriend", jn_sendBackAnimal = "sendBackAnimal", jn_sendType = "sendType",
@@ -43,8 +44,8 @@ public class Config
  /* member */
  jn_receivePoint = "receivePoint", jn_receivePointTime = "receivePointTime";
 
- public static boolean shouldReloadConfig;
- public static boolean hasConfigChanged;
+ public static boolean shouldReload;
+ public static boolean hasChanged;
 
  /* application */
  private boolean immediateEffect;
@@ -67,6 +68,9 @@ public class Config
  private boolean receiveForestTaskAward;
  private List<String> waterFriendList;
  private List<Integer> waterCountList;
+ private boolean cooperateWater;
+ private List<String> cooperateWaterList;
+ private List<Integer> cooperateWaterNumList;
 
  /* farm */
  private boolean enableFarm;
@@ -94,15 +98,12 @@ public class Config
  /* other */
  private boolean reInit;
  private static Config config;
- private static Map idMap;
- private static boolean hasIdMapChanged = false;
- private static String selfId;
 
  /* application */
  public static void setImmediateEffect(boolean b)
  {
   getConfig().immediateEffect = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean immediateEffect()
@@ -113,7 +114,7 @@ public class Config
  public static void setRecordLog(boolean b)
  {
   getConfig().recordLog = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean recordLog()
@@ -124,7 +125,7 @@ public class Config
  public static void setAutoRestart(boolean b)
  {
   getConfig().autoRestart = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean autoRestart()
@@ -136,7 +137,7 @@ public class Config
  public static void setCollectEnergy(boolean b)
  {
   getConfig().collectEnergy = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean collectEnergy()
@@ -147,7 +148,7 @@ public class Config
  public static void setCheckInterval(int i)
  {
   getConfig().checkInterval = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int checkInterval()
@@ -158,7 +159,7 @@ public class Config
  public static void setThreadCount(int i)
  {
   getConfig().threadCount = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int threadCount()
@@ -169,7 +170,7 @@ public class Config
  public static void setAdvanceTime(int i)
  {
   getConfig().advanceTime = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int advanceTime()
@@ -180,7 +181,7 @@ public class Config
  public static void setCollectInterval(int i)
  {
   getConfig().collectInterval = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int collectInterval()
@@ -191,7 +192,7 @@ public class Config
  public static void setCollectTimeout(int i)
  {
   getConfig().collectTimeout = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int collectTimeout()
@@ -202,7 +203,7 @@ public class Config
  public static void setReturnWater30(int i)
  {
   getConfig().returnWater30 = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int returnWater30()
@@ -213,7 +214,7 @@ public class Config
  public static void setReturnWater20(int i)
  {
   getConfig().returnWater20 = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int returnWater20()
@@ -224,7 +225,7 @@ public class Config
  public static void setReturnWater10(int i)
  {
   getConfig().returnWater10 = i;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static int returnWater10()
@@ -235,7 +236,7 @@ public class Config
  public static void setHelpFriendCollect(boolean b)
  {
   getConfig().helpFriendCollect = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean helpFriendCollect()
@@ -256,7 +257,7 @@ public class Config
  public static void setReceiveForestTaskAward(boolean b)
  {
   getConfig().receiveForestTaskAward = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean receiveForestTaskAward()
@@ -274,11 +275,32 @@ public class Config
   return getConfig().waterCountList;
  }
 
+ public static void setCooperateWater(boolean b)
+ {
+  getConfig().cooperateWater = b;
+  hasChanged = true;
+ }
+
+ public static boolean cooperateWater()
+ {
+  return getConfig().cooperateWater;
+ }
+
+ public static List<String> getCooperateWaterList()
+ {
+  return getConfig().cooperateWaterList;
+ }
+
+ public static List<Integer> getcooperateWaterNumList()
+ {
+  return getConfig().cooperateWaterNumList;
+ }
+
  /* farm */
  public static void setEnableFarm(boolean b)
  {
   getConfig().enableFarm = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean enableFarm()
@@ -289,7 +311,7 @@ public class Config
  public static void setRewardFriend(boolean b)
  {
   getConfig().rewardFriend = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean rewardFriend()
@@ -300,7 +322,7 @@ public class Config
  public static void setSendBackAnimal(boolean b)
  {
   getConfig().sendBackAnimal = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean sendBackAnimal()
@@ -311,7 +333,7 @@ public class Config
  public static void setSendType(int i)
  {
   getConfig().sendType = SendType.values()[i];
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static SendType sendType()
@@ -327,7 +349,7 @@ public class Config
  public static void setRecallAnimalType(int i)
  {
   getConfig().recallAnimalType = RecallAnimalType.values()[i];
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static RecallAnimalType recallAnimalType()
@@ -338,7 +360,7 @@ public class Config
  public static void setReceiveFarmToolReward(boolean b)
  {
   getConfig().receiveFarmToolReward = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean receiveFarmToolReward()
@@ -349,7 +371,7 @@ public class Config
  public static void setUseNewEggTool(boolean b)
  {
   getConfig().useNewEggTool = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean useNewEggTool()
@@ -360,7 +382,7 @@ public class Config
  public static void setHarvestProduce(boolean b)
  {
   getConfig().harvestProduce = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean harvestProduce()
@@ -371,7 +393,7 @@ public class Config
  public static void setDonation(boolean b)
  {
   getConfig().donation = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean donation()
@@ -382,7 +404,7 @@ public class Config
  public static void setAnswerQuestion(boolean b)
  {
   getConfig().answerQuestion = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean answerQuestion()
@@ -393,7 +415,7 @@ public class Config
  public static void setReceiveFarmTaskAward(boolean b)
  {
   getConfig().receiveFarmTaskAward = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean receiveFarmTaskAward()
@@ -404,7 +426,7 @@ public class Config
  public static void setFeedAnimal(boolean b)
  {
   getConfig().feedAnimal = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean feedAnimal()
@@ -415,7 +437,7 @@ public class Config
  public static void setUseAccelerateTool(boolean b)
  {
   getConfig().useAccelerateTool = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean useAccelerateTool()
@@ -436,7 +458,7 @@ public class Config
  public static void setNotifyFriend(boolean b)
  {
   getConfig().notifyFriend = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean notifyFriend()
@@ -453,7 +475,7 @@ public class Config
  public static void setReceivePoint(boolean b)
  {
   getConfig().receivePoint = b;
-  hasConfigChanged = true;
+  hasChanged = true;
  }
 
  public static boolean receivePoint()
@@ -464,139 +486,15 @@ public class Config
  /* other */
  private static Config getConfig()
  {
-  if(config == null || shouldReloadConfig && config.immediateEffect)
+  if(config == null || shouldReload && config.immediateEffect)
   {
-   shouldReloadConfig = false;
+   shouldReload = false;
    String confJson = null;
    if(FileUtils.getConfigFile().exists())
     confJson = FileUtils.readFromFile(FileUtils.getConfigFile());
    config = json2Config(confJson);
   }
   return config;
- }
-
- public static void putIdMap(String key, String value)
- {
-  if(key == null || key.isEmpty()) return;
-  if(getIdMap().containsKey(key))
-  {
-   if(!getIdMap().get(key).equals(value))
-   {
-    getIdMap().remove(key);
-    getIdMap().put(key, value);
-    hasIdMapChanged = true;
-   }
-  }else
-  {
-   getIdMap().put(key, value);
-   hasIdMapChanged = true;
-  }
- }
-
- public static void removeIdMap(String key)
- {
-  if(key == null || key.isEmpty()) return;
-  if(getIdMap().containsKey(key))
-  {
-   getIdMap().remove(key);
-   hasIdMapChanged = true;
-  }
- }
-
- public static boolean saveIdMap()
- {
-  if(hasIdMapChanged)
-  {
-   StringBuilder sb = new StringBuilder();
-   Set idSet = getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
-   {
-    sb.append(entry.getKey());
-    sb.append(':');
-    sb.append(entry.getValue());
-    sb.append('\n');
-   }
-   hasIdMapChanged = !FileUtils.write2File(sb.toString(), FileUtils.getFriendIdMapFile());
-  }
-  return hasIdMapChanged;
- }
-
- private static String getSelfId()
- {
-  if(selfId == null)
-  {
-   Set idSet = getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
-    if(!entry.getValue().toString().contains("*"))
-    {
-     selfId = entry.getKey().toString();
-     break;
-    }
-  }
-  return selfId;
- }
-
- public static String getNameById(String id)
- {
-  if(id == null || id.isEmpty()) return id;
-  if(getIdMap().containsKey(id))
-  {
-   String n = getIdMap().get(id).toString();
-   int ind = n.lastIndexOf('(');
-   if(ind > 0) n = n.substring(0, ind);
-   if(!n.equals("*")) return n;
-  }else
-  {
-   putIdMap(id, "*(*)");
-  }
-  return id;
- }
-
- public static String[] getUnknownIds()
- {
-  List<String> idList = new ArrayList<String>();
-  Set idSet = getIdMap().entrySet();
-  for(Map.Entry entry: idSet)
-   if(entry.getValue().toString().contains("(*)"))
-    idList.add(entry.getKey().toString());
-  if(idList.size() > 0)
-  {
-   String[] ids = new String[idList.size()];
-   for(int i = 0; i < ids.length; i++)
-   {
-    ids[i] = idList.get(i);
-    Log.i(TAG, "未知id: " + ids[i]);
-   }
-   return ids;
-  }
-  return null;
- }
-
- public static Map getIdMap()
- {
-  if(idMap == null)
-  {
-   idMap = new TreeMap<>();
-   String str = FileUtils.readFromFile(FileUtils.getFriendIdMapFile());
-   if(str != null && str.length() > 0)
-   {
-    try
-    {
-     String[] idSet = str.split("\n");
-     for(String s: idSet)
-     {
-      Log.i(TAG, s);
-      String[] entry = s.split(":");
-      idMap.put(entry[0], entry[1]);
-     }
-    }catch(Throwable t)
-    {
-     Log.printStackTrace(TAG, t);
-     idMap.clear();
-    }
-   }
-  }
-  return idMap;
  }
 
  public static Config defInit()
@@ -623,6 +521,9 @@ public class Config
   c.receiveForestTaskAward = true;
   if(c.waterFriendList == null) c.waterFriendList = new ArrayList<>();
   if(c.waterCountList == null) c.waterCountList = new ArrayList<>();
+  c.cooperateWater = true;
+  if(c.cooperateWaterList == null) c.cooperateWaterList = new ArrayList<>();
+  if(c.cooperateWaterNumList == null) c.cooperateWaterNumList = new ArrayList<>();
 
   c.enableFarm = true;
   c.rewardFriend = true;
@@ -749,6 +650,25 @@ public class Config
      Log.i(TAG, "  "
            + config.waterFriendList.get(i) + ","
            + config.waterCountList.get(i) + ",");
+    }
+   }
+
+   config.cooperateWater = jo.optBoolean(jn_cooperateWater, true);
+
+   config.cooperateWaterList = new ArrayList<>();
+   config.cooperateWaterNumList = new ArrayList<>();
+   Log.i(TAG, jn_cooperateWaterList + ":[");
+   if(jo.has(jn_cooperateWaterList))
+   {
+    ja = jo.getJSONArray(jn_cooperateWaterList);
+    for(int i = 0; i < ja.length(); i++)
+    {
+     jaa = ja.getJSONArray(i);
+     config.cooperateWaterList.add(jaa.getString(0));
+     config.cooperateWaterNumList.add(jaa.getInt(1));
+     Log.i(TAG, "  "
+           + config.cooperateWaterList.get(i) + ","
+           + config.cooperateWaterNumList.get(i) + ",");
     }
    }
 
@@ -926,6 +846,18 @@ public class Config
     ja.put(jaa);
    }
    jo.put(jn_waterFriendList, ja);
+
+   jo.put(jn_cooperateWater, config.cooperateWater);
+
+   ja = new JSONArray();
+   for(int i = 0; i < config.cooperateWaterList.size(); i++)
+   {
+    jaa = new JSONArray();
+    jaa.put(config.cooperateWaterList.get(i));
+    jaa.put(config.cooperateWaterNumList.get(i));
+    ja.put(jaa);
+   }
+   jo.put(jn_cooperateWaterList, ja);
 
    /* farm */
    jo.put(jn_enableFarm, config.enableFarm);

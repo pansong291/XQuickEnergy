@@ -12,6 +12,7 @@ import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import java.util.Map;
+import pansong291.xposed.quickenergy.AntCooperate;
 import pansong291.xposed.quickenergy.AntFarm;
 import pansong291.xposed.quickenergy.AntForest;
 import pansong291.xposed.quickenergy.AntForestNotification;
@@ -28,6 +29,7 @@ public class XposedHook implements IXposedHookLoadPackage
  private static PowerManager.WakeLock wakeLock;
  private static Handler handler;
  private static Runnable runnable;
+ private static int times;
 
  @Override
  public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
@@ -62,6 +64,7 @@ public class XposedHook implements IXposedHookLoadPackage
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
       Service service = (Service) param.thisObject;
+      times = 0;
       PowerManager pm = (PowerManager) service.getSystemService(service.POWER_SERVICE);
       wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, service.getClass().getName());
       wakeLock.acquire();
@@ -79,21 +82,22 @@ public class XposedHook implements IXposedHookLoadPackage
         @Override
         public void run()
         {
-         Config.shouldReloadConfig = true;
+         Config.shouldReload = true;
          Statistics.resetToday();
-         AntForest.checkEnergyRanking(loader);
+         AntForest.checkEnergyRanking(loader, times);
+         AntCooperate.start(loader, times);
          AntFarm.start(loader);
-         AntMember.receivePoint(loader);
+         AntMember.receivePoint(loader, times);
          if(Config.collectEnergy() || Config.enableFarm())
           handler.postDelayed(this, Config.checkInterval());
          else AntForestNotification.stop(service, false);
+         times = (times + 1) % (3600_000 / Config.checkInterval());
         }
        }.setData(service);
       if(Config.collectEnergy() || Config.enableFarm())
       {
        AntForestNotification.start(service);
        handler.post(runnable);
-       Log.i(TAG, "task start. interval=" + Config.checkInterval());
       }
      }
     });
@@ -117,10 +121,10 @@ public class XposedHook implements IXposedHookLoadPackage
        wakeLock = null;
       }
       Service service = (Service) param.thisObject;
+      AntForestNotification.stop(service, false);
       AntForestNotification.setContentText("支付宝前台服务被销毁");
       Log.recordLog("支付宝前台服务被销毁", "");
       handler.removeCallbacks(runnable);
-      AntForestNotification.stop(service, false);
       if(Config.autoRestart())
       {
        AlarmManager alarmManager = (AlarmManager) service.getSystemService(service.ALARM_SERVICE);

@@ -11,54 +11,50 @@ public class AntMember
 {
  public static final String TAG = AntMember.class.getCanonicalName();
 
- private static int times = 0;
-
- public static void receivePoint(ClassLoader loader)
+ public static void receivePoint(ClassLoader loader, int times)
  {
-  if(!Config.receivePoint())
+  if(!Config.receivePoint() || times != 0)
    return;
 
-  if(times == 0)
-   new Thread()
+  new Thread()
+  {
+   ClassLoader loader;
+
+   public Thread setData(ClassLoader cl)
    {
-    ClassLoader loader;
+    loader = cl;
+    return this;
+   }
 
-    public Thread setData(ClassLoader cl)
+   @Override
+   public void run()
+   {
+    try
     {
-     loader = cl;
-     return this;
-    }
-
-    @Override
-    public void run()
-    {
-     try
+     if(Statistics.canMemberSigninToday())
      {
-      if(Statistics.canMemberSigninToday())
+      String s = AntMemberRpcCall.rpcCall_memberSignin(loader);
+      JSONObject jo = new JSONObject(s);
+      if(jo.getString("resultCode").equals("SUCCESS"))
       {
-       String s = AntMemberRpcCall.rpcCall_memberSignin(loader);
-       JSONObject jo = new JSONObject(s);
-       if(jo.getString("resultCode").equals("SUCCESS"))
-       {
-        Log.other(
-         "领取〈每日签到〉〈" + jo.getString("signinPoint") +
-         "积分〉，已签到〈" + jo.getString("signinSumDay") + "天〉");
-        Statistics.memberSigninToday();
-       }else
-       {
-        Log.recordLog(jo.getString("resultDesc"), s);
-       }
+       Log.other(
+        "领取〈每日签到〉〈" + jo.getString("signinPoint") +
+        "积分〉，已签到〈" + jo.getString("signinSumDay") + "天〉");
+       Statistics.memberSigninToday();
+      }else
+      {
+       Log.recordLog(jo.getString("resultDesc"), s);
       }
-      queryPointCert(loader, 1, 8);
-      claimFamilyPoint(loader);
-     }catch(Throwable t)
-     {
-      Log.i(TAG, "receivePoint.run err:");
-      Log.printStackTrace(TAG, t);
      }
+     queryPointCert(loader, 1, 8);
+     claimFamilyPoint(loader);
+    }catch(Throwable t)
+    {
+     Log.i(TAG, "receivePoint.run err:");
+     Log.printStackTrace(TAG, t);
     }
-   }.setData(loader).start();
-  times = (times + 1) % (3600_000 / Config.checkInterval());
+   }
+  }.setData(loader).start();
  }
 
  private static void queryPointCert(ClassLoader loader, int page, int pageSize)

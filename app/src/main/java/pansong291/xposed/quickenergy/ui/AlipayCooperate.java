@@ -4,27 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import pansong291.xposed.quickenergy.util.FriendIdMap;
+import pansong291.xposed.quickenergy.util.CooperationIdMap;
 
-public class AlipayUser extends AlipayId
+public class AlipayCooperate extends AlipayId
 {
- private static List<AlipayUser> list;
+ private static List<AlipayCooperate> list;
 
- public AlipayUser(String i, String n)
+ public AlipayCooperate(String i, String n)
  {
   id = i;
   name = n;
  }
 
- public static List<AlipayUser> getList()
+ public static List<AlipayCooperate> getList()
  {
   if(list == null)
   {
-   list = new ArrayList<AlipayUser>();
-   Set idSet = FriendIdMap.getIdMap().entrySet();
+   list = new ArrayList<AlipayCooperate>();
+   Set idSet = CooperationIdMap.getIdMap().entrySet();
    for(Map.Entry entry: idSet)
    {
-    list.add(new AlipayUser(entry.getKey().toString(), entry.getValue().toString()));
+    list.add(new AlipayCooperate(entry.getKey().toString(), entry.getValue().toString()));
    }
   }
   return list;

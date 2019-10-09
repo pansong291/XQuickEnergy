@@ -9,14 +9,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 import pansong291.xposed.quickenergy.R;
-import pansong291.xposed.quickenergy.hook.RpcCall;
 import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.CooperationIdMap;
+import pansong291.xposed.quickenergy.util.FriendIdMap;
 
 public class SettingsActivity extends Activity
 {
  CheckBox cb_immediateEffect, cb_recordLog, cb_autoRestart,
  cb_collectEnergy, cb_helpFriendCollect,
- cb_receiveForestTaskAward, cb_enableFarm, cb_rewardFriend,
+ cb_receiveForestTaskAward, cb_cooperateWater,
+ cb_enableFarm, cb_rewardFriend,
  cb_sendBackAnimal, cb_receiveFarmToolReward, cb_useNewEggTool,
  cb_harvestProduce, cb_donation, cb_answerQuestion,
  cb_receiveFarmTaskAward, cb_feedAnimal, cb_useAccelerateTool,
@@ -28,7 +30,9 @@ public class SettingsActivity extends Activity
   super.onCreate(savedInstanceState);
   setContentView(R.layout.activity_settings);
 
-  Config.shouldReloadConfig = true;
+  Config.shouldReload = true;
+  FriendIdMap.shouldReload = true;
+  CooperationIdMap.shouldReload = true;
 
   cb_immediateEffect = (CheckBox) findViewById(R.id.cb_immediateEffect);
   cb_recordLog = (CheckBox) findViewById(R.id.cb_recordLog);
@@ -36,6 +40,7 @@ public class SettingsActivity extends Activity
   cb_collectEnergy = (CheckBox) findViewById(R.id.cb_collectEnergy);
   cb_helpFriendCollect = (CheckBox) findViewById(R.id.cb_helpFriendCollect);
   cb_receiveForestTaskAward = (CheckBox) findViewById(R.id.cb_receiveForestTaskAward);
+  cb_cooperateWater = (CheckBox) findViewById(R.id.cb_cooperateWater);
   cb_enableFarm = (CheckBox) findViewById(R.id.cb_enableFarm);
   cb_rewardFriend = (CheckBox) findViewById(R.id.cb_rewardFriend);
   cb_sendBackAnimal = (CheckBox) findViewById(R.id.cb_sendBackAnimal);
@@ -58,10 +63,11 @@ public class SettingsActivity extends Activity
   cb_immediateEffect.setChecked(Config.immediateEffect());
   cb_recordLog.setChecked(Config.recordLog());
   cb_autoRestart.setChecked(Config.autoRestart());
-  cb_enableFarm.setChecked(Config.enableFarm());
   cb_collectEnergy.setChecked(Config.collectEnergy());
   cb_helpFriendCollect.setChecked(Config.helpFriendCollect());
   cb_receiveForestTaskAward.setChecked(Config.receiveForestTaskAward());
+  cb_cooperateWater.setChecked(Config.cooperateWater());
+  cb_enableFarm.setChecked(Config.enableFarm());
   cb_rewardFriend.setChecked(Config.rewardFriend());
   cb_sendBackAnimal.setChecked(Config.sendBackAnimal());
   cb_receiveFarmToolReward.setChecked(Config.receiveFarmToolReward());
@@ -135,11 +141,11 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_dontCollectList:
-    ListDialog.show(this, btn.getText(), Config.getDontCollectList(), null);
+    ListDialog.show(this, btn.getText(), AlipayUser.getList(), Config.getDontCollectList(), null);
     break;
 
    case R.id.btn_dontHelpCollectList:
-    ListDialog.show(this, btn.getText(), Config.getDontHelpCollectList(), null);
+    ListDialog.show(this, btn.getText(), AlipayUser.getList(), Config.getDontHelpCollectList(), null);
     break;
 
    case R.id.cb_receiveForestTaskAward:
@@ -147,7 +153,15 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_waterFriendList:
-    ListDialog.show(this, btn.getText(), Config.getWaterFriendList(), Config.getWaterCountList());
+    ListDialog.show(this, btn.getText(), AlipayUser.getList(), Config.getWaterFriendList(), Config.getWaterCountList());
+    break;
+
+   case R.id.cb_cooperateWater:
+    Config.setCooperateWater(cb.isChecked());
+    break;
+
+   case R.id.btn_cooperateWaterList:
+    ListDialog.show(this, btn.getText(), AlipayCooperate.getList(), Config.getCooperateWaterList(), Config.getcooperateWaterNumList());
     break;
 
    case R.id.cb_enableFarm:
@@ -167,7 +181,7 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_dontSendFriendList:
-    ListDialog.show(this, btn.getText(), Config.getDontSendFriendList(), null);
+    ListDialog.show(this, btn.getText(), AlipayUser.getList(), Config.getDontSendFriendList(), null);
     break;
 
    case R.id.btn_recallAnimalType:
@@ -207,7 +221,7 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_feedFriendAnimalList:
-    ListDialog.show(this, btn.getText(), Config.getFeedFriendAnimalList(), Config.getFeedFriendCountList());
+    ListDialog.show(this, btn.getText(), AlipayUser.getList(), Config.getFeedFriendAnimalList(), Config.getFeedFriendCountList());
     break;
 
    case R.id.cb_notifyFriend:
@@ -215,7 +229,7 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_dontNotifyFriendList:
-    ListDialog.show(this, btn.getText(), Config.getDontNotifyFriendList(), null);
+    ListDialog.show(this, btn.getText(), AlipayUser.getList(), Config.getDontNotifyFriendList(), null);
     break;
 
    case R.id.cb_receivePoint:
@@ -239,12 +253,13 @@ public class SettingsActivity extends Activity
  protected void onPause()
  {
   super.onPause();
-  if(Config.hasConfigChanged)
+  if(Config.hasChanged)
   {
-   Config.hasConfigChanged = !Config.saveConfigFile();
+   Config.hasChanged = !Config.saveConfigFile();
    Toast.makeText(this, "配置已保存", 0).show();
   }
-  Config.saveIdMap();
+  FriendIdMap.saveIdMap();
+  CooperationIdMap.saveIdMap();
  }
 
 }

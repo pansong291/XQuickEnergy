@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnShowListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import java.util.List;
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.CooperationIdMap;
+import pansong291.xposed.quickenergy.util.FriendIdMap;
 
 public class ListDialog
 {
@@ -26,17 +29,20 @@ public class ListDialog
  static List<String> selectedList;
  static List<Integer> countList;
  static ListAdapter.ViewHolder curViewHolder;
- static AlipayUser curAlipayUser;
+ static AlipayId curAlipayId;
 
  static AlertDialog edtDialog;
  static EditText edt_count;
 
  static AlertDialog deleteDialog;
 
- public static void show(Context c, CharSequence title, List<String> l, List<Integer> lc)
+ public static void show(Context c, CharSequence title, List<?> bl, List<String> sl, List<Integer> cl)
  {
-  selectedList = l;
-  countList = lc;
+  selectedList = sl;
+  countList = cl;
+  ListAdapter la = ListAdapter.get(c);
+  la.setBaseList(bl);
+  la.setSelectedList(selectedList);
   try
   {
    getListDialog(c).show();
@@ -46,9 +52,6 @@ public class ListDialog
    getListDialog(c).show();
   }
   listDialog.setTitle(title);
-  ListAdapter la = ListAdapter.get(c);
-  la.setSelectedList(selectedList);
-  la.notifyDataSetChanged();
  }
 
  private static AlertDialog getListDialog(Context c)
@@ -59,6 +62,23 @@ public class ListDialog
     .setView(getListView(c))
     .setPositiveButton("确定", null)
     .create();
+  listDialog.setOnShowListener(
+   new OnShowListener()
+   {
+    Context c;
+
+    public OnShowListener setContext(Context c)
+    {
+     this.c = c;
+     return this;
+    }
+
+    @Override
+    public void onShow(DialogInterface p1)
+    {
+     ListAdapter.get(c).notifyDataSetChanged();
+    }
+   }.setContext(c));
   return listDialog;
  }
 
@@ -72,9 +92,7 @@ public class ListDialog
   btn_find_next.setOnClickListener(onBtnClickListener);
   edt_find = v.findViewById(R.id.edt_find);
   lv_list = v.findViewById(R.id.lv_list);
-  ListAdapter la = ListAdapter.get(c);
-  la.setAlipayUserList(AlipayUser.getAlipayUserList());
-  lv_list.setAdapter(la);
+  lv_list.setAdapter(ListAdapter.get(c));
   lv_list.setOnItemClickListener(
    new OnItemClickListener()
    {
@@ -82,21 +100,21 @@ public class ListDialog
     public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
     {
      curViewHolder = (ListAdapter.ViewHolder) p2.getTag();
-     curAlipayUser = (AlipayUser) p1.getAdapter().getItem(p3);
+     curAlipayId = (AlipayId) p1.getAdapter().getItem(p3);
      if(countList == null)
      {
       if(curViewHolder.cb.isChecked())
       {
-       if(selectedList.contains(curAlipayUser.id))
-        selectedList.remove(curAlipayUser.id);
+       if(selectedList.contains(curAlipayId.id))
+        selectedList.remove(curAlipayId.id);
        curViewHolder.cb.setChecked(false);
       }else
       {
-       if(!selectedList.contains(curAlipayUser.id))
-        selectedList.add(curAlipayUser.id);
+       if(!selectedList.contains(curAlipayId.id))
+        selectedList.add(curAlipayId.id);
        curViewHolder.cb.setChecked(true);
       }
-      Config.hasConfigChanged = true;
+      Config.hasChanged = true;
      }else
      {
       try
@@ -107,8 +125,12 @@ public class ListDialog
        edtDialog = null;
        getEdtDialog(p1.getContext()).show();
       }
-      edtDialog.setTitle(curAlipayUser.name);
-      int i = selectedList.indexOf(curAlipayUser.id);
+      edtDialog.setTitle(curAlipayId.name);
+      if(curAlipayId instanceof AlipayCooperate)
+       edt_count.setHint("克数");
+      else
+       edt_count.setHint("次数");
+      int i = selectedList.indexOf(curAlipayId.id);
       if(i >= 0)
        edt_count.setText(String.valueOf(countList.get(i)));
       else
@@ -122,7 +144,7 @@ public class ListDialog
     @Override
     public boolean onItemLongClick(AdapterView<?> p1, View p2, int p3, long p4)
     {
-     curAlipayUser = (AlipayUser) p1.getAdapter().getItem(p3);
+     curAlipayId = (AlipayId) p1.getAdapter().getItem(p3);
      try
      {
       getDeleteDialog(p1.getContext()).show();
@@ -131,7 +153,7 @@ public class ListDialog
       deleteDialog = null;
       getDeleteDialog(p1.getContext()).show();
      }
-     deleteDialog.setMessage("删除用户 " + curAlipayUser.name);
+     deleteDialog.setMessage("删除 " + curAlipayId.name);
      return true;
     }
    });
@@ -167,12 +189,12 @@ public class ListDialog
         {
          return;
         }
-       int index = selectedList.indexOf(curAlipayUser.id);
+       int index = selectedList.indexOf(curAlipayId.id);
        if(count > 0)
        {
         if(index < 0)
         {
-         selectedList.add(curAlipayUser.id);
+         selectedList.add(curAlipayId.id);
          countList.add(count);
         }else
         {
@@ -188,14 +210,13 @@ public class ListDialog
         }
         curViewHolder.cb.setChecked(false);
        }
-       Config.hasConfigChanged = true;
+       Config.hasChanged = true;
        break;
      }
      ListAdapter.get(c).notifyDataSetChanged();
     }
    }.setContext(c);
    edt_count = new EditText(c);
-   edt_count.setHint("次数");
    edtDialog = new AlertDialog.Builder(c)
     .setTitle("title")
     .setView(edt_count)
@@ -226,18 +247,27 @@ public class ListDialog
      switch(p2)
      {
       case DialogInterface.BUTTON_POSITIVE:
-       Config.removeIdMap(curAlipayUser.id);
-       AlipayUser.remove(curAlipayUser.id);
+       if(curAlipayId instanceof AlipayUser)
+       {
+        FriendIdMap.removeIdMap(curAlipayId.id);
+        AlipayUser.remove(curAlipayId.id);
+       }else if(curAlipayId instanceof AlipayCooperate)
+       {
+        CooperationIdMap.removeIdMap(curAlipayId.id);
+        AlipayCooperate.remove(curAlipayId.id);
+       }
+       if(selectedList.contains(curAlipayId.id))
+        selectedList.remove(curAlipayId.id);
        break;
      }
      ListAdapter.get(c).notifyDataSetChanged();
     }
    }.setContext(c);
    deleteDialog = new AlertDialog.Builder(c)
-   .setMessage("msg")
-   .setPositiveButton("确定", listener)
-   .setNegativeButton("取消", null)
-   .create();
+    .setMessage("msg")
+    .setPositiveButton("确定", listener)
+    .setNegativeButton("取消", null)
+    .create();
   }
   return deleteDialog;
  }

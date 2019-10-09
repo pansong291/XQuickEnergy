@@ -4,9 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import pansong291.xposed.quickenergy.hook.AntFarmRpcCall;
 import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.FriendIdMap;
 import pansong291.xposed.quickenergy.util.Log;
-import pansong291.xposed.quickenergy.util.Statistics;
 import pansong291.xposed.quickenergy.util.RandomUtils;
+import pansong291.xposed.quickenergy.util.Statistics;
 
 public class AntFarm
 {
@@ -65,7 +66,6 @@ public class AntFarm
   public int toolCount, toolHoldLimit;
   }/**/
 
- public static String currentUid;
  private static String ownerFarmId;
  private static Animal[] animals;
  private static Animal ownerAnimal;
@@ -96,13 +96,13 @@ public class AntFarm
    {
     try
     {
-     while(currentUid == null || currentUid.isEmpty())
+     while(FriendIdMap.currentUid == null || FriendIdMap.currentUid.isEmpty())
       Thread.sleep(100);
-     String s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", currentUid);
+     String s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", FriendIdMap.currentUid);
      if(s == null)
      {
       Thread.sleep(RandomUtils.delay());
-      s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", currentUid);
+      s = AntFarmRpcCall.rpcCall_enterFarm(loader, "", FriendIdMap.currentUid);
      }
      JSONObject jo = new JSONObject(s);
      String memo = jo.getString("memo");
@@ -144,7 +144,7 @@ public class AntFarm
       }
 
       boolean hungry = false;
-      String userName = Config.getNameById(AntFarmRpcCall.farmId2UserId(ownerAnimal.currentFarmId));
+      String userName = FriendIdMap.getNameById(AntFarmRpcCall.farmId2UserId(ownerAnimal.currentFarmId));
       switch(AnimalFeedStatus.valueOf(ownerAnimal.animalFeedStatus))
       {
        case HUNGRY:
@@ -200,7 +200,7 @@ public class AntFarm
       donation(loader);
      }
 
-     if(Config.answerQuestion() && Statistics.canAnswerQuestionToday(currentUid))
+     if(Config.answerQuestion() && Statistics.canAnswerQuestionToday(FriendIdMap.currentUid))
      {
       answerQuestion(loader);
      }
@@ -244,7 +244,7 @@ public class AntFarm
      Log.i(TAG, "AntFarm.start.run err:");
      Log.printStackTrace(TAG, t);
     }
-    Config.saveIdMap();
+    FriendIdMap.saveIdMap();
    }
   }.setData(loader).start();
 
@@ -328,7 +328,7 @@ public class AntFarm
      {
       double rewardCount = benevolenceScore - jo.getDouble("farmProduct");
       benevolenceScore -= rewardCount;
-      Log.farm("打赏〔" + Config.getNameById(rewardList[i].friendId) + "〕〔" + rewardCount + "颗〕爱心鸡蛋");
+      Log.farm("打赏〔" + FriendIdMap.getNameById(rewardList[i].friendId) + "〕〔" + rewardCount + "颗〕爱心鸡蛋");
      }else
      {
       Log.recordLog(memo, s);
@@ -381,7 +381,7 @@ public class AntFarm
      if(Config.getDontSendFriendList().contains(user))
       continue;
      SendType sendType = Config.sendType();
-     user = Config.getNameById(user);
+     user = FriendIdMap.getNameById(user);
      String s = AntFarmRpcCall.rpcCall_sendBackAnimal(
       loader, sendType.name(), animals[i].animalId,
       animals[i].currentFarmId, animals[i].masterFarmId);
@@ -582,7 +582,7 @@ public class AntFarm
           {
            s = jo.getBoolean("rightAnswer") ? "正确": "错误";
            Log.farm("答题" + s + "，可领取［" + jo.getInt("awardCount") + "克］");
-           Statistics.answerQuestionToday(currentUid);
+           Statistics.answerQuestionToday(FriendIdMap.currentUid);
           }else
           {
            Log.recordLog(memo, s);
@@ -592,7 +592,7 @@ public class AntFarm
          {
           Statistics.setQuestionHint(rightReply);
           Log.farm("未找到正确答案，放弃作答。提示：" + rightReply);
-          Statistics.answerQuestionToday(currentUid);
+          Statistics.answerQuestionToday(FriendIdMap.currentUid);
          }
         }else
         {
@@ -603,13 +603,13 @@ public class AntFarm
        case RECEIVED:
         Statistics.setQuestionHint(null);
         Log.recordLog("今日答题已完成", "");
-        Statistics.answerQuestionToday(currentUid);
+        Statistics.answerQuestionToday(FriendIdMap.currentUid);
         break;
 
        case FINISHED:
         Statistics.setQuestionHint(null);
         Log.recordLog("已经答过题了，饲料待领取", "");
-        Statistics.answerQuestionToday(currentUid);
+        Statistics.answerQuestionToday(FriendIdMap.currentUid);
         break;
       }
       break;
@@ -764,7 +764,7 @@ public class AntFarm
    for(int i = 0; i < Config.getFeedFriendAnimalList().size(); i++)
    {
     String userId = Config.getFeedFriendAnimalList().get(i);
-    if(userId.equals(currentUid))
+    if(userId.equals(FriendIdMap.currentUid))
      continue;
     if(!Statistics.canFeedFriendToday(userId, Config.getFeedFriendCountList().get(i)))
      continue;
@@ -786,7 +786,7 @@ public class AntFarm
        if(AnimalInteractStatus.HOME.name().equals(jo.getString("animalInteractStatus"))
           && AnimalFeedStatus.HUNGRY.name().equals(jo.getString("animalFeedStatus")))
        {
-        feedFriendAnimal(loader, friendFarmId, Config.getNameById(userId));
+        feedFriendAnimal(loader, friendFarmId, FriendIdMap.getNameById(userId));
        }
        break;
       }
@@ -866,9 +866,9 @@ public class AntFarm
      {
       jo = jaRankingList.getJSONObject(i);
       String userId = jo.getString("userId");
-      String userName = Config.getNameById(userId);
+      String userName = FriendIdMap.getNameById(userId);
       if(Config.getDontNotifyFriendList().contains(userId)
-        || userId.equals(currentUid))
+        || userId.equals(FriendIdMap.currentUid))
        continue;
       boolean starve = jo.has("actionType") &&  jo.getString("actionType").equals("starve_action");
       if(jo.getBoolean("stealingAnimal") && !starve)

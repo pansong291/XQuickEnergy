@@ -12,6 +12,7 @@ public class FileUtils
  private static File directory;
  private static File configFile;
  private static File friendIdMapFile;
+ private static File cooperationIdMapFile;
  private static File statisticsFile;
  private static File forestLogFile;
  private static File farmLogFile;
@@ -59,6 +60,17 @@ public class FileUtils
     friendIdMapFile.delete();
   }
   return friendIdMapFile;
+ }
+
+ public static File getCooperationIdMapFile()
+ {
+  if(cooperationIdMapFile == null)
+  {
+   cooperationIdMapFile = new File(getDirectoryPath(), "cooperationId.list");
+   if(cooperationIdMapFile.exists() && cooperationIdMapFile.isDirectory())
+    cooperationIdMapFile.delete();
+  }
+  return cooperationIdMapFile;
  }
 
  public static File getStatisticsFile()

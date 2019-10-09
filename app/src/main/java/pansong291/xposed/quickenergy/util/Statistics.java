@@ -53,6 +53,7 @@ public class Statistics
  private TimeStatistics day;
 
  // forest
+ private ArrayList<String> cooperateWaterList;
 
  // farm
  private ArrayList<String> answerQuestionList;
@@ -148,10 +149,27 @@ public class Statistics
   return sb.toString();
  }
 
+ public static boolean canCooperateWaterToday(String uid, String coopId)
+ {
+  Statistics stat = getStatistics();
+  return !stat.cooperateWaterList.contains(uid + "_" + coopId);
+ }
+
+ public static void cooperateWaterToday(String uid, String coopId)
+ {
+  Statistics stat = getStatistics();
+  String v = uid + "_" + coopId;
+  if(!stat.cooperateWaterList.contains(v))
+  {
+   stat.cooperateWaterList.add(v);
+   save();
+  }
+ }
+
  public static boolean canAnswerQuestionToday(String uid)
  {
   Statistics stat = getStatistics();
-  return stat.answerQuestionList.contains(uid);
+  return !stat.answerQuestionList.contains(uid);
  }
 
  public static void answerQuestionToday(String uid)
@@ -269,6 +287,7 @@ public class Statistics
  private static void dayClear()
  {
   Statistics stat = getStatistics();
+  stat.cooperateWaterList.clear();
   stat.answerQuestionList.clear();
   stat.feedFriendLogList.clear();
   stat.memberSignin = 0;
@@ -287,6 +306,10 @@ public class Statistics
    stat.month = stat.new TimeStatistics(Integer.parseInt(date[1]));
   if(stat.day == null)
    stat.day = stat.new TimeStatistics(Integer.parseInt(date[2]));
+  if(stat.cooperateWaterList == null)
+   stat.cooperateWaterList = new ArrayList<>();
+  if(stat.answerQuestionList == null)
+   stat.answerQuestionList = new ArrayList<>();
   if(stat.feedFriendLogList == null)
    stat.feedFriendLogList = new ArrayList<>();
   return stat;
@@ -330,6 +353,18 @@ public class Statistics
    Log.i(TAG, "  " + jn_helped + ":" + stat.day.helped);
    stat.day.watered = joo.getInt(jn_watered);
    Log.i(TAG, "  " + jn_watered + ":" + stat.day.watered);
+
+   stat.cooperateWaterList = new ArrayList<>();
+   Log.i(TAG, Config.jn_cooperateWaterList + ":[");
+   if(jo.has(Config.jn_cooperateWaterList))
+   {
+    JSONArray ja = jo.getJSONArray(Config.jn_cooperateWaterList);
+    for(int i = 0; i < ja.length(); i++)
+    {
+     stat.cooperateWaterList.add(ja.getString(i));
+     Log.i(TAG, stat.cooperateWaterList.get(i) + ",");
+    }
+   }
 
    stat.answerQuestionList = new ArrayList<>();
    Log.i(TAG, jn_answerQuestionList + ":[");
@@ -412,6 +447,13 @@ public class Statistics
    joo.put(jn_helped, stat.day.helped);
    joo.put(jn_watered, stat.day.watered);
    jo.put(jn_day, joo);
+
+   ja = new JSONArray();
+   for(int i = 0; i < stat.cooperateWaterList.size(); i++)
+   {
+    ja.put(stat.cooperateWaterList.get(i));
+   }
+   jo.put(Config.jn_cooperateWaterList, ja);
 
    ja = new JSONArray();
    for(int i = 0; i < stat.answerQuestionList.size(); i++)

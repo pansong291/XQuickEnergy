@@ -5,8 +5,8 @@ import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
 import pansong291.xposed.quickenergy.AntForestNotification;
 import pansong291.xposed.quickenergy.hook.AntForestRpcCall;
-import pansong291.xposed.quickenergy.hook.RpcCall;
 import pansong291.xposed.quickenergy.util.Config;
+import pansong291.xposed.quickenergy.util.FriendIdMap;
 import pansong291.xposed.quickenergy.util.Log;
 import pansong291.xposed.quickenergy.util.RandomUtils;
 import pansong291.xposed.quickenergy.util.Statistics;
@@ -32,8 +32,6 @@ public class AntForest
    return nickNames[ordinal()];
   }
  }
-
- private static int times = 0;
 
  private static long serverTime = -1;
  private static long offsetTime = -1;
@@ -66,7 +64,7 @@ public class AntForest
        canCollectEnergy(loader, userId, true);
       }else
       {
-       Config.getNameById(userId);
+       FriendIdMap.getNameById(userId);
       }
      }
     }else
@@ -82,7 +80,7 @@ public class AntForest
   onForestEnd(loader);
  }
 
- private static void canCollectSelfEnergy(ClassLoader loader)
+ private static void canCollectSelfEnergy(ClassLoader loader, int times)
  {
   try
   {
@@ -105,13 +103,13 @@ public class AntForest
     JSONArray jaBubbles = jo.getJSONArray("bubbles");
     jo = jo.getJSONObject("userEnergy");
     selfId = jo.getString("userId");
-    AntFarm.currentUid = selfId;
+    FriendIdMap.currentUid = selfId;
     String selfName = jo.getString("displayName");
     if(selfName == null || selfName.isEmpty())
      selfName = "我";
-    Config.putIdMap(selfId, selfName);
+    FriendIdMap.putIdMap(selfId, selfName);
     Log.recordLog("进入【" + selfName + "】的蚂蚁森林", "");
-    Config.saveIdMap();
+    FriendIdMap.saveIdMap();
     if(Config.collectEnergy())
      for(int i = 0; i < jaBubbles.length(); i++)
      {
@@ -160,7 +158,6 @@ public class AntForest
    Log.i(TAG, "canCollectSelfEnergy err:");
    Log.printStackTrace(TAG, t);
   }
-  times = (times + 1) % (3600_000 / Config.checkInterval());
  }
 
  private static void canCollectEnergy(ClassLoader loader, String userId, boolean laterCollect)
@@ -186,9 +183,9 @@ public class AntForest
     String loginId = userName;
     if(jo.has("loginId"))
      loginId += "(" + jo.getString("loginId") + ")";
-    Config.putIdMap(userId, loginId);
+    FriendIdMap.putIdMap(userId, loginId);
     Log.recordLog("进入【" + loginId + "】的蚂蚁森林", "");
-    Config.saveIdMap();
+    FriendIdMap.saveIdMap();
     for(int i = 0; i < jaProps.length(); i++)
     {
      JSONObject joProps = jaProps.getJSONObject(i);
@@ -485,7 +482,7 @@ public class AntForest
    "收【" + collectedEnergy + "克】，帮【"
    + helpCollectedEnergy + "克】，"
    + collectTaskCount + "个蹲点任务", "");
-  Config.saveIdMap();
+  FriendIdMap.saveIdMap();
   collectedEnergy = 0;
   helpCollectedEnergy = 0;
   if(Config.collectEnergy())
@@ -510,32 +507,34 @@ public class AntForest
   laterTime = -1;
  }
 
- public static void checkEnergyRanking(ClassLoader loader)
+ public static void checkEnergyRanking(ClassLoader loader, int times)
  {
   Log.recordLog("定时检测开始", "");
   new Thread()
   {
    ClassLoader loader;
+   int times;
 
-   public Thread setData(ClassLoader cl)
+   public Thread setData(ClassLoader cl, int i)
    {
     loader = cl;
+    times = i;
     return this;
    }
 
    @Override
    public void run()
    {
-    canCollectSelfEnergy(loader);
+    canCollectSelfEnergy(loader, times);
     if(Config.collectEnergy())
      queryEnergyRanking(loader, "1");
    }
-  }.setData(loader).start();
+  }.setData(loader, times).start();
  }
 
  public static void checkUnknownId(ClassLoader loader)
  {
-  String[] unknownIds = Config.getUnknownIds();
+  String[] unknownIds = FriendIdMap.getUnknownIds();
   if(unknownIds != null)
   {
    new Thread()
@@ -572,9 +571,9 @@ public class AntForest
         String loginId = userName;
         if(jo.has("loginId"))
          loginId += "(" + jo.getString("loginId") + ")";
-        Config.putIdMap(unknownIds[i], loginId);
+        FriendIdMap.putIdMap(unknownIds[i], loginId);
         Log.recordLog("进入【" + loginId + "】的蚂蚁森林", "");
-        Config.saveIdMap();
+        FriendIdMap.saveIdMap();
        }
       }
      }catch(Throwable t)
