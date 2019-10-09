@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
-import android.webkit.WebView;
+import android.view.MenuItem;
 
 public class HtmlViewerActivity extends Activity
 {
@@ -32,7 +32,25 @@ public class HtmlViewerActivity extends Activity
   it.setDataAndType(uri, "text/html");
   menu.add(0, 1, 0, "使用浏览器打开")
    .setIntent(Intent.createChooser(it, "选择浏览器"));
+  menu.add(0, 2, 0, "滚动到顶部");
+  menu.add(0, 3, 0, "滚动到底部");
   return super.onCreateOptionsMenu(menu);
+ }
+
+ @Override
+ public boolean onOptionsItemSelected(MenuItem item)
+ {
+  switch(item.getItemId())
+  {
+   case 2:
+    mWebView.scrollTo(0, 0);
+    break;
+
+   case 3:
+    mWebView.scrollToBottom();
+    break;
+  }
+  return true;
  }
 
 }

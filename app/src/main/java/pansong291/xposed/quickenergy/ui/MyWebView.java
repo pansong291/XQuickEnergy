@@ -22,16 +22,19 @@ public class MyWebView extends WebView
     public void onPageFinished(WebView view, String url)
     {
      if(url.endsWith(".log"))
-     post(
+     postDelayed(
       new Runnable()
       {
        @Override
        public void run()
        {
         if(Thread.interrupted()) return;
-        scrollToBottom();
+        if(getContentHeight() == 0)
+         postDelayed(this, 100);
+        else
+         scrollToBottom();
        }
-      });
+      }, 500);
     }
    });
  }
@@ -40,5 +43,5 @@ public class MyWebView extends WebView
  {
   scrollTo(0, computeVerticalScrollRange());
  }
- 
+
 }
