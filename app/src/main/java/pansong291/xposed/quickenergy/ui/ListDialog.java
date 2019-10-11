@@ -341,6 +341,7 @@ public class ListDialog
        }
        if(selectedList.contains(curAlipayId.id))
         selectedList.remove(curAlipayId.id);
+       ListAdapter.get(c).exitFind();
        break;
      }
      ListAdapter.get(c).notifyDataSetChanged();
