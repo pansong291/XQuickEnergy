@@ -870,7 +870,7 @@ public class AntFarm
       String userId = jo.getString("userId");
       String userName = FriendIdMap.getNameById(userId);
       if(Config.getDontNotifyFriendList().contains(userId)
-        || userId.equals(FriendIdMap.currentUid))
+         || userId.equals(FriendIdMap.currentUid))
        continue;
       boolean starve = jo.has("actionType") &&  jo.getString("actionType").equals("starve_action");
       if(jo.getBoolean("stealingAnimal") && !starve)

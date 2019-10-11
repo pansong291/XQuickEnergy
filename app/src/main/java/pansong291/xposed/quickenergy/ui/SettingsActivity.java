@@ -244,7 +244,7 @@ public class SettingsActivity extends Activity
     break;
 
    case R.id.btn_donation_developer:
-    Intent it2 = new Intent(Intent.ACTION_VIEW, Uri.parse("alipays://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/tsx00339eflkuhhtfctcn48"));
+    Intent it2 = new Intent(Intent.ACTION_VIEW, Uri.parse("alipays://platformapi/startapp?saId=10000007&qrcode=https%3A%2F%2Fqr.alipay.com%2Ftsx00339eflkuhhtfctcn48"));
     startActivity(it2);
     break;
   }

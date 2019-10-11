@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,6 +36,7 @@ public class ListDialog
  static AlertDialog edtDialog;
  static EditText edt_count;
 
+ static AlertDialog optionsDialog;
  static AlertDialog deleteDialog;
 
  public static void show(Context c, CharSequence title, List<?> bl, List<String> sl, List<Integer> cl)
@@ -43,6 +46,11 @@ public class ListDialog
   ListAdapter la = ListAdapter.get(c);
   la.setBaseList(bl);
   la.setSelectedList(selectedList);
+  showListDialog(c, title);
+ }
+
+ private static void showListDialog(Context c, CharSequence title)
+ {
   try
   {
    getListDialog(c).show();
@@ -117,24 +125,7 @@ public class ListDialog
       Config.hasChanged = true;
      }else
      {
-      try
-      {
-       getEdtDialog(p1.getContext()).show();
-      }catch(Throwable t)
-      {
-       edtDialog = null;
-       getEdtDialog(p1.getContext()).show();
-      }
-      edtDialog.setTitle(curAlipayId.name);
-      if(curAlipayId instanceof AlipayCooperate)
-       edt_count.setHint("grams");
-      else
-       edt_count.setHint("count");
-      int i = selectedList.indexOf(curAlipayId.id);
-      if(i >= 0)
-       edt_count.setText(String.valueOf(countList.get(i)));
-      else
-       edt_count.getText().clear();
+      showEdtDialog(p1.getContext());
      }
     }
    });
@@ -145,19 +136,39 @@ public class ListDialog
     public boolean onItemLongClick(AdapterView<?> p1, View p2, int p3, long p4)
     {
      curAlipayId = (AlipayId) p1.getAdapter().getItem(p3);
-     try
+     if(curAlipayId instanceof AlipayCooperate)
      {
-      getDeleteDialog(p1.getContext()).show();
-     }catch(Throwable t)
+      showDeleteDialog(p1.getContext());
+     }else
      {
-      deleteDialog = null;
-      getDeleteDialog(p1.getContext()).show();
+      showOptionsDialog(p1.getContext());
      }
-     deleteDialog.setMessage("Delete " + curAlipayId.name);
      return true;
     }
    });
   return v;
+ }
+
+ private static void showEdtDialog(Context c)
+ {
+  try
+  {
+   getEdtDialog(c).show();
+  }catch(Throwable t)
+  {
+   edtDialog = null;
+   getEdtDialog(c).show();
+  }
+  edtDialog.setTitle(curAlipayId.name);
+  if(curAlipayId instanceof AlipayCooperate)
+   edt_count.setHint("grams");
+  else
+   edt_count.setHint("count");
+  int i = selectedList.indexOf(curAlipayId.id);
+  if(i >= 0)
+   edt_count.setText(String.valueOf(countList.get(i)));
+  else
+   edt_count.getText().clear();
  }
 
  private static AlertDialog getEdtDialog(Context c)
@@ -227,6 +238,78 @@ public class ListDialog
   return edtDialog;
  }
 
+ private static void showOptionsDialog(Context c)
+ {
+  try
+  {
+   getOptionsDailog(c).show();
+  }catch(Throwable t)
+  {
+   optionsDialog = null;
+   getOptionsDailog(c).show();
+  }
+ }
+
+ private static AlertDialog getOptionsDailog(Context c)
+ {
+  if(optionsDialog == null)
+  {
+   optionsDialog = new AlertDialog.Builder(c)
+    .setTitle("Options")
+    .setAdapter(
+    OptionsAdapter.get(c), new OnClickListener()
+    {
+     Context c;
+
+     public OnClickListener setContext(Context c)
+     {
+      this.c = c;
+      return this;
+     }
+
+     @Override
+     public void onClick(DialogInterface p1, int p2)
+     {
+      String url = null;
+      switch(p2)
+      {
+       case 0:
+        url = "alipays://platformapi/startapp?saId=10000007&qrcode=https%3A%2F%2F60000002.h5app.alipay.com%2Fwww%2Fhome.html%3FuserId%3D";
+        break;
+
+       case 1:
+        url = "alipays://platformapi/startapp?saId=10000007&qrcode=https%3A%2F%2F66666674.h5app.alipay.com%2Fwww%2Findex.htm%3Fuid%3D";
+        break;
+
+       case 2:
+        showDeleteDialog(c);
+      }
+      if(url != null && !url.isEmpty())
+      {
+       Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse(url + curAlipayId.id));
+       c.startActivity(it);
+      }
+     }
+    }.setContext(c))
+    .setNegativeButton("CANCEL", null)
+    .create();
+  }
+  return optionsDialog;
+ }
+
+ private static void showDeleteDialog(Context c)
+ {
+  try
+  {
+   getDeleteDialog(c).show();
+  }catch(Throwable t)
+  {
+   deleteDialog = null;
+   getDeleteDialog(c).show();
+  }
+  deleteDialog.setTitle("Delete " + curAlipayId.name);
+ }
+
  private static AlertDialog getDeleteDialog(Context c)
  {
   if(deleteDialog == null)
@@ -264,7 +347,7 @@ public class ListDialog
     }
    }.setContext(c);
    deleteDialog = new AlertDialog.Builder(c)
-    .setMessage("msg")
+    .setTitle("title")
     .setPositiveButton("OK", listener)
     .setNegativeButton("CANCEL", null)
     .create();
@@ -294,7 +377,7 @@ public class ListDialog
    }
    if(index < 0)
    {
-    Toast.makeText(p1.getContext(), "Not find", Toast.LENGTH_SHORT).show();
+    Toast.makeText(p1.getContext(), "Not found", Toast.LENGTH_SHORT).show();
    }else
    {
     lv_list.setSelection(index);
