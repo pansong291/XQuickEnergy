@@ -268,9 +268,11 @@ public class AntForest
     }
     if(collected > 0)
     {
-     Log.forest("偷取【" + userName + "】的能量【" + collected + "克】");
      totalCollected += collected;
      Statistics.addData(Statistics.DataType.COLLECTED, collected);
+     String str = "偷取【" + userName + "】的能量【" + collected + "克】";
+     Log.forest(str);
+     AntForestToast.show(str);
     }else
     {
      Log.recordLog("偷取【" + userName + "】的能量失败", "，UserID：" + userId + "，BubbleId：" + bubbleId);
@@ -501,7 +503,7 @@ public class AntForest
     if(minute > 0) sb.append(minute + "分");
     sb.append(second + "秒");
    }
-   AntForestToast.show(sb.toString());
+   Log.recordLog(sb.toString(), "");
    AntForestNotification.setContentText(Log.getFormatTime() + sb.toString());
   }
   laterTime = -1;

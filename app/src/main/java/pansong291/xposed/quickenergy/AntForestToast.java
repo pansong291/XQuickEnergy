@@ -14,7 +14,6 @@ public class AntForestToast
 
  public static void show(CharSequence cs)
  {
-  Log.recordLog(cs.toString(), "");
   try
   {
    if(context != null && Config.showToast())
