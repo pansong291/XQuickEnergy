@@ -45,7 +45,8 @@ public class AntForestNotification
   if(isStart)
   {
    mNotification = builder.setContentText(cs).build();
-   getNotificationManager(null).notify(ANTFOREST_NOTIFICATION_ID, mNotification);
+   if(mNotifyManager != null)
+    mNotifyManager.notify(ANTFOREST_NOTIFICATION_ID, mNotification);
   }
  }
 
@@ -56,7 +57,7 @@ public class AntForestNotification
    if(context instanceof Service)
     ((Service)context).stopForeground(remove);
    else
-    getNotificationManager(null).cancel(ANTFOREST_NOTIFICATION_ID);
+    getNotificationManager(context).cancel(ANTFOREST_NOTIFICATION_ID);
    isStart = false;
   }
  }
@@ -79,6 +80,7 @@ public class AntForestNotification
     builder = new Notification.Builder(context, CHANNEL_ID);
    }else
    {
+    getNotificationManager(context);
     builder = new Notification.Builder(context)
      .setPriority(Notification.PRIORITY_LOW);
    }
