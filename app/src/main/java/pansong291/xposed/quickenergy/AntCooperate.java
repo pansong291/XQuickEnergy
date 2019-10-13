@@ -86,7 +86,7 @@ public class AntCooperate
      }
     }catch(Throwable t)
     {
-     Log.i(TAG, "AntCooperate.start.run err:");
+     Log.i(TAG, "start.run err:");
      Log.printStackTrace(TAG, t);
     }
     CooperationIdMap.saveIdMap();

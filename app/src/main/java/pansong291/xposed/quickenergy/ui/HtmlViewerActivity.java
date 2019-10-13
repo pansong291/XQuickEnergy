@@ -1,6 +1,7 @@
 package pansong291.xposed.quickenergy.ui;
 
 import android.app.Activity;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,8 +33,9 @@ public class HtmlViewerActivity extends Activity
   it.setDataAndType(uri, "text/html");
   menu.add(0, 1, 0, "Open with other browser")
    .setIntent(Intent.createChooser(it, "Choose a browser"));
-  menu.add(0, 2, 0, "Scroll to top");
-  menu.add(0, 3, 0, "Scroll to bottom");
+  menu.add(0,2,0,"Copy the url");
+  menu.add(0, 3, 0, "Scroll to top");
+  menu.add(0, 4, 0, "Scroll to bottom");
   return super.onCreateOptionsMenu(menu);
  }
 
@@ -43,10 +45,15 @@ public class HtmlViewerActivity extends Activity
   switch(item.getItemId())
   {
    case 2:
+    ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+    cm.setText(uri.toString());
+    break;
+    
+   case 3:
     mWebView.scrollTo(0, 0);
     break;
 
-   case 3:
+   case 4:
     mWebView.scrollToBottom();
     break;
   }

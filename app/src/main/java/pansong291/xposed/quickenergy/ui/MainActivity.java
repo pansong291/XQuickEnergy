@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.util.FileUtils;
 import pansong291.xposed.quickenergy.util.Statistics;
@@ -71,7 +72,9 @@ public class MainActivity extends Activity
   menu.add(0, 1, 0, "Hide the application icon")
    .setCheckable(true)
    .setChecked(state > PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-  menu.add(0, 2, 0, "Settings");
+  menu.add(0, 2, 0, "Export statistic file");
+  menu.add(0, 3, 0, "Import statistic file");
+  menu.add(0, 4, 0, "Settings");
   return super.onCreateOptionsMenu(menu);
  }
 
@@ -86,7 +89,21 @@ public class MainActivity extends Activity
      .setComponentEnabledSetting(new ComponentName(this, getClass().getCanonicalName() + "Alias"), state, PackageManager.DONT_KILL_APP);
     item.setChecked(!item.isChecked());
     break;
+
    case 2:
+    if(FileUtils.copyTo(FileUtils.getStatisticsFile(), FileUtils.getExportedStatisticsFile()))
+     Toast.makeText(this, "Export success", 0).show();
+    break;
+
+   case 3:
+    if(FileUtils.copyTo(FileUtils.getExportedStatisticsFile(), FileUtils.getStatisticsFile()))
+    {
+     tv_statistics.setText(Statistics.getText());
+     Toast.makeText(this, "Import success", 0).show();
+    }
+    break;
+
+   case 4:
     startActivity(new Intent(this, SettingsActivity.class));
     break;
   }

@@ -9,42 +9,57 @@ import java.io.FileWriter;
 public class FileUtils
 {
  private static final String TAG = FileUtils.class.getCanonicalName();
- private static File directory;
+ private static File androidDirectory;
+ private static File configDirectory;
  private static File configFile;
  private static File friendIdMapFile;
  private static File cooperationIdMapFile;
  private static File statisticsFile;
+ private static File exportedStatisticsFile;
  private static File forestLogFile;
  private static File farmLogFile;
  private static File otherLogFile;
  private static File simpleLogFile;
  private static File runtimeLogFile;
 
- public static File getDirectoryPath()
+ public static File getAndroidDirectoryFile()
  {
-  if(directory == null)
+  if(androidDirectory == null)
   {
-   directory = new File(Environment.getExternalStorageDirectory(), "Android/data/pansong291.xposed.quickenergy");
-   if(directory.exists())
+   androidDirectory = new File(Environment.getExternalStorageDirectory(), "Android");
+   if(!androidDirectory.exists())
    {
-    if(directory.isFile())
+    androidDirectory.mkdirs();
+   }
+  }
+  return androidDirectory;
+ }
+
+ public static File getConfigDirectoryFile()
+ {
+  if(configDirectory == null)
+  {
+   configDirectory = new File(getAndroidDirectoryFile(), "data/pansong291.xposed.quickenergy");
+   if(configDirectory.exists())
+   {
+    if(configDirectory.isFile())
     {
-     directory.delete();
-     directory.mkdirs();
+     configDirectory.delete();
+     configDirectory.mkdirs();
     }
    }else
    {
-    directory.mkdirs();
+    configDirectory.mkdirs();
    }
   }
-  return directory;
+  return configDirectory;
  }
 
  public static File getConfigFile()
  {
   if(configFile == null)
   {
-   configFile = new File(getDirectoryPath(), "config.json");
+   configFile = new File(getConfigDirectoryFile(), "config.json");
    if(configFile.exists() && configFile.isDirectory())
     configFile.delete();
   }
@@ -55,7 +70,7 @@ public class FileUtils
  {
   if(friendIdMapFile == null)
   {
-   friendIdMapFile = new File(getDirectoryPath(), "friendId.list");
+   friendIdMapFile = new File(getConfigDirectoryFile(), "friendId.list");
    if(friendIdMapFile.exists() && friendIdMapFile.isDirectory())
     friendIdMapFile.delete();
   }
@@ -66,7 +81,7 @@ public class FileUtils
  {
   if(cooperationIdMapFile == null)
   {
-   cooperationIdMapFile = new File(getDirectoryPath(), "cooperationId.list");
+   cooperationIdMapFile = new File(getConfigDirectoryFile(), "cooperationId.list");
    if(cooperationIdMapFile.exists() && cooperationIdMapFile.isDirectory())
     cooperationIdMapFile.delete();
   }
@@ -77,18 +92,29 @@ public class FileUtils
  {
   if(statisticsFile == null)
   {
-   statisticsFile = new File(getDirectoryPath(), "statistics.json");
+   statisticsFile = new File(getConfigDirectoryFile(), "statistics.json");
    if(statisticsFile.exists() && statisticsFile.isDirectory())
     statisticsFile.delete();
   }
   return statisticsFile;
  }
 
+ public static File getExportedStatisticsFile()
+ {
+  if(exportedStatisticsFile == null)
+  {
+   exportedStatisticsFile = new File(getAndroidDirectoryFile(), "statistics.json");
+   if(exportedStatisticsFile.exists() && exportedStatisticsFile.isDirectory())
+    exportedStatisticsFile.delete();
+  }
+  return exportedStatisticsFile;
+ }
+
  public static File getForestLogFile()
  {
   if(forestLogFile == null)
   {
-   forestLogFile = new File(getDirectoryPath(), "forest.log");
+   forestLogFile = new File(getConfigDirectoryFile(), "forest.log");
    if(forestLogFile.exists() && forestLogFile.isDirectory())
     forestLogFile.delete();
    if(!forestLogFile.exists())
@@ -105,7 +131,7 @@ public class FileUtils
  {
   if(farmLogFile == null)
   {
-   farmLogFile = new File(getDirectoryPath(), "farm.log");
+   farmLogFile = new File(getConfigDirectoryFile(), "farm.log");
    if(farmLogFile.exists() && farmLogFile.isDirectory())
     farmLogFile.delete();
    if(!farmLogFile.exists())
@@ -122,7 +148,7 @@ public class FileUtils
  {
   if(otherLogFile == null)
   {
-   otherLogFile = new File(getDirectoryPath(), "other.log");
+   otherLogFile = new File(getConfigDirectoryFile(), "other.log");
    if(otherLogFile.exists() && otherLogFile.isDirectory())
     otherLogFile.delete();
    if(!otherLogFile.exists())
@@ -139,7 +165,7 @@ public class FileUtils
  {
   if(simpleLogFile == null)
   {
-   simpleLogFile = new File(getDirectoryPath(), "simple.log");
+   simpleLogFile = new File(getConfigDirectoryFile(), "simple.log");
    if(simpleLogFile.exists() && simpleLogFile.isDirectory())
     simpleLogFile.delete();
   }
@@ -150,7 +176,7 @@ public class FileUtils
  {
   if(runtimeLogFile == null)
   {
-   runtimeLogFile = new File(getDirectoryPath(), "runtime.log");
+   runtimeLogFile = new File(getConfigDirectoryFile(), "runtime.log");
    if(runtimeLogFile.exists() && runtimeLogFile.isDirectory())
     runtimeLogFile.delete();
   }
@@ -179,7 +205,7 @@ public class FileUtils
   {
    Log.printStackTrace(TAG, t);
   }
-  close(fr);
+  close(fr, f);
   return result.toString();
  }
 
@@ -209,9 +235,10 @@ public class FileUtils
    success = true;
   }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, t);
+   if(!f.equals(getRuntimeLogFile()))
+    Log.printStackTrace(TAG, t);
   }
-  close(fw);
+  close(fw, f);
   return success;
  }
 
@@ -227,20 +254,27 @@ public class FileUtils
    success = true;
   }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, t);
+   if(!f.equals(getRuntimeLogFile()))
+    Log.printStackTrace(TAG, t);
   }
-  close(fw);
+  close(fw, f);
   return success;
  }
 
- public static void close(Closeable c)
+ public static boolean copyTo(File f1, File f2)
+ {
+  return write2File(readFromFile(f1), f2);
+ }
+
+ public static void close(Closeable c, File f)
  {
   try
   {
    if(c != null) c.close();
   }catch(Throwable t)
   {
-   Log.printStackTrace(TAG, t);
+   if(!f.equals(getRuntimeLogFile()))
+    Log.printStackTrace(TAG, t);
   }
  }
 

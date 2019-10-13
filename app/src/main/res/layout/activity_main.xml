@@ -10,7 +10,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:id="@+id/tv_unactive"
-		android:text="MODULE UNACTIVE"
+		android:text="UNACTIVATED"
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:textColor="#FFFF0000"/>
 
@@ -51,17 +51,16 @@
 		android:background="@drawable/button"
 		android:id="@+id/btn_other_log"/>
 
-	<TextView
-		android:layout_width="wrap_content"
+	<Button
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="You can't see me"
-		android:focusable="true"
-		android:clickable="true"
+		style="?android:attr/buttonBarButtonStyle"
+		android:text="看不到我看不到我看不到我"
+		android:textAllCaps="false"
 		android:onClick="onClick"
 		android:background="@drawable/button"
 		android:id="@+id/btn_help"
 		android:layout_marginTop="24dp"
-		android:textSize="4sp"
 		android:textColor="#FF000000"/>
 
 </LinearLayout>

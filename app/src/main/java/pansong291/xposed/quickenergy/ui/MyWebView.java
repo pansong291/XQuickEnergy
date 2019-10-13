@@ -16,6 +16,7 @@ public class MyWebView extends WebView
   getSettings().setUseWideViewPort(false);
   getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
   getSettings().setAllowFileAccess(true);
+  getSettings().setJavaScriptEnabled(true);
   setWebViewClient(
    new WebViewClient()
    {

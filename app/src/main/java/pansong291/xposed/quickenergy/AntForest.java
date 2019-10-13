@@ -623,7 +623,6 @@ public class AntForest
   public long getDelayTime()
   {
    sleep = produceTime + offsetTime - System.currentTimeMillis() - Config.advanceTime();
-   if(sleep < 0) sleep = 0;
    return  sleep;
   }
 
@@ -632,7 +631,7 @@ public class AntForest
   {
    try
    {
-    Thread.sleep(sleep);
+    if(sleep > 0) sleep(sleep);
     Log.recordLog("【" + userName + "】蹲点收取开始" + collectTaskCount, "");
     collectTaskCount--;
     long time = System.currentTimeMillis();
@@ -642,7 +641,7 @@ public class AntForest
      collected = collectEnergy(loader, userId, bubbleId, userName, bizNo);
      if(collected > 0) break;
      if(Config.collectInterval() > 0)
-      Thread.sleep(Config.collectInterval());
+      sleep(Config.collectInterval());
     }
    }catch(Throwable t)
    {
