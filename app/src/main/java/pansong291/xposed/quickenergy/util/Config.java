@@ -44,8 +44,8 @@ public class Config
  jn_answerQuestion = "answerQuestion", jn_receiveFarmTaskAward = "receiveFarmTaskAward", jn_feedAnimal = "feedAnimal",
  jn_useAccelerateTool = "useAccelerateTool", jn_feedFriendAnimalList = "feedFriendAnimalList", jn_notifyFriend = "notifyFriend",
  jn_dontNotifyFriendList = "dontNotifyFriendList",
- /* member */
- jn_receivePoint = "receivePoint", jn_receivePointTime = "receivePointTime";
+ /* other */
+ jn_receivePoint = "receivePoint", jn_openTreasureBox = "openTreasureBox", jn_kbSignIn = "kbSignIn";
 
  public static boolean shouldReload;
  public static boolean hasChanged;
@@ -96,10 +96,12 @@ public class Config
  private boolean notifyFriend;
  private List<String> dontNotifyFriendList;
 
- /* member */
- private boolean receivePoint;
-
  /* other */
+ private boolean receivePoint;
+ private boolean openTreasureBox;
+ private boolean kbSignIn;
+
+ /* base */
  private boolean reInit;
  private static Config config;
 
@@ -486,7 +488,7 @@ public class Config
   return getConfig().dontNotifyFriendList;
  }
 
- /* member */
+ /* other */
  public static void setReceivePoint(boolean b)
  {
   getConfig().receivePoint = b;
@@ -498,7 +500,29 @@ public class Config
   return getConfig().receivePoint;
  }
 
- /* other */
+ public static void setOpenTreasureBox(boolean b)
+ {
+  getConfig().openTreasureBox = b;
+  hasChanged = true;
+ }
+
+ public static boolean openTreasureBox()
+ {
+  return getConfig().openTreasureBox;
+ }
+
+ public static void setKbSginIn(boolean b)
+ {
+  getConfig().kbSignIn = b;
+  hasChanged = true;
+ }
+
+ public static boolean kbSginIn()
+ {
+  return getConfig().kbSignIn;
+ }
+
+ /* base */
  private static Config getConfig()
  {
   if(config == null || shouldReload && config.immediateEffect)
@@ -561,6 +585,8 @@ public class Config
   if(c.dontNotifyFriendList == null) c.dontNotifyFriendList = new ArrayList<>();
 
   c.receivePoint = true;
+  c.openTreasureBox = true;
+  c.kbSignIn = true;
   return c;
  }
 
@@ -782,9 +808,15 @@ public class Config
     }
    }
 
-   /* member */
+   /* other */
    config.receivePoint = jo.optBoolean(jn_receivePoint, true);
    Log.i(TAG, jn_receivePoint + ":" + config.receivePoint);
+
+   config.openTreasureBox = jo.optBoolean(jn_openTreasureBox, true);
+   Log.i(TAG, jn_openTreasureBox + ":" + config.openTreasureBox);
+
+   config.kbSignIn = jo.optBoolean(jn_kbSignIn, true);
+   Log.i(TAG, jn_kbSignIn + ":" + config.kbSignIn);
 
   }catch(Throwable t)
   {
@@ -933,8 +965,12 @@ public class Config
    }
    jo.put(jn_dontNotifyFriendList, ja);
 
-   /* member */
+   /* other */
    jo.put(jn_receivePoint, config.receivePoint);
+
+   jo.put(jn_openTreasureBox, config.openTreasureBox);
+
+   jo.put(jn_kbSignIn, config.kbSignIn);
 
   }catch(Throwable t)
   {

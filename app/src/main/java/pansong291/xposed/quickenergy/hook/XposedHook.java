@@ -18,6 +18,8 @@ import pansong291.xposed.quickenergy.AntForest;
 import pansong291.xposed.quickenergy.AntForestNotification;
 import pansong291.xposed.quickenergy.AntForestToast;
 import pansong291.xposed.quickenergy.AntMember;
+import pansong291.xposed.quickenergy.AntSports;
+import pansong291.xposed.quickenergy.KBMember;
 import pansong291.xposed.quickenergy.hook.ClassMember;
 import pansong291.xposed.quickenergy.ui.MainActivity;
 import pansong291.xposed.quickenergy.util.Config;
@@ -55,12 +57,21 @@ public class XposedHook implements IXposedHookLoadPackage
   }
  }
 
- private void hookLauncherService(final ClassLoader loader)
+ private void hookLauncherService(ClassLoader loader)
  {
   try
   {
-   XposedHelpers.findAndHookMethod(ClassMember.com_alipay_android_launcher_service_LauncherService, loader, ClassMember.onCreate, new XC_MethodHook()
+   XposedHelpers.findAndHookMethod(
+    ClassMember.com_alipay_android_launcher_service_LauncherService, loader, ClassMember.onCreate, new XC_MethodHook()
     {
+     ClassLoader loader;
+
+     public XC_MethodHook setData(ClassLoader cl)
+     {
+      loader = cl;
+      return this;
+     }
+
      @Override
      protected void afterHookedMethod(MethodHookParam param) throws Throwable
      {
@@ -74,10 +85,12 @@ public class XposedHook implements IXposedHookLoadPackage
       if(runnable == null) runnable = new Runnable()
        {
         Service service;
+        ClassLoader loader;
 
-        public Runnable setData(Service s)
+        public Runnable setData(Service s, ClassLoader cl)
         {
          service = s;
+         loader = cl;
          return this;
         }
 
@@ -90,19 +103,21 @@ public class XposedHook implements IXposedHookLoadPackage
          AntCooperate.start(loader, times);
          AntFarm.start(loader);
          AntMember.receivePoint(loader, times);
+         AntSports.start(loader);
+         KBMember.start(loader);
          if(Config.collectEnergy() || Config.enableFarm())
           handler.postDelayed(this, Config.checkInterval());
          else AntForestNotification.stop(service, false);
          times = (times + 1) % (3600_000 / Config.checkInterval());
         }
-       }.setData(service);
+       }.setData(service, loader);
       if(Config.collectEnergy() || Config.enableFarm())
       {
        AntForestNotification.start(service);
        handler.post(runnable);
       }
      }
-    });
+    }.setData(loader));
    Log.i(TAG, "hook " + ClassMember.onCreate + " successfully");
   }catch(Throwable t)
   {

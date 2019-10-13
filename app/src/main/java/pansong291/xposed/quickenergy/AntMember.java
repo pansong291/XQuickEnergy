@@ -31,7 +31,7 @@ public class AntMember
    {
     try
     {
-     if(Statistics.canMemberSigninToday())
+     if(Statistics.canMemberSignInToday())
      {
       String s = AntMemberRpcCall.rpcCall_memberSignin(loader);
       JSONObject jo = new JSONObject(s);
@@ -40,7 +40,7 @@ public class AntMember
        Log.other(
         "领取〈每日签到〉〈" + jo.getString("signinPoint") +
         "积分〉，已签到〈" + jo.getString("signinSumDay") + "天〉");
-       Statistics.memberSigninToday();
+       Statistics.memberSignInToday();
       }else
       {
        Log.recordLog(jo.getString("resultDesc"), s);

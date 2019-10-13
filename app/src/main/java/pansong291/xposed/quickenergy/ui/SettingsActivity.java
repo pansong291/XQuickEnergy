@@ -23,7 +23,7 @@ public class SettingsActivity extends Activity
  cb_receiveFarmToolReward, cb_useNewEggTool, cb_harvestProduce,
  cb_donation, cb_answerQuestion, cb_receiveFarmTaskAward,
  cb_feedAnimal, cb_useAccelerateTool, cb_notifyFriend,
- cb_receivePoint;
+ cb_receivePoint, cb_openTreasureBox, cb_kbSignIn;
 
  @Override
  protected void onCreate(Bundle savedInstanceState)
@@ -56,6 +56,8 @@ public class SettingsActivity extends Activity
   cb_useAccelerateTool = (CheckBox) findViewById(R.id.cb_useAccelerateTool);
   cb_notifyFriend = (CheckBox) findViewById(R.id.cb_notifyFriend);
   cb_receivePoint = (CheckBox) findViewById(R.id.cb_receivePoint);
+  cb_openTreasureBox = (CheckBox) findViewById(R.id.cb_openTreasureBox);
+  cb_kbSignIn = (CheckBox) findViewById(R.id.cb_kbSignIn);
  }
 
  @Override
@@ -83,6 +85,8 @@ public class SettingsActivity extends Activity
   cb_useAccelerateTool.setChecked(Config.useAccelerateTool());
   cb_notifyFriend.setChecked(Config.notifyFriend());
   cb_receivePoint.setChecked(Config.receivePoint());
+  cb_openTreasureBox.setChecked(Config.openTreasureBox());
+  cb_kbSignIn.setChecked(Config.kbSginIn());
  }
 
  public void onClick(View v)
@@ -246,6 +250,14 @@ public class SettingsActivity extends Activity
    case R.id.btn_donation_developer:
     Intent it2 = new Intent(Intent.ACTION_VIEW, Uri.parse("alipays://platformapi/startapp?saId=10000007&qrcode=https%3A%2F%2Fqr.alipay.com%2Ftsx00339eflkuhhtfctcn48"));
     startActivity(it2);
+    break;
+
+   case R.id.cb_openTreasureBox:
+    Config.setOpenTreasureBox(cb.isChecked());
+    break;
+
+   case R.id.cb_kbSignIn:
+    Config.setKbSginIn(cb.isChecked());
     break;
   }
  }

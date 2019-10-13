@@ -46,7 +46,8 @@ public class Statistics
  jn_year = "year", jn_month = "month", jn_day = "day",
  jn_collected = "collected", jn_helped = "helped", jn_watered = "watered",
  jn_answerQuestionList = "answerQuestionList",
- jn_questionHint = "questionHint", jn_memberSignin = "memberSignin";
+ jn_questionHint = "questionHint", jn_memberSignIn = "memberSignIn",
+ jn_kbSignIn = "kbSignIn";
 
  private TimeStatistics year;
  private TimeStatistics month;
@@ -60,8 +61,9 @@ public class Statistics
  private String questionHint;
  private ArrayList<FeedFriendLog> feedFriendLogList;
 
- // member
- private int memberSignin = 0;
+ // other
+ private int memberSignIn = 0;
+ private int kbSignIn = 0;
 
  private static Statistics statistics;
 
@@ -226,17 +228,36 @@ public class Statistics
   save();
  }
 
- public static boolean canMemberSigninToday()
+ public static boolean canMemberSignInToday()
  {
   Statistics stat = getStatistics();
-  return stat.memberSignin < stat.day.time;
+  return stat.memberSignIn < stat.day.time;
  }
 
- public static void memberSigninToday()
+ public static void memberSignInToday()
  {
   Statistics stat = getStatistics();
-  stat.memberSignin = stat.day.time;
-  save();
+  if(stat.memberSignIn != stat.day.time)
+  {
+   stat.memberSignIn = stat.day.time;
+   save();
+  }
+ }
+
+ public static boolean canKbSignInToday()
+ {
+  Statistics stat = getStatistics();
+  return stat.kbSignIn < stat.day.time;
+ }
+
+ public static void KbSignInToday()
+ {
+  Statistics stat = getStatistics();
+  if(stat.kbSignIn != stat.day.time)
+  {
+   stat.kbSignIn = stat.day.time;
+   save();
+  }
  }
 
  private static Statistics getStatistics()
@@ -264,13 +285,11 @@ public class Statistics
    stat.year.reset(ye);
    stat.month.reset(mo);
    stat.day.reset(da);
-   monthClear();
    dayClear();
   }else if(mo > stat.month.time)
   {
    stat.month.reset(mo);
    stat.day.reset(da);
-   monthClear();
    dayClear();
   }else if(da > stat.day.time)
   {
@@ -281,7 +300,6 @@ public class Statistics
 
  private static void monthClear()
  {
-  FileUtils.getOtherLogFile().delete();
  }
 
  private static void dayClear()
@@ -290,10 +308,13 @@ public class Statistics
   stat.cooperateWaterList.clear();
   stat.answerQuestionList.clear();
   stat.feedFriendLogList.clear();
-  stat.memberSignin = 0;
+  stat.questionHint = null;
+  stat.memberSignIn = 0;
+  stat.kbSignIn = 0;
   save();
   FileUtils.getForestLogFile().delete();
   FileUtils.getFarmLogFile().delete();
+  FileUtils.getOtherLogFile().delete();
  }
 
  private static Statistics defInit()
@@ -397,9 +418,13 @@ public class Statistics
     }
    }
 
-   if(jo.has(jn_memberSignin))
-    stat.memberSignin = jo.getInt(jn_memberSignin);
-   Log.i(TAG, jn_memberSignin + ":" + stat.memberSignin);
+   if(jo.has(jn_memberSignIn))
+    stat.memberSignIn = jo.getInt(jn_memberSignIn);
+   Log.i(TAG, jn_memberSignIn + ":" + stat.memberSignIn);
+
+   if(jo.has(jn_kbSignIn))
+    stat.kbSignIn = jo.getInt(jn_kbSignIn);
+   Log.i(TAG, jn_kbSignIn + ":" + stat.kbSignIn);
 
   }catch(Throwable t)
   {
@@ -476,7 +501,9 @@ public class Statistics
    }
    jo.put(Config.jn_feedFriendAnimalList, ja);
 
-   jo.put(jn_memberSignin, stat.memberSignin);
+   jo.put(jn_memberSignIn, stat.memberSignIn);
+
+   jo.put(jn_kbSignIn, stat.kbSignIn);
   }catch(Throwable t)
   {
    Log.printStackTrace(TAG, t);
