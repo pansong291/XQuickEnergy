@@ -11,15 +11,19 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import pansong291.xposed.quickenergy.R;
 import pansong291.xposed.quickenergy.util.FileUtils;
+import pansong291.xposed.quickenergy.util.RandomUtils;
 import pansong291.xposed.quickenergy.util.Statistics;
 
 public class MainActivity extends Activity
 {
+ private static String[] strArray;
  TextView tv_statistics;
+ Button btn_help;
 
  @Override
  protected void onCreate(Bundle savedInstanceState)
@@ -29,6 +33,11 @@ public class MainActivity extends Activity
   setModuleActive(false);
 
   tv_statistics = (TextView) findViewById(R.id.tv_statistics);
+  btn_help = (Button) findViewById(R.id.btn_help);
+  if(strArray == null)
+   strArray = getResources().getStringArray(R.array.sentences);
+  if(strArray != null)
+   btn_help.setText(strArray[RandomUtils.nextInt(0, strArray.length)]);
  }
 
  @Override

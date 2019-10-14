@@ -52,7 +52,7 @@
 		android:id="@+id/btn_other_log"/>
 
 	<Button
-		android:layout_width="match_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		style="?android:attr/buttonBarButtonStyle"
 		android:text="看不到我看不到我看不到我"
@@ -61,7 +61,9 @@
 		android:background="@drawable/button"
 		android:id="@+id/btn_help"
 		android:layout_marginTop="24dp"
-		android:textColor="#FF000000"/>
+		android:textColor="#FF000000"
+		android:gravity="center|start"
+		android:padding="12dp"/>
 
 </LinearLayout>
 
