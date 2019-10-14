@@ -10,7 +10,6 @@ public class AntForestToast
 {
  private static final String TAG = AntForestToast.class.getCanonicalName();
  public static Context context;
- private static Toast toast;
 
  public static void show(CharSequence cs)
  {
@@ -34,10 +33,7 @@ public class AntForestToast
       {
        try
        {
-        if(toast == null)
-         toast = Toast.makeText(context, "toast", 1);
-        toast.setText(cs);
-        toast.show();
+        Toast.makeText(context, cs, 0).show();
        }catch(Throwable t)
        {
         Log.i(TAG, "show.run err:");

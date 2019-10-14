@@ -15,7 +15,7 @@ public class AntSports
 
  public static void start(ClassLoader loader)
  {
-  if(!Config.openTreasureBox())
+  if(!Config.openTreasureBox() && !Config.donateCharityCoin())
    return;
   new Thread()
   {
@@ -32,7 +32,10 @@ public class AntSports
    {
     try
     {
-     queryMyHomePage(loader);
+     if(Config.openTreasureBox())
+      queryMyHomePage(loader);
+     if(Config.donateCharityCoin())
+      queryProjectList(loader);
     }catch(Throwable t)
     {
      Log.i(TAG, "start.run err:");
@@ -54,20 +57,21 @@ public class AntSports
     if(s.equals("GOING"))
     {
      FriendIdMap.currentUid = jo.getJSONObject("myPositionModel").getString("userId");
-     int charityCoinCount = jo.getInt("charityCoinCount");
      String rankCacheKey = jo.getString("rankCacheKey");
      JSONArray ja = jo.getJSONArray("treasureBoxModelList");
      for(int i = 0; i < ja.length(); i++)
      {
       parseTreasureBoxModel(loader, ja.getJSONObject(i), rankCacheKey);
      }
-     String title = jo.getJSONObject("pathRenderModel").getString("title");
+     JSONObject joPathRender = jo.getJSONObject("pathRenderModel");
+     String title = joPathRender.getString("title");
+     int minGoStepCount = joPathRender.getInt("minGoStepCount");
      jo = jo.getJSONObject("dailyStepModel");
      int consumeQuantity = jo.getInt("consumeQuantity");
      int produceQuantity = jo.getInt("produceQuantity");
      String day = jo.getString("day");
      int canMoveStepCount = produceQuantity - consumeQuantity;
-     if(canMoveStepCount > 0)
+     if(canMoveStepCount >= minGoStepCount)
      {
       go(loader, day, rankCacheKey, canMoveStepCount, title);
      }
@@ -163,7 +167,7 @@ public class AntSports
     long cot = Long.parseLong(canOpenTime);
     long now = Long.parseLong(rankCacheKey);
     long delay = cot - now;
-    Log.recordLog("还有 " + delay + "ms 才能打开", "");
+    Log.recordLog("还有 " + delay + "ms 才能开宝箱", "");
     if(delay < Config.checkInterval())
     {
      new Thread()
@@ -239,6 +243,61 @@ public class AntSports
    Log.printStackTrace(TAG, t);
   }
   return 0;
+ }
+
+ private static boolean queryProjectList(ClassLoader loader)
+ {
+  boolean haveMore = false;
+  try
+  {
+   String s = AntSportsRpcCall.rpcCall_queryProjectList(loader, 0);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    int charityCoinCount = jo.getInt("charityCoinCount");
+    if(charityCoinCount < 10) return false;
+    jo = jo.getJSONObject("projectPage");
+    haveMore = jo.getBoolean("haveMore");
+    JSONArray ja = jo.getJSONArray("data");
+    for(int i = 0; i < ja.length(); i++)
+    {
+     jo = ja.getJSONObject(i).getJSONObject("basicModel");
+     if(jo.getString("footballFieldStatus").equals("OPENING_DONATE"))
+     {
+      donate(loader, 10, jo.getString("projectId"), jo.getString("title"));
+      break;
+     }
+    }
+   }else
+   {
+    Log.recordLog(TAG, jo.getString("resultDesc"));
+   }
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "queryProjectList err:");
+   Log.printStackTrace(TAG, t);
+  }
+  return haveMore;
+ }
+
+ private static void donate(ClassLoader loader, int donateCharityCoin, String projectId, String title)
+ {
+  try
+  {
+   String s = AntSportsRpcCall.rpcCall_donate(loader, donateCharityCoin, projectId);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    Log.other("捐赠〈" + title + "〉〈" + donateCharityCoin + "运动币〉");
+   }else
+   {
+    Log.i(TAG, jo.getString("resultDesc"));
+   }
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "donate err:");
+   Log.printStackTrace(TAG, t);
+  }
  }
 
 }

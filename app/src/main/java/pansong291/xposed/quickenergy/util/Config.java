@@ -45,7 +45,8 @@ public class Config
  jn_useAccelerateTool = "useAccelerateTool", jn_feedFriendAnimalList = "feedFriendAnimalList", jn_notifyFriend = "notifyFriend",
  jn_dontNotifyFriendList = "dontNotifyFriendList",
  /* other */
- jn_receivePoint = "receivePoint", jn_openTreasureBox = "openTreasureBox", jn_kbSignIn = "kbSignIn";
+ jn_receivePoint = "receivePoint", jn_openTreasureBox = "openTreasureBox", jn_donateCharityCoin = "donateCharityCoin",
+ jn_kbSignIn = "kbSignIn";
 
  public static boolean shouldReload;
  public static boolean hasChanged;
@@ -99,6 +100,7 @@ public class Config
  /* other */
  private boolean receivePoint;
  private boolean openTreasureBox;
+ private boolean donateCharityCoin;
  private boolean kbSignIn;
 
  /* base */
@@ -511,6 +513,17 @@ public class Config
   return getConfig().openTreasureBox;
  }
 
+ public static void setDonateCharityCoin(boolean b)
+ {
+  getConfig().donateCharityCoin = b;
+  hasChanged = true;
+ }
+
+ public static boolean donateCharityCoin()
+ {
+  return getConfig().donateCharityCoin;
+ }
+
  public static void setKbSginIn(boolean b)
  {
   getConfig().kbSignIn = b;
@@ -586,6 +599,7 @@ public class Config
 
   c.receivePoint = true;
   c.openTreasureBox = true;
+  c.donateCharityCoin = true;
   c.kbSignIn = true;
   return c;
  }
@@ -815,6 +829,9 @@ public class Config
    config.openTreasureBox = jo.optBoolean(jn_openTreasureBox, true);
    Log.i(TAG, jn_openTreasureBox + ":" + config.openTreasureBox);
 
+   config.donateCharityCoin = jo.optBoolean(jn_donateCharityCoin, true);
+   Log.i(TAG, jn_donateCharityCoin + ":" + config.donateCharityCoin);
+
    config.kbSignIn = jo.optBoolean(jn_kbSignIn, true);
    Log.i(TAG, jn_kbSignIn + ":" + config.kbSignIn);
 
@@ -969,6 +986,8 @@ public class Config
    jo.put(jn_receivePoint, config.receivePoint);
 
    jo.put(jn_openTreasureBox, config.openTreasureBox);
+
+   jo.put(jn_donateCharityCoin, config.donateCharityCoin);
 
    jo.put(jn_kbSignIn, config.kbSignIn);
 

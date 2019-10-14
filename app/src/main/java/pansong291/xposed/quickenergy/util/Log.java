@@ -53,8 +53,7 @@ public class Log
  public static boolean other(String s)
  {
   recordLog(s, "");
-  String day = getFormatDateTime().split("-")[2];
-  return FileUtils.append2File(day + " " + s + "\n", FileUtils.getOtherLogFile());
+  return FileUtils.append2File(getFormatTime() + " " + s + "\n", FileUtils.getOtherLogFile());
  }
 
  public static boolean recordLog(String str, String str2)

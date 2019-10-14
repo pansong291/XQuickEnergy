@@ -11,7 +11,8 @@ public class AntSportsRpcCall
  {
   try
   {
-   String args1 = "[{\"chInfo\":\"" + chInfo + "\",\"pathListUsePage\":true,\"timeZone\":\"" + timeZone + "\"}]";
+   String args1 = "[{\"chInfo\":\"" + chInfo
+    + "\",\"pathListUsePage\":true,\"timeZone\":\"" + timeZone + "\"}]";
    return RpcCall.invoke(loader, "alipay.antsports.walk.map.queryMyHomePage", args1);
   }catch(Throwable t)
   {
@@ -25,7 +26,8 @@ public class AntSportsRpcCall
  {
   try
   {
-   String args1 = "[{\"chInfo\":\"" + chInfo + "\",\"pathId\":\"" + pathId + "}]";
+   String args1 = "[{\"chInfo\":\"" + chInfo
+    + "\",\"pathId\":\"" + pathId + "}]";
    return RpcCall.invoke(loader, "alipay.antsports.walk.map.join", args1);
   }catch(Throwable t)
   {
@@ -55,11 +57,42 @@ public class AntSportsRpcCall
  {
   try
   {
-   String args1 = "[{\"boxNo\":\"" + boxNo + "\",\"chInfo\":\"" + chInfo + "\",\"userId\":\"" + userId + "\"}]";
+   String args1 = "[{\"boxNo\":\"" + boxNo + "\",\"chInfo\":\""
+    + chInfo + "\",\"userId\":\"" + userId + "\"}]";
    return RpcCall.invoke(loader, "alipay.antsports.walk.treasureBox.openTreasureBox", args1);
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_openTreasureBox err:");
+   Log.printStackTrace(TAG, t);
+  }
+  return null;
+ }
+
+ public static String rpcCall_queryProjectList(ClassLoader loader, int index)
+ {
+  try
+  {
+   String args1 = "[{\"chInfo\":\"" + chInfo + "\",\"index\":"
+    + index + ",\"projectListUseVertical\":true}]";
+   return RpcCall.invoke(loader, "alipay.antsports.walk.charity.queryProjectList", args1);
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "rpcCall_queryProjectList err:");
+   Log.printStackTrace(TAG, t);
+  }
+  return null;
+ }
+
+ public static String rpcCall_donate(ClassLoader loader, int donateCharityCoin, String projectId)
+ {
+  try
+  {
+   String args1 = "[{\"chInfo\":\"" + chInfo + "\",\"donateCharityCoin\":"
+    + donateCharityCoin + ",\"projectId\":\"" + projectId + "\"}]";
+   return RpcCall.invoke(loader, "alipay.antsports.walk.charity.donate", args1);
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "rpcCall_queryProjectList err:");
    Log.printStackTrace(TAG, t);
   }
   return null;
