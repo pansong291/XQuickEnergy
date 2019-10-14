@@ -64,7 +64,7 @@ public class EditDialog
          break;
 
         case THREAD_COUNT:
-         if(i > 0)
+         if(i >= 0)
           Config.setThreadCount(i);
          break;
 

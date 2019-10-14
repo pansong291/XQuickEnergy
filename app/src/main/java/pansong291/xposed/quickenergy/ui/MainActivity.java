@@ -72,8 +72,8 @@ public class MainActivity extends Activity
   menu.add(0, 1, 0, "Hide the application icon")
    .setCheckable(true)
    .setChecked(state > PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
-  menu.add(0, 2, 0, "Export statistic file");
-  menu.add(0, 3, 0, "Import statistic file");
+  menu.add(0, 2, 0, "Export the statistic file");
+  menu.add(0, 3, 0, "Import the statistic file");
   menu.add(0, 4, 0, "Settings");
   return super.onCreateOptionsMenu(menu);
  }
