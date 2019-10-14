@@ -328,13 +328,13 @@ public class AntSports
        double amount = jo.getJSONObject("userAmount").getDouble("amount");
        Log.other("捐出〈" + userCount + "步〉，可抵〈" + amount + "元〉");
        Statistics.exchangeToday();
-      }else if(s.contains("已捐步"))
-      {
-       Statistics.exchangeToday();
       }else
       {
        Log.i(TAG, jo.getString("resultDesc"));
       }
+     }else if(s.contains("已捐步"))
+     {
+      Statistics.exchangeToday();
      }else
      {
       Log.i(TAG, jo.getString("resultDesc"));
