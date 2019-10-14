@@ -263,6 +263,14 @@ public class SettingsActivity extends Activity
     Config.setDonateCharityCoin(cb.isChecked());
     break;
 
+   case R.id.btn_minExchangeCount:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.MIN_EXCHANGE_COUNT);
+    break;
+
+   case R.id.btn_latestExchangeTime:
+    EditDialog.showEditDialog(this, btn.getText(), EditDialog.EditMode.LATEST_EXCHANGE_TIME);
+    break;
+
    case R.id.cb_kbSignIn:
     Config.setKbSginIn(cb.isChecked());
     break;

@@ -469,6 +469,32 @@
 			android:minHeight="50dp"
 			android:id="@+id/cb_donateCharityCoin"/>
 
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Min exchange count"
+			android:textAllCaps="false"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_minExchangeCount"
+			android:paddingLeft="8dp"/>
+
+		<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Latest exchange time (24-hour system)"
+			android:textAllCaps="false"
+			android:onClick="onClick"
+			android:minHeight="50dp"
+			android:gravity="left|center_vertical"
+			android:background="@drawable/button"
+			android:id="@+id/btn_latestExchangeTime"
+			android:paddingLeft="8dp"/>
+
 		<CheckBox
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"

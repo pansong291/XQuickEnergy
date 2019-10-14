@@ -47,7 +47,7 @@ public class Statistics
  jn_collected = "collected", jn_helped = "helped", jn_watered = "watered",
  jn_answerQuestionList = "answerQuestionList",
  jn_questionHint = "questionHint", jn_memberSignIn = "memberSignIn",
- jn_kbSignIn = "kbSignIn";
+ jn_exchange = "exchange", jn_kbSignIn = "kbSignIn";
 
  private TimeStatistics year;
  private TimeStatistics month;
@@ -63,6 +63,7 @@ public class Statistics
 
  // other
  private int memberSignIn = 0;
+ private int exchange = 0;
  private int kbSignIn = 0;
 
  private static Statistics statistics;
@@ -244,6 +245,22 @@ public class Statistics
   }
  }
 
+ public static boolean canExchangeToday()
+ {
+  Statistics stat = getStatistics();
+  return stat.exchange < stat.day.time;
+ }
+
+ public static void exchangeToday()
+ {
+  Statistics stat = getStatistics();
+  if(stat.exchange != stat.day.time)
+  {
+   stat.exchange = stat.day.time;
+   save();
+  }
+ }
+
  public static boolean canKbSignInToday()
  {
   Statistics stat = getStatistics();
@@ -310,6 +327,7 @@ public class Statistics
   stat.feedFriendLogList.clear();
   stat.questionHint = null;
   stat.memberSignIn = 0;
+  stat.exchange = 0;
   stat.kbSignIn = 0;
   save();
   FileUtils.getForestLogFile().delete();
@@ -422,6 +440,10 @@ public class Statistics
     stat.memberSignIn = jo.getInt(jn_memberSignIn);
    Log.i(TAG, jn_memberSignIn + ":" + stat.memberSignIn);
 
+   if(jo.has(jn_exchange))
+    stat.exchange = jo.getInt(jn_exchange);
+   Log.i(TAG, jn_exchange + ":" + stat.exchange);
+
    if(jo.has(jn_kbSignIn))
     stat.kbSignIn = jo.getInt(jn_kbSignIn);
    Log.i(TAG, jn_kbSignIn + ":" + stat.kbSignIn);
@@ -502,6 +524,8 @@ public class Statistics
    jo.put(Config.jn_feedFriendAnimalList, ja);
 
    jo.put(jn_memberSignIn, stat.memberSignIn);
+
+   jo.put(jn_exchange, stat.exchange);
 
    jo.put(jn_kbSignIn, stat.kbSignIn);
   }catch(Throwable t)

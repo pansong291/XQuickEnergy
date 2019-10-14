@@ -46,7 +46,7 @@ public class Config
  jn_dontNotifyFriendList = "dontNotifyFriendList",
  /* other */
  jn_receivePoint = "receivePoint", jn_openTreasureBox = "openTreasureBox", jn_donateCharityCoin = "donateCharityCoin",
- jn_kbSignIn = "kbSignIn";
+ jn_minExchangeCount = "minExchangeCount", jn_latestExchangeTime = "latestExchangeTime", jn_kbSignIn = "kbSignIn";
 
  public static boolean shouldReload;
  public static boolean hasChanged;
@@ -101,6 +101,8 @@ public class Config
  private boolean receivePoint;
  private boolean openTreasureBox;
  private boolean donateCharityCoin;
+ private int minExchangeCount;
+ private int latestExchangeTime;
  private boolean kbSignIn;
 
  /* base */
@@ -524,6 +526,28 @@ public class Config
   return getConfig().donateCharityCoin;
  }
 
+ public static void setMinExchangeCount(int i)
+ {
+  getConfig().minExchangeCount = i;
+  hasChanged = true;
+ }
+
+ public static int minExchangeCount()
+ {
+  return getConfig().minExchangeCount;
+ }
+
+ public static void setLatestExchangeTime(int i)
+ {
+  getConfig().latestExchangeTime = i;
+  hasChanged = true;
+ }
+
+ public static int latestExchangeTime()
+ {
+  return getConfig().latestExchangeTime;
+ }
+
  public static void setKbSginIn(boolean b)
  {
   getConfig().kbSignIn = b;
@@ -832,6 +856,12 @@ public class Config
    config.donateCharityCoin = jo.optBoolean(jn_donateCharityCoin, true);
    Log.i(TAG, jn_donateCharityCoin + ":" + config.donateCharityCoin);
 
+   config.minExchangeCount = jo.optInt(jn_minExchangeCount);
+   Log.i(TAG, jn_minExchangeCount + ":" + config.minExchangeCount);
+
+   config.latestExchangeTime = jo.optInt(jn_latestExchangeTime, 21);
+   Log.i(TAG, jn_latestExchangeTime + ":" + config.latestExchangeTime);
+
    config.kbSignIn = jo.optBoolean(jn_kbSignIn, true);
    Log.i(TAG, jn_kbSignIn + ":" + config.kbSignIn);
 
@@ -988,6 +1018,10 @@ public class Config
    jo.put(jn_openTreasureBox, config.openTreasureBox);
 
    jo.put(jn_donateCharityCoin, config.donateCharityCoin);
+
+   jo.put(jn_minExchangeCount, config.minExchangeCount);
+
+   jo.put(jn_latestExchangeTime, config.latestExchangeTime);
 
    jo.put(jn_kbSignIn, config.kbSignIn);
 

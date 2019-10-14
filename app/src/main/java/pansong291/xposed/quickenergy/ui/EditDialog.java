@@ -13,7 +13,8 @@ public class EditDialog
  private static EditText edt;
  public enum EditMode
  { CHECK_INTERVAL, THREAD_COUNT, ADVANCE_TIME, COLLECT_INTERVAL,
-  COLLECT_TIMEOUT, RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10 }
+  COLLECT_TIMEOUT, RETURN_WATER_30, RETURN_WATER_20, RETURN_WATER_10,
+  MIN_EXCHANGE_COUNT, LATEST_EXCHANGE_TIME }
  private static EditMode mode;
 
  public static void showEditDialog(Context c, CharSequence title, EditMode em)
@@ -97,6 +98,17 @@ public class EditDialog
          if(i >= 0)
           Config.setReturnWater10(i);
          break;
+
+        case MIN_EXCHANGE_COUNT:
+         if(i >= 0)
+          Config.setMinExchangeCount(i);
+         break;
+
+        case LATEST_EXCHANGE_TIME:
+         if(i >= 0 && i < 24)
+          Config.setLatestExchangeTime(i);
+         break;
+
        }
       }catch(Throwable t)
       {}
@@ -138,6 +150,15 @@ public class EditDialog
    case RETURN_WATER_10:
     str = String.valueOf(Config.returnWater10());
     break;
+
+   case MIN_EXCHANGE_COUNT:
+    str = String.valueOf(Config.minExchangeCount());
+    break;
+
+   case LATEST_EXCHANGE_TIME:
+    str = String.valueOf(Config.latestExchangeTime());
+    break;
+
   }
   edt.setText(str);
   return editDialog;

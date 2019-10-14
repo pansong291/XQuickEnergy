@@ -11,19 +11,19 @@ import pansong291.xposed.quickenergy.util.Statistics;
 
 public class AntSports
 {
- private static final String TAG = AntCooperate.class.getCanonicalName();
+ private static final String TAG = AntSports.class.getCanonicalName();
 
- public static void start(ClassLoader loader)
+ public static void start(ClassLoader loader, int times)
  {
-  if(!Config.openTreasureBox() && !Config.donateCharityCoin())
-   return;
   new Thread()
   {
-   private ClassLoader loader;
+   ClassLoader loader;
+   int times;
 
-   public Thread setData(ClassLoader cl)
+   public Thread setData(ClassLoader cl, int i)
    {
     loader = cl;
+    times = i;
     return this;
    }
 
@@ -36,13 +36,15 @@ public class AntSports
       queryMyHomePage(loader);
      if(Config.donateCharityCoin())
       queryProjectList(loader);
+     if(Config.minExchangeCount() > 0 && Statistics.canExchangeToday() && times == 0)
+      queryWalkStep(loader);
     }catch(Throwable t)
     {
      Log.i(TAG, "start.run err:");
      Log.printStackTrace(TAG, t);
     }
    }
-  }.setData(loader).start();
+  }.setData(loader, times).start();
  }
 
  private static void queryMyHomePage(ClassLoader loader)
@@ -194,10 +196,11 @@ public class AntSports
         if(delay > 0) sleep(delay);
         Log.recordLog("蹲点开箱开始", "");
         long startTime = System.currentTimeMillis();
-        while(System.currentTimeMillis() - startTime < 10_000)
+        while(System.currentTimeMillis() - startTime < 5_000)
         {
          if(openTreasureBox(loader, boxNo, userId) > 0)
           break;
+         sleep(200);
         }
        }catch(Throwable t)
        {
@@ -235,7 +238,7 @@ public class AntSports
     return num;
    }else
    {
-    Log.recordLog(TAG, jo.getString("resultDesc"));
+    Log.recordLog(jo.getString("resultDesc"), "");
    }
   }catch(Throwable t)
   {
@@ -300,4 +303,51 @@ public class AntSports
   }
  }
 
+ private static void queryWalkStep(ClassLoader loader)
+ {
+  try
+  {
+   String s = AntSportsRpcCall.rpcCall_queryWalkStep(loader);
+   JSONObject jo = new JSONObject(s);
+   if(jo.getString("resultCode").equals("SUCCESS"))
+   {
+    jo = jo.getJSONObject("dailyStepModel");
+    int produceQuantity = jo.getInt("produceQuantity");
+    int hour = Integer.parseInt(Log.getFormatTime().split(":")[1]);
+    if(produceQuantity > Config.minExchangeCount() || hour >= Config.latestExchangeTime())
+    {
+     s = AntSportsRpcCall.rpcCall_exchange(loader, produceQuantity, 3);
+     jo = new JSONObject(s);
+     if(jo.getBoolean("isSuccess"))
+     {
+      s = AntSportsRpcCall.rpcCall_exchange_success(loader, jo.getString("exchangeId"));
+      jo = new JSONObject(s);
+      if(jo.getBoolean("isSuccess"))
+      {
+       int userCount = jo.getInt("userCount");
+       double amount = jo.getJSONObject("userAmount").getDouble("amount");
+       Log.other("捐出〈" + userCount + "步〉，可抵〈" + amount + "元〉");
+       Statistics.exchangeToday();
+      }else if(s.contains("已捐步"))
+      {
+       Statistics.exchangeToday();
+      }else
+      {
+       Log.i(TAG, jo.getString("resultDesc"));
+      }
+     }else
+     {
+      Log.i(TAG, jo.getString("resultDesc"));
+     }
+    }
+   }else
+   {
+    Log.i(TAG, jo.getString("resultDesc"));
+   }
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "queryWalkStep err:");
+   Log.printStackTrace(TAG, t);
+  }
+ }
 }
