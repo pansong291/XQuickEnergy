@@ -21,6 +21,20 @@ public class AntSportsRpcCall
   return null;
  }
 
+ public static String rpcCall_join(ClassLoader loader, String pathId)
+ {
+  try
+  {
+   String args1 = "[{\"chInfo\":\"" + chInfo + "\",\"pathId\":\"" + pathId + "}]";
+   return RpcCall.invoke(loader, "alipay.antsports.walk.map.join", args1);
+  }catch(Throwable t)
+  {
+   Log.i(TAG, "rpcCall_join err:");
+   Log.printStackTrace(TAG, t);
+  }
+  return null;
+ }
+
  public static String rpcCall_go(ClassLoader loader, String day, String rankCacheKey, int stepCount)
  {
   try
