@@ -28,7 +28,7 @@ public class Config
  public static final String
  /* application */
  jn_immediateEffect = "immediateEffect", jn_recordLog = "recordLog", jn_showToast = "showToast",
- jn_autoRestart = "autoRestart",
+ jn_stayAwake = "stayAwake", jn_autoRestart = "autoRestart",
  /* forest */
  jn_collectEnergy = "collectEnergy", jn_ReturnWater30 = "returnWater30", jn_ReturnWater20 = "returnWater20",
  jn_ReturnWater10 = "returnWater10", jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList",
@@ -55,6 +55,7 @@ public class Config
  private boolean immediateEffect;
  private boolean recordLog;
  private boolean showToast;
+ private boolean stayAwake;
  private boolean autoRestart;
 
  /* forest */
@@ -141,6 +142,17 @@ public class Config
  public static boolean showToast()
  {
   return getConfig().showToast;
+ }
+
+ public static void setStayAwake(boolean b)
+ {
+  getConfig().stayAwake = b;
+  hasChanged = true;
+ }
+
+ public static boolean stayAwake()
+ {
+  return getConfig().stayAwake;
  }
 
  public static void setAutoRestart(boolean b)
@@ -581,6 +593,7 @@ public class Config
   c.immediateEffect = true;
   c.recordLog = true;
   c.showToast = true;
+  c.stayAwake = true;
   c.autoRestart = true;
 
   c.collectEnergy = true;
@@ -650,6 +663,9 @@ public class Config
 
    config.showToast = jo.optBoolean(jn_showToast, true);
    Log.i(TAG, jn_showToast + ":" + config.showToast);
+
+   config.stayAwake = jo.optBoolean(jn_stayAwake, true);
+   Log.i(TAG, jn_stayAwake + ":" + config.stayAwake);
 
    config.autoRestart = jo.optBoolean(jn_autoRestart, true);
    Log.i(TAG, jn_autoRestart + ":" + config.autoRestart);
@@ -897,6 +913,8 @@ public class Config
    jo.put(jn_recordLog, config.recordLog);
 
    jo.put(jn_showToast, config.showToast);
+
+   jo.put(jn_stayAwake, config.stayAwake);
 
    jo.put(jn_autoRestart, config.autoRestart);
 

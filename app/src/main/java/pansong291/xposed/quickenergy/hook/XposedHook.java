@@ -78,9 +78,12 @@ public class XposedHook implements IXposedHookLoadPackage
       Service service = (Service) param.thisObject;
       AntForestToast.context = service.getApplicationContext();
       times = 0;
-      PowerManager pm = (PowerManager) service.getSystemService(service.POWER_SERVICE);
-      wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, service.getClass().getName());
-      wakeLock.acquire();
+      if(Config.stayAwake())
+      {
+       PowerManager pm = (PowerManager) service.getSystemService(service.POWER_SERVICE);
+       wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, service.getClass().getName());
+       wakeLock.acquire();
+      }
       if(handler == null) handler = new Handler();
       if(runnable == null) runnable = new Runnable()
        {

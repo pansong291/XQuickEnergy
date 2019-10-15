@@ -16,7 +16,7 @@ import pansong291.xposed.quickenergy.util.FriendIdMap;
 public class SettingsActivity extends Activity
 {
  CheckBox cb_immediateEffect, cb_recordLog, cb_showToast,
- cb_autoRestart,
+ cb_stayAwake, cb_autoRestart,
  cb_collectEnergy, cb_helpFriendCollect, cb_receiveForestTaskAward,
  cb_cooperateWater,
  cb_enableFarm, cb_rewardFriend, cb_sendBackAnimal,
@@ -39,6 +39,7 @@ public class SettingsActivity extends Activity
   cb_immediateEffect = (CheckBox) findViewById(R.id.cb_immediateEffect);
   cb_recordLog = (CheckBox) findViewById(R.id.cb_recordLog);
   cb_showToast = (CheckBox) findViewById(R.id.cb_showToast);
+  cb_stayAwake = (CheckBox) findViewById(R.id.cb_stayAwake);
   cb_autoRestart = (CheckBox) findViewById(R.id.cb_autoRestart);
   cb_collectEnergy = (CheckBox) findViewById(R.id.cb_collectEnergy);
   cb_helpFriendCollect = (CheckBox) findViewById(R.id.cb_helpFriendCollect);
@@ -69,6 +70,7 @@ public class SettingsActivity extends Activity
   cb_immediateEffect.setChecked(Config.immediateEffect());
   cb_recordLog.setChecked(Config.recordLog());
   cb_showToast.setChecked(Config.showToast());
+  cb_stayAwake.setChecked(Config.stayAwake());
   cb_autoRestart.setChecked(Config.autoRestart());
   cb_collectEnergy.setChecked(Config.collectEnergy());
   cb_helpFriendCollect.setChecked(Config.helpFriendCollect());
@@ -108,6 +110,10 @@ public class SettingsActivity extends Activity
 
    case R.id.cb_showToast:
     Config.setShowToast(cb.isChecked());
+    break;
+
+   case R.id.cb_stayAwake:
+    Config.setStayAwake(cb.isChecked());
     break;
 
    case R.id.cb_autoRestart:
