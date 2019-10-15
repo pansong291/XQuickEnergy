@@ -267,7 +267,7 @@ public class AntSports
      jo = ja.getJSONObject(i).getJSONObject("basicModel");
      if(jo.getString("footballFieldStatus").equals("OPENING_DONATE"))
      {
-      donate(loader, 10, jo.getString("projectId"), jo.getString("title"));
+      donate(loader, charityCoinCount / 10 * 10, jo.getString("projectId"), jo.getString("title"));
       break;
      }
     }
@@ -313,7 +313,7 @@ public class AntSports
    {
     jo = jo.getJSONObject("dailyStepModel");
     int produceQuantity = jo.getInt("produceQuantity");
-    int hour = Integer.parseInt(Log.getFormatTime().split(":")[1]);
+    int hour = Integer.parseInt(Log.getFormatTime().split(":")[0]);
     if(produceQuantity > Config.minExchangeCount() || hour >= Config.latestExchangeTime())
     {
      s = AntSportsRpcCall.rpcCall_exchange(loader, produceQuantity, 3);
@@ -326,7 +326,7 @@ public class AntSports
       {
        int userCount = jo.getInt("userCount");
        double amount = jo.getJSONObject("userAmount").getDouble("amount");
-       Log.other("捐出〈" + userCount + "步〉，可抵〈" + amount + "元〉");
+       Log.other("捐出〈" + userCount + "步〉，兑换〈" + amount + "元〉公益金");
        Statistics.exchangeToday();
       }else
       {
