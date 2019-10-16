@@ -80,7 +80,7 @@ public class AntSports
     }else if(s.equals("NOT_JOIN"))
     {
      JSONArray ja = jo.getJSONArray("allPathBaseInfoList");
-     for(int i = ja.length(); i > 0; i--)
+     for(int i = ja.length() - 1; i >= 0; i--)
      {
       jo = ja.getJSONObject(i);
       if(jo.getBoolean("unlocked"))
