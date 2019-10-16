@@ -28,7 +28,7 @@ public class AntSportsRpcCall
   try
   {
    String args1 = "[{\"chInfo\":\"" + chInfo
-    + "\",\"pathId\":\"" + pathId + "}]";
+    + "\",\"pathId\":\"" + pathId + "\"}]";
    return RpcCall.invoke(loader, "alipay.antsports.walk.map.join", args1);
   }catch(Throwable t)
   {
