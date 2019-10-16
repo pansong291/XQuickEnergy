@@ -1,6 +1,5 @@
 package pansong291.xposed.quickenergy.hook;
 
-import android.app.Activity;
 import java.lang.reflect.Method;
 import pansong291.xposed.quickenergy.util.Log;
 
@@ -11,7 +10,7 @@ public class RpcCall
  private static Method getResponseMethod;
  private static Object curH5PageImpl;
 
- public static String invoke(ClassLoader loader, String args0, String args1) throws Exception
+ public static String invoke(ClassLoader loader, String args0, String args1) throws Throwable
  {
   if(rpcCallMethod == null)
   {
@@ -66,7 +65,7 @@ public class RpcCall
   return str;
  }
 
- public static String getResponse(Object resp) throws Exception
+ public static String getResponse(Object resp) throws Throwable
  {
   if(getResponseMethod == null)
    getResponseMethod = resp.getClass().getMethod(ClassMember.getResponse);

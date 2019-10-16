@@ -1,11 +1,8 @@
 package pansong291.xposed.quickenergy.util;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import de.robv.android.xposed.XposedBridge;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import pansong291.xposed.quickenergy.hook.RpcCall;
 
 public class Log
 {

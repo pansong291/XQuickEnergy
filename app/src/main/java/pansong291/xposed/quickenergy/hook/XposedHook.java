@@ -20,7 +20,6 @@ import pansong291.xposed.quickenergy.AntForestToast;
 import pansong291.xposed.quickenergy.AntMember;
 import pansong291.xposed.quickenergy.AntSports;
 import pansong291.xposed.quickenergy.KBMember;
-import pansong291.xposed.quickenergy.hook.ClassMember;
 import pansong291.xposed.quickenergy.ui.MainActivity;
 import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.util.Log;
