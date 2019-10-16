@@ -7,22 +7,44 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+import pansong291.xposed.quickenergy.R;
 
 public class HtmlViewerActivity extends Activity
 {
- private MyWebView mWebView;
- private Uri uri;
+ MyWebView mWebView;
+ ProgressBar pgb;
+ Uri uri;
 
  @Override
  protected void onCreate(Bundle savedInstanceState)
  {
   super.onCreate(savedInstanceState);
-  mWebView = new MyWebView(this);
-  setContentView(mWebView);
+  setContentView(R.layout.activity_html_viewer);
+
+  mWebView = (MyWebView) findViewById(R.id.mwv_webview);
+  pgb = (ProgressBar) findViewById(R.id.pgb_webview);
+
   uri = getIntent().getData();
+
+  mWebView.setWebChromeClient(
+   new WebChromeClient()
+   {
+    public void onProgressChanged(WebView view, int progress)
+    {
+     pgb.setProgress(progress);
+     if(progress == 100)
+     {
+      setTitle(uri.getLastPathSegment());
+      pgb.setVisibility(View.GONE);
+     }
+    }
+   });
   mWebView.loadUrl(uri.toString());
-  setTitle(uri.getLastPathSegment());
  }
 
  @Override
