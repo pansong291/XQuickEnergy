@@ -3,7 +3,6 @@ package pansong291.xposed.quickenergy.ui;
 import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +17,6 @@ public class HtmlViewerActivity extends Activity
 {
  MyWebView mWebView;
  ProgressBar pgb;
- Uri uri;
 
  @Override
  protected void onCreate(Bundle savedInstanceState)
@@ -29,22 +27,25 @@ public class HtmlViewerActivity extends Activity
   mWebView = (MyWebView) findViewById(R.id.mwv_webview);
   pgb = (ProgressBar) findViewById(R.id.pgb_webview);
 
-  uri = getIntent().getData();
-
   mWebView.setWebChromeClient(
    new WebChromeClient()
    {
+    @Override
     public void onProgressChanged(WebView view, int progress)
     {
      pgb.setProgress(progress);
-     if(progress == 100)
+     if(progress < 100)
      {
-      setTitle(uri.getLastPathSegment());
+      setTitle("Loading...");
+      pgb.setVisibility(View.VISIBLE);
+     }else
+     {
+      setTitle(mWebView.getTitle());
       pgb.setVisibility(View.GONE);
      }
     }
    });
-  mWebView.loadUrl(uri.toString());
+  mWebView.loadUrl(getIntent().getData().toString());
  }
 
  @Override
@@ -66,13 +67,13 @@ public class HtmlViewerActivity extends Activity
     Intent it = new Intent(Intent.ACTION_VIEW);
     it.addCategory(Intent.CATEGORY_DEFAULT);  
     it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    it.setDataAndType(uri, "text/html");
+    it.setDataAndType(getIntent().getData(), "text/html");
     startActivity(Intent.createChooser(it, "Choose a browser"));
     break;
 
    case 2:
     ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-    cm.setText(uri.toString());
+    cm.setText(mWebView.getUrl());
     Toast.makeText(this, "Copy success", 0).show();
     break;
 

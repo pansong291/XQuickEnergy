@@ -52,7 +52,6 @@
             
         <activity
             android:name=".ui.HtmlViewerActivity"
-            android:label="Loading..."
             android:resizeableActivity="true"/>
         
     </application>
