@@ -22,9 +22,9 @@ public class AlipayCooperate extends AlipayId
   {
    list = new ArrayList<AlipayCooperate>();
    Set idSet = CooperationIdMap.getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
+   for(Object entry: idSet)
    {
-    list.add(new AlipayCooperate(entry.getKey().toString(), entry.getValue().toString()));
+    list.add(new AlipayCooperate(((Map.Entry) entry).getKey().toString(), ((Map.Entry) entry).getValue().toString()));
    }
   }
   return list;

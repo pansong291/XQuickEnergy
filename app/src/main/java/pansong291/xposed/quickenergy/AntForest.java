@@ -85,13 +85,13 @@ public class AntForest
   try
   {
    long start = System.currentTimeMillis();
-   String s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
+   String s = AntForestRpcCall.rpcCall_queryNextAction(loader,FriendIdMap.getSelfId());
    long end = System.currentTimeMillis();
    if(s == null)
    {
     Thread.sleep(RandomUtils.delay());
     start = System.currentTimeMillis();
-    s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
+    s = AntForestRpcCall.rpcCall_queryNextAction(loader, FriendIdMap.getSelfId());
     end = System.currentTimeMillis();
    }
    JSONObject jo = new JSONObject(s);

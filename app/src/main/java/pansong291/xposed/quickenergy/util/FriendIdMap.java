@@ -52,11 +52,11 @@ public class FriendIdMap
   {
    StringBuilder sb = new StringBuilder();
    Set idSet = getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
+   for(Object entry: idSet)
    {
-    sb.append(entry.getKey());
+    sb.append(((Map.Entry) entry).getKey());
     sb.append(':');
-    sb.append(entry.getValue());
+    sb.append(((Map.Entry) entry).getValue());
     sb.append('\n');
    }
    hasChanged = !FileUtils.write2File(sb.toString(), FileUtils.getFriendIdMapFile());
@@ -64,15 +64,15 @@ public class FriendIdMap
   return hasChanged;
  }
 
- private static String getSelfId()
+ public static String getSelfId()
  {
   if(selfId == null)
   {
    Set idSet = getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
-    if(!entry.getValue().toString().contains("*"))
+   for(Object entry: idSet)
+    if(!((Map.Entry) entry).getValue().toString().contains("*"))
     {
-     selfId = entry.getKey().toString();
+     selfId = ((Map.Entry) entry).getKey().toString();
      break;
     }
   }
@@ -99,9 +99,9 @@ public class FriendIdMap
  {
   List<String> idList = new ArrayList<String>();
   Set idSet = getIdMap().entrySet();
-  for(Map.Entry entry: idSet)
-   if(entry.getValue().toString().contains("(*)"))
-    idList.add(entry.getKey().toString());
+  for(Object entry: idSet)
+   if(((Map.Entry) entry).getValue().toString().contains("(*)"))
+    idList.add(((Map.Entry) entry).getKey().toString());
   if(idList.size() > 0)
   {
    String[] ids = new String[idList.size()];

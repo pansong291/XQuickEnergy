@@ -22,9 +22,9 @@ public class AlipayUser extends AlipayId
   {
    list = new ArrayList<AlipayUser>();
    Set idSet = FriendIdMap.getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
+   for(Object entry: idSet)
    {
-    list.add(new AlipayUser(entry.getKey().toString(), entry.getValue().toString()));
+    list.add(new AlipayUser(((Map.Entry) entry).getKey().toString(),((Map.Entry) entry).getValue().toString()));
    }
   }
   return list;

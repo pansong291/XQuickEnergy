@@ -55,11 +55,11 @@ public class CooperationIdMap
   {
    StringBuilder sb = new StringBuilder();
    Set idSet = getIdMap().entrySet();
-   for(Map.Entry entry: idSet)
+   for(Object entry: idSet)
    {
-    sb.append(entry.getKey());
+    sb.append(((Map.Entry) entry).getKey());
     sb.append(':');
-    sb.append(entry.getValue());
+    sb.append(((Map.Entry) entry).getValue());
     sb.append('\n');
    }
    hasChanged = !FileUtils.write2File(sb.toString(), FileUtils.getCooperationIdMapFile());
