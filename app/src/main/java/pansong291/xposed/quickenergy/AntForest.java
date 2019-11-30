@@ -3,7 +3,6 @@ package pansong291.xposed.quickenergy;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pansong291.xposed.quickenergy.AntFarm.TaskStatus;
-import pansong291.xposed.quickenergy.AntForestNotification;
 import pansong291.xposed.quickenergy.hook.AntForestRpcCall;
 import pansong291.xposed.quickenergy.util.Config;
 import pansong291.xposed.quickenergy.util.FriendIdMap;
@@ -37,6 +36,46 @@ public class AntForest
  private static long offsetTime = -1;
  private static long laterTime = -1;
 
+// public static void querySelfId(ClassLoader loader)
+// {
+//  Log.recordLog("fuck ", "querySelfId");
+//  try
+//  {
+//   String s;
+//   JSONObject jo;
+//   s = AntForestRpcCall.rpcCall_queryEnergyRanking(loader, "0");
+//   jo = new JSONObject(s);
+//   if(jo.getString("resultCode").equals("SUCCESS"))
+//   {
+//    JSONArray jaFriendRanking = jo.getJSONArray("friendRanking");
+//    for(int i = 0; i < jaFriendRanking.length(); i++)
+//    {
+//     jo = jaFriendRanking.getJSONObject(i);
+//     String userId = jo.getString("userId");
+//     String userName = jo.getString("displayName");
+//     if(!userName.contains("*"))
+//     {
+//      selfId = userId;
+//      FriendIdMap.putIdMap(selfId, "我");
+//      Log.recordLog("fuck ", userId);
+////      AntForestToast.show(userId);
+//      break;
+//     }
+//    }
+//   }else
+//   {
+//    Log.recordLog("fuck ", "not success");
+//    Log.recordLog(jo.getString("resultDesc"), s);
+//   }
+////   AntForestToast.show("Can't find UserId");
+//   Log.recordLog("fuck ", "not find id");
+//  }catch(Throwable t)
+//  {
+//   Log.i(TAG, "querySelfId err:");
+//   Log.printStackTrace(TAG, t);
+//  }
+// }
+
  private static void queryEnergyRanking(ClassLoader loader, String startPoint)
  {
   boolean hasMore = false;
@@ -59,6 +98,11 @@ public class AntForest
       boolean optBoolean = jo.getBoolean("canCollectEnergy")
        || jo.getBoolean("canHelpCollect") || jo.getLong("canCollectLaterTime") > 0;
       String userId = jo.getString("userId");
+      String userName = jo.getString("displayName");
+      if(!userName.contains("*")){
+       FriendIdMap.putIdMap(selfId, "我");
+       FriendIdMap.saveIdMap();
+      }
       if(optBoolean && !userId.equals(selfId))
       {
        canCollectEnergy(loader, userId, true);
@@ -85,13 +129,13 @@ public class AntForest
   try
   {
    long start = System.currentTimeMillis();
-   String s = AntForestRpcCall.rpcCall_queryNextAction(loader,FriendIdMap.getSelfId());
+   String s = AntForestRpcCall.rpcCall_queryNextAction(loader,selfId);
    long end = System.currentTimeMillis();
    if(s == null)
    {
     Thread.sleep(RandomUtils.delay());
     start = System.currentTimeMillis();
-    s = AntForestRpcCall.rpcCall_queryNextAction(loader, FriendIdMap.getSelfId());
+    s = AntForestRpcCall.rpcCall_queryNextAction(loader, selfId);
     end = System.currentTimeMillis();
    }
    JSONObject jo = new JSONObject(s);
@@ -527,9 +571,9 @@ public class AntForest
    @Override
    public void run()
    {
-    canCollectSelfEnergy(loader, times);
     if(Config.collectEnergy())
      queryEnergyRanking(loader, "1");
+    canCollectSelfEnergy(loader, times);
    }
   }.setData(loader, times).start();
  }

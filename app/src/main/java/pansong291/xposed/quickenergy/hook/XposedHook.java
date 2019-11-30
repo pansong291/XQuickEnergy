@@ -101,6 +101,7 @@ public class XposedHook implements IXposedHookLoadPackage
         {
          Config.shouldReload = true;
          Statistics.resetToday();
+//         AntForest.querySelfId(loader);
          AntForest.checkEnergyRanking(loader, times);
          AntCooperate.start(loader, times);
          AntFarm.start(loader);
