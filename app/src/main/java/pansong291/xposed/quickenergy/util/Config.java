@@ -28,7 +28,7 @@ public class Config
  public static final String
  /* application */
  jn_immediateEffect = "immediateEffect", jn_recordLog = "recordLog", jn_showToast = "showToast",
- jn_stayAwake = "stayAwake", jn_autoRestart = "autoRestart",
+ jn_stayAwake = "stayAwake", jn_autoRestart = "autoRestart", jn_xedgeproData = "xedgeproData",
  /* forest */
  jn_collectEnergy = "collectEnergy", jn_ReturnWater30 = "returnWater30", jn_ReturnWater20 = "returnWater20",
  jn_ReturnWater10 = "returnWater10", jn_helpFriendCollect = "helpFriendCollect", jn_dontCollectList = "dontCollectList",
@@ -57,6 +57,7 @@ public class Config
  private boolean showToast;
  private boolean stayAwake;
  private boolean autoRestart;
+ private String xedgeproData;
 
  /* forest */
  private boolean collectEnergy;
@@ -164,6 +165,17 @@ public class Config
  public static boolean autoRestart()
  {
   return getConfig().autoRestart;
+ }
+
+ public static void setXedgeproData(String s)
+ {
+  getConfig().xedgeproData = s;
+  hasChanged = true;
+ }
+
+ public static String xedgeproData()
+ {
+  return getConfig().xedgeproData;
  }
 
  /* forest */
@@ -595,6 +607,7 @@ public class Config
   c.showToast = true;
   c.stayAwake = true;
   c.autoRestart = true;
+  c.xedgeproData = "";
 
   c.collectEnergy = true;
   c.checkInterval = 120_000;
@@ -669,6 +682,9 @@ public class Config
 
    config.autoRestart = jo.optBoolean(jn_autoRestart, true);
    Log.i(TAG, jn_autoRestart + ":" + config.autoRestart);
+
+   config.xedgeproData = jo.optString(jn_xedgeproData, "");
+   Log.i(TAG, jn_xedgeproData + ":" + config.xedgeproData);
 
    /* forest */
    config.collectEnergy = jo.optBoolean(jn_collectEnergy, true);
@@ -918,6 +934,8 @@ public class Config
 
    jo.put(jn_autoRestart, config.autoRestart);
 
+   jo.put(jn_xedgeproData, config.xedgeproData);
+
    /* forest */
    jo.put(jn_collectEnergy, config.collectEnergy);
 
@@ -1047,7 +1065,7 @@ public class Config
   {
    Log.printStackTrace(TAG, t);
   }
-  return formatJson(jo, true);
+  return formatJson(jo, false);
  }
 
  public static String formatJson(JSONObject jo, boolean removeQuote)

@@ -92,8 +92,8 @@ public class CooperationIdMap
      for(String s: idSet)
      {
       Log.i(TAG, s);
-      String[] entry = s.split(":");
-      idMap.put(entry[0], entry[1]);
+      int ind = s.indexOf(":");
+      idMap.put(s.substring(0, ind), s.substring(ind + 1));
      }
     }catch(Throwable t)
     {

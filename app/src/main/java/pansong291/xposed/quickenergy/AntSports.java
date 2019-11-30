@@ -314,7 +314,7 @@ public class AntSports
     jo = jo.getJSONObject("dailyStepModel");
     int produceQuantity = jo.getInt("produceQuantity");
     int hour = Integer.parseInt(Log.getFormatTime().split(":")[0]);
-    if(produceQuantity > Config.minExchangeCount() || hour >= Config.latestExchangeTime())
+    if(produceQuantity >= Config.minExchangeCount() || hour >= Config.latestExchangeTime())
     {
      s = AntSportsRpcCall.rpcCall_exchange(loader, produceQuantity, 3);
      jo = new JSONObject(s);

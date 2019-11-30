@@ -6,7 +6,7 @@ public class AntMemberRpcCall
 {
  private static final String TAG = AntMemberRpcCall.class.getCanonicalName();
 
- private static final String appVersion = "2.0.0";
+ private static final String appVersion = "3.0.0";
 
  /* ant member point */
  public static String rpcCall_queryPointCert(ClassLoader loader, int page, int pageSize)

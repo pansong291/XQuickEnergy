@@ -84,14 +84,16 @@ public class AntForest
  {
   try
   {
+   while(FriendIdMap.currentUid == null || FriendIdMap.currentUid.isEmpty())
+    Thread.sleep(100);
    long start = System.currentTimeMillis();
-   String s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
+   String s = AntForestRpcCall.rpcCall_queryNextAction(loader, FriendIdMap.currentUid);
    long end = System.currentTimeMillis();
    if(s == null)
    {
     Thread.sleep(RandomUtils.delay());
     start = System.currentTimeMillis();
-    s = AntForestRpcCall.rpcCall_queryNextAction(loader, "");
+    s = AntForestRpcCall.rpcCall_queryNextAction(loader, FriendIdMap.currentUid);
     end = System.currentTimeMillis();
    }
    JSONObject jo = new JSONObject(s);
@@ -149,7 +151,8 @@ public class AntForest
      int waterCount = Config.getWaterCountList().get(i);
      if(waterCount <= 0) continue;
      if(waterCount > 3) waterCount = 3;
-     waterFriendEnergy(loader, uid, waterCount);
+     if(Statistics.canWaterFriendToday(uid, waterCount))
+      waterFriendEnergy(loader, uid, waterCount);
     }
     checkUnknownId(loader);
    }
@@ -348,7 +351,8 @@ public class AntForest
     String bizNo = jo.getString("bizNo");
     jo = jo.getJSONObject("userEnergy");
     String userName = jo.getString("displayName");
-    returnFriendWater(loader, userId, userName, bizNo, count);
+    count = returnFriendWater(loader, userId, userName, bizNo, count);
+    if(count > 0) Statistics.waterFriendToday(userId, count);
    }else
    {
     Log.recordLog(jo.getString("resultDesc"), s);
@@ -360,9 +364,10 @@ public class AntForest
   }
  }
 
- private static void returnFriendWater(ClassLoader loader, String userId, String userName, String bizNo, int count)
+ private static int returnFriendWater(ClassLoader loader, String userId, String userName, String bizNo, int count)
  {
-  if(bizNo == null || bizNo.isEmpty()) return;
+  if(bizNo == null || bizNo.isEmpty()) return 0;
+  int wateredTimes = 0;
   try
   {
    String s;
@@ -376,10 +381,12 @@ public class AntForest
     {
      s = jo.getJSONObject("treeEnergy").getString("currentEnergy");
      Log.forest("给【" + userName + "】浇水成功，剩余能量【" + s + "克】");
+     wateredTimes++;
      Statistics.addData(Statistics.DataType.WATERED, 10);
     }else if(s.equals("WATERING_TIMES_LIMIT"))
     {
      Log.recordLog("今日给【" + userName + "】浇水已达上限", "");
+     wateredTimes = 3;
      break;
     }else
     {
@@ -392,6 +399,7 @@ public class AntForest
    Log.i(TAG, "returnFriendWater err:");
    Log.printStackTrace(TAG, t);
   }
+  return wateredTimes;
  }
 
  private static void receiveTaskAward(ClassLoader loader)

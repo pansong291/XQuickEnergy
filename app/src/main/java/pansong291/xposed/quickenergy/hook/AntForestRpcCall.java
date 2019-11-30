@@ -25,13 +25,15 @@ public class AntForestRpcCall
  {
   try
   {
-   String args1 = "[{\"userId\":\"" + userId + "\"}]";
-   return RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryNextAction", args1);
+   String args1 = "[{\"canRobFlags\":\"F,F,F\",\"source\":\"_NO_SOURCE_\",\"userId\":\""
+    + userId + "\",\"version\":\"20181220\"}]";
+   String res = RpcCall.invoke(loader, "alipay.antmember.forest.h5.queryNextAction", args1);
 
 //   args1 = "[{\"av\":\"5\",\"ct\":\"android\",\"pageSize\":3,\"startIndex\":0,\"userId\":\""
-//    +userId+"\"}]";
+//    + userId + "\"}]";
 //   RpcCall.invoke(loader, "alipay.antmember.forest.h5.pageQueryDynamics", args1);
 
+   return res;
   }catch(Throwable t)
   {
    Log.i(TAG, "rpcCall_queryNextAction err:");
@@ -87,7 +89,7 @@ public class AntForestRpcCall
  {
   try
   {
-   String args1 = "[{\"version\":\"20190321\"}]"; // 
+   String args1 = "[{\"version\":\"20191010\"}]"; // 
    return RpcCall.invoke(loader, "alipay.antforest.forest.h5.queryTaskList", args1);
   }catch(Throwable t)
   {
