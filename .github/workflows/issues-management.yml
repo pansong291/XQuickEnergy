@@ -1,0 +1,31 @@
+name: issues managment
+on:
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+jobs:
+  close-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - id: check-issue
+        name: 'Check issue #${{ github.event.issue.number }}'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'check-issue'
+          title-includes: ${{ secrets.CLOSE_LOCK_ISSUE_TITLE_INCLUDES }}
+          body-includes: ${{ secrets.CLOSE_LOCK_ISSUE_TITLE_INCLUDES }}
+      - name: 'Update and close issue #${{ github.event.issue.number }}'
+        if: steps.check-issue.outputs.check-result == 'true'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'update-issue'
+          state: 'closed'
+          title: 'xxx'
+          body: 'xxx'
+          update-mode: 'replace'
+      - name: 'Lock issue #${{ github.event.issue.number }}'
+        if: steps.check-issue.outputs.check-result == 'true'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'lock-issue'
+          lock-reason: 'spam'
