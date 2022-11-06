@@ -1,0 +1,17 @@
+name: Lock Issue And Delete Comment
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created, edited]
+  workflow_dispatch:
+
+jobs:
+  lock-and-delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: lock issue and delete comment
+        uses: pansong291/issue-interceptor-action@v1.0
+        with:
+          test-regex: ${{ secrets.REGEX_ISSUE_INTERCEPTOR }}
