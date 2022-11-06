@@ -12,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: lock issue and delete comment
-        uses: pansong291/issue-interceptor-action@v1.0.1
+        uses: pansong291/issue-interceptor-action@main
         with:
           test-regex: ${{ secrets.REGEX_ISSUE_INTERCEPTOR }}
