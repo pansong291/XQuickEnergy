@@ -1,17 +1,29 @@
-name: Lock Issue And Delete Comment
-
+name: Android CI
 on:
-  issues:
-    types: [opened, edited, reopened]
-  issue_comment:
-    types: [created, edited]
-  workflow_dispatch:
-
+  release:
+    types: [published]
 jobs:
-  lock-and-delete:
+  build:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: lock issue and delete comment
-        uses: pansong291/issue-interceptor-action@main
+      - uses: actions/checkout@v3
         with:
-          test-regex: ${{ secrets.REGEX_ISSUE_INTERCEPTOR }}
+          fetch-depth: 0
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+      - name: Upload to Release Action
+        uses: Shopify/upload-to-release@v1.0.1
+        with:
+          name: app-${{ github.event.release.tag_name }}.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          repo-token: ${{ github.token }}
+          content-type: application/zip
